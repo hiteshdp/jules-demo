@@ -1,0 +1,43 @@
+# Cursor AI Rules for Hair Loss Diagnosis & Treatment Platform
+
+## Project Overview
+This is a complete Hair Loss Diagnosis & Treatment Platform built with Laravel 11 backend and React 19 frontend applications.
+
+## Code Standards
+- Use Laravel 11+ with proper Eloquent ORM and migrations
+- Use React 19+ with TypeScript and functional components
+- Follow PSR-12 coding standards for PHP
+- Use Tailwind CSS for styling
+- Implement proper error handling and validation
+
+## File Organization
+- Backend: Laravel 11 in root directory
+- Frontend: React apps in `frontend/` directory
+- Setup scripts: Shell scripts for Unix/Linux/macOS and batch files for Windows
+- Documentation: Comprehensive setup and usage guides
+
+## Prompt Tracking
+- Every significant prompt and response should be documented
+- Update `prompts.json` with prompt metadata
+- Create prompt files in `prompts/` directory when needed
+- Include prompt references in generated code comments
+
+## Development Workflow
+- Use the provided setup scripts for local development
+- Test all functionality before deployment
+- Maintain proper error handling and user feedback
+- Keep documentation updated with any changes
+
+## Key Features
+- Multi-role authentication (Patient, Dermatologist, Admin)
+- Hair loss assessment quiz with AI recommendations
+- Real-time chat between patients and dermatologists
+- Payment integration with Razorpay
+- Email notification system
+- Comprehensive admin panel
+
+## Setup Instructions
+- Use `setup-backend.bat` for Windows backend setup
+- Use `setup-patient.bat`, `setup-dermatologist.bat`, `setup-admin.bat` for frontend apps
+- Use `setup-all.bat` for complete platform setup
+- Follow the comprehensive `SETUP.md` guide for detailed instructions

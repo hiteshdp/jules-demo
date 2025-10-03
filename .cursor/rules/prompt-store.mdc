@@ -1,0 +1,35 @@
+---
+alwaysApply: true
+---
+
+# Cursor Prompt Governance and Versioning Rules
+
+## 1. Prompt Versioning & Storage
+- Every prompt executed must be saved as a markdown (`.md`) file inside `/prompts` folder.
+- The filename format should be: `<entity>_<operation>_v<version>.md` (e.g., `customer_crud_v2.md`).
+- Every prompt execution must update a centralized `prompts.json` file with entries including:
+  - `id`: unique prompt id (snake_case)
+  - `path`: relative path to the prompt file
+  - `used_in`: array of files or features that the prompt impacts
+  - `author`: prompt author name (user or AI)
+  - `date`: ISO 8601 format date of creation/update
+  - `user_prompt`: the original user prompt that triggered the response
+  - `prompt_type`: either "user_request" or "ai_response"
+
+## 2. Code Documentation & Comments
+- Every generated file must start with a comment:
+  ```php
+  <?php
+  // Generated via prompt: prompts/<prompt_file_name>
+  ```
+
+## 3. Automatic Prompt Tracking
+- When creating or modifying files, always create a corresponding prompt file
+- Update the prompts.json file with the new prompt entry
+- Include the prompt file reference in the generated code comment
+- Capture both user prompts and AI responses in the prompt file
+
+## 4. User Prompt Capture
+- Always include the original user prompt at the beginning of each prompt file
+- Format: "## User Prompt: [original user request]"
+- Follow with "## AI Response: [generated content]"

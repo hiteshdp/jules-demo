@@ -1,0 +1,153 @@
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { appointmentAPI } from '../api/appointmentAPI';
+
+interface Patient {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  patientProfile?: {
+    medical_history?: string;
+    allergies?: string;
+    current_medications?: string;
+    family_history?: string;
+  };
+}
+
+interface Appointment {
+  id: number;
+  patient_id: number;
+  dermatologist_id: number;
+  scheduled_at: string;
+  status: string;
+  notes?: string;
+  prescription?: string;
+  zoom_link?: string;
+  consultation_fee: number;
+  is_paid: boolean;
+  patient?: Patient;
+}
+
+interface AppointmentState {
+  appointments: Appointment[];
+  currentAppointment: Appointment | null;
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: AppointmentState = {
+  appointments: [],
+  currentAppointment: null,
+  loading: false,
+  error: null,
+};
+
+export const fetchAppointments = createAsyncThunk(
+  'appointment/fetchAppointments',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await appointmentAPI.getAppointments();
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch appointments');
+    }
+  }
+);
+
+export const fetchAppointment = createAsyncThunk(
+  'appointment/fetchAppointment',
+  async (appointmentId: number, { rejectWithValue }) => {
+    try {
+      const response = await appointmentAPI.getAppointment(appointmentId);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch appointment');
+    }
+  }
+);
+
+export const updateAppointmentStatus = createAsyncThunk(
+  'appointment/updateStatus',
+  async ({ appointmentId, status, notes, prescription }: { 
+    appointmentId: number; 
+    status: string; 
+    notes?: string; 
+    prescription?: string; 
+  }, { rejectWithValue }) => {
+    try {
+      const response = await appointmentAPI.updateAppointmentStatus(appointmentId, {
+        status,
+        notes,
+        prescription,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update appointment');
+    }
+  }
+);
+
+const appointmentSlice = createSlice({
+  name: 'appointment',
+  initialState,
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    setCurrentAppointment: (state, action: PayloadAction<Appointment | null>) => {
+      state.currentAppointment = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Fetch Appointments
+      .addCase(fetchAppointments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAppointments.fulfilled, (state, action: PayloadAction<Appointment[]>) => {
+        state.loading = false;
+        state.appointments = action.payload;
+      })
+      .addCase(fetchAppointments.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Single Appointment
+      .addCase(fetchAppointment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAppointment.fulfilled, (state, action: PayloadAction<Appointment>) => {
+        state.loading = false;
+        state.currentAppointment = action.payload;
+      })
+      .addCase(fetchAppointment.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Update Appointment Status
+      .addCase(updateAppointmentStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateAppointmentStatus.fulfilled, (state, action: PayloadAction<Appointment>) => {
+        state.loading = false;
+        const updatedAppointment = action.payload;
+        const index = state.appointments.findIndex(apt => apt.id === updatedAppointment.id);
+        if (index !== -1) {
+          state.appointments[index] = updatedAppointment;
+        }
+        if (state.currentAppointment?.id === updatedAppointment.id) {
+          state.currentAppointment = updatedAppointment;
+        }
+      })
+      .addCase(updateAppointmentStatus.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+export const { clearError, setCurrentAppointment } = appointmentSlice.actions;
+export default appointmentSlice.reducer;

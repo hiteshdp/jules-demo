@@ -1,0 +1,28 @@
+// Generated via prompt: prompts/react19_full_compatibility_fix_v1.md
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 3001,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  build: {
+    outDir: 'build',
+    sourcemap: true,
+  },
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
+})

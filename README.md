@@ -1,92 +1,252 @@
-# Laravel-hair_skin_health
+# Hair Loss Diagnosis & Treatment Platform
 
+A comprehensive full-stack platform for hair loss diagnosis and treatment, built with Laravel 11 backend and React.js 19 frontend.
 
+## Features
 
-## Getting started
+### Patient Portal
+- User registration and authentication
+- Comprehensive hair loss quiz with multiple question types
+- Personalized recommendations based on quiz responses
+- Appointment booking with dermatologists
+- Product catalog with categories and filtering
+- Profile management with medical history
+- Real-time chat with dermatologists
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### Dermatologist Portal
+- Professional dashboard
+- Patient appointment management
+- Chat functionality with patients
+- Patient history and quiz response viewing
+- Prescription and notes management
+- Payment history tracking
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### Admin Panel
+- User management (patients and dermatologists)
+- Appointment oversight
+- Product catalog management
+- Payment and subscription management
+- Analytics dashboard
+- System settings configuration
 
-## Add your files
+## Technology Stack
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Backend
+- **Laravel 11** - PHP framework
+- **MySQL** - Database
+- **Laravel Sanctum** - API authentication
+- **Razorpay** - Payment gateway integration
+- **Zoom SDK** - Video consultation integration
 
-```
-cd existing_repo
-git remote add origin http://git-web.webline.local/hair_skin_health/laravel-hair_skin_health.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](http://git-web.webline.local/hair_skin_health/laravel-hair_skin_health/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Frontend
+- **React 19** - Frontend framework
+- **TypeScript** - Type safety
+- **Redux Toolkit** - State management
+- **Tailwind CSS** - Styling
+- **React Router v6** - Routing
+- **Headless UI** - Accessible components
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Prerequisites
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- MySQL 8.0+
+- Git
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Backend Setup
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd hair_skin_health
+   ```
+
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
+
+3. **Environment configuration**
+   ```bash
+   cp env.example .env
+   php artisan key:generate
+   ```
+
+4. **Database setup**
+   ```bash
+   # Update .env with your database credentials
+   php artisan migrate
+   php artisan db:seed
+   ```
+
+5. **Start the server**
+   ```bash
+   php artisan serve
+   ```
+
+### Frontend Setup
+
+1. **Navigate to patient app**
+   ```bash
+   cd frontend/patient
+   npm install
+   ```
+
+2. **Start development server**
+   ```bash
+   npm start
+   ```
+
+3. **Access the application**
+   - Patient Portal: http://localhost:3000
+   - API: http://localhost:8000
+
+## Environment Variables
+
+### Backend (.env)
+```env
+APP_NAME="Hair Skin Health"
+APP_ENV=local
+APP_KEY=your-app-key
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=hair_skin_health
+DB_USERNAME=root
+DB_PASSWORD=your-password
+
+# Razorpay Configuration
+RAZORPAY_KEY_ID=your-razorpay-key-id
+RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+
+# Zoom SDK Configuration
+ZOOM_API_KEY=your-zoom-api-key
+ZOOM_API_SECRET=your-zoom-api-secret
+
+# OpenAI Configuration
+OPENAI_API_KEY=your-openai-api-key
+
+# Frontend URLs
+FRONTEND_PATIENT_URL=http://localhost:3000
+FRONTEND_DERMATOLOGIST_URL=http://localhost:3001
+FRONTEND_ADMIN_URL=http://localhost:3002
+```
+
+### Frontend (.env)
+```env
+REACT_APP_API_URL=http://localhost:8000/api
+```
+
+## Database Schema
+
+### Core Tables
+- `users` - User accounts with role-based access
+- `patient_profiles` - Patient medical history and lifestyle
+- `dermatologists` - Dermatologist credentials and availability
+- `hair_loss_quiz_questions` - Quiz questions and options
+- `hair_loss_quiz_responses` - User quiz responses
+- `products` - Product catalog
+- `subscriptions` - User subscription plans
+- `appointments` - Consultation appointments
+- `payments` - Payment records
+- `notifications` - Email notifications
+- `admin_settings` - System configuration
+
+## API Endpoints
+
+### Authentication
+- `POST /api/register` - User registration
+- `POST /api/login` - User login
+- `POST /api/logout` - User logout
+- `GET /api/me` - Get current user
+
+### Patient Routes
+- `GET /api/patient/profile` - Get patient profile
+- `PUT /api/patient/profile` - Update patient profile
+- `GET /api/patient/quiz/questions` - Get quiz questions
+- `POST /api/patient/quiz/submit` - Submit quiz responses
+- `GET /api/patient/recommendations` - Get recommendations
+- `GET /api/patient/dermatologists` - Get available dermatologists
+- `POST /api/patient/appointments` - Book appointment
+- `GET /api/patient/appointments` - Get patient appointments
+- `GET /api/patient/products` - Get products catalog
+
+### Dermatologist Routes
+- `GET /api/dermatologist/profile` - Get dermatologist profile
+- `PUT /api/dermatologist/profile` - Update dermatologist profile
+- `GET /api/dermatologist/appointments` - Get assigned appointments
+- `GET /api/dermatologist/appointments/{id}` - Get appointment details
+- `PUT /api/dermatologist/appointments/{id}/status` - Update appointment status
+- `POST /api/dermatologist/appointments/{id}/messages` - Send chat message
+- `GET /api/dermatologist/appointments/{id}/messages` - Get chat messages
+
+### Admin Routes
+- `GET /api/admin/dashboard` - Get dashboard statistics
+- `GET /api/admin/patients` - Get all patients
+- `GET /api/admin/dermatologists` - Get all dermatologists
+- `POST /api/admin/dermatologists` - Create dermatologist
+- `GET /api/admin/appointments` - Get all appointments
+- `GET /api/admin/products` - Get all products
+- `POST /api/admin/products` - Create product
+- `PUT /api/admin/products/{id}` - Update product
+- `GET /api/admin/settings` - Get system settings
+- `PUT /api/admin/settings` - Update system settings
+
+## Development
+
+### Running Tests
+```bash
+# Backend tests
+php artisan test
+
+# Frontend tests
+cd frontend/patient
+npm test
+```
+
+### Code Style
+```bash
+# Backend
+./vendor/bin/pint
+
+# Frontend
+npm run lint
+```
+
+## Deployment
+
+### Backend Deployment
+1. Set up production environment variables
+2. Run database migrations
+3. Configure web server (Nginx/Apache)
+4. Set up SSL certificates
+5. Configure queue workers for background jobs
+
+### Frontend Deployment
+1. Build production assets
+   ```bash
+   npm run build
+   ```
+2. Deploy to CDN or static hosting
+3. Configure environment variables
 
 ## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+This project is licensed under the MIT License.
+
+## Support
+
+For support and questions, please contact the development team or create an issue in the repository.

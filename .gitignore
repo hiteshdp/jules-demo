@@ -1,0 +1,56 @@
+# =========================================
+# Laravel
+# =========================================
+/vendor/
+/.env
+/.env.*
+/storage/*.key
+/public/storage
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/bootstrap/cache/*
+
+# Ignore compiled assets
+/public/hot
+/public/storage
+/public/mix-manifest.json
+
+# =========================================
+# Node & React (multiple frontends)
+# =========================================
+# General Node stuff
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Build / Dist outputs
+build/
+dist/
+
+# Each frontend folder exclusions
+/frontend/**/node_modules/
+/frontend/**/build/
+/frontend/**/dist/
+/frontend/**/.env.local
+/frontend/**/.env.development.local
+/frontend/**/.env.test.local
+/frontend/**/.env.production.local
+
+# =========================================
+# System / Editor
+# =========================================
+/.idea/
+/.vscode/
+/*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# =========================================
+# Optional: lock files (if you don’t want to commit them)
+# Comment these out if you prefer to keep them
+# composer.lock
+# package-lock.json
+# yarn.lock
