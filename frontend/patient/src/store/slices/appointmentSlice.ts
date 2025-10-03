@@ -32,6 +32,8 @@ interface AppointmentState {
   dermatologists: Dermatologist[];
   loading: boolean;
   error: string | null;
+  appointmentsLoaded: boolean;
+  dermatologistsLoaded: boolean;
 }
 
 const initialState: AppointmentState = {
@@ -39,11 +41,19 @@ const initialState: AppointmentState = {
   dermatologists: [],
   loading: false,
   error: null,
+  appointmentsLoaded: false,
+  dermatologistsLoaded: false,
 };
 
 export const fetchAppointments = createAsyncThunk(
   'appointment/fetchAppointments',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState() as { appointment: AppointmentState };
+    // Skip if already loaded
+    if (state.appointment.appointmentsLoaded) {
+      return state.appointment.appointments;
+    }
+    
     try {
       const response = await appointmentAPI.getAppointments();
       // Extract appointments array from the API response
@@ -56,7 +66,13 @@ export const fetchAppointments = createAsyncThunk(
 
 export const fetchDermatologists = createAsyncThunk(
   'appointment/fetchDermatologists',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState() as { appointment: AppointmentState };
+    // Skip if already loaded
+    if (state.appointment.dermatologistsLoaded) {
+      return state.appointment.dermatologists;
+    }
+    
     try {
       const response = await appointmentAPI.getDermatologists();
       // Extract dermatologists array from the API response
@@ -98,6 +114,7 @@ const appointmentSlice = createSlice({
       .addCase(fetchAppointments.fulfilled, (state, action: PayloadAction<Appointment[]>) => {
         state.loading = false;
         state.appointments = Array.isArray(action.payload) ? action.payload : [];
+        state.appointmentsLoaded = true;
       })
       .addCase(fetchAppointments.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -112,7 +129,8 @@ const appointmentSlice = createSlice({
       })
       .addCase(fetchDermatologists.fulfilled, (state, action: PayloadAction<Dermatologist[]>) => {
         state.loading = false;
-        state.dermatologists = action.payload;
+        state.dermatologists = Array.isArray(action.payload) ? action.payload : [];
+        state.dermatologistsLoaded = true;
       })
       .addCase(fetchDermatologists.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;

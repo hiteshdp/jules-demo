@@ -10,13 +10,15 @@ const Layout = () => {
   const dispatch = useDispatch<AppDispatch>();
   // const navigate = useNavigate(); // TODO: Will be used for navigation logic
   // const location = useLocation(); // TODO: Will be used for route-based logic
-  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, loading, user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    // Only call getMe if we have a token, are authenticated, not already loading, and haven't loaded user data yet
+    const token = localStorage.getItem('token');
+    if (token && isAuthenticated && !loading && !user) {
       dispatch(getMe());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, isAuthenticated, loading, user]); // Include necessary dependencies but with guards
 
   if (loading) {
     return (

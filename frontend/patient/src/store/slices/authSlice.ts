@@ -19,6 +19,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  userLoaded: boolean;
 }
 
 const initialState: AuthState = {
@@ -27,6 +28,7 @@ const initialState: AuthState = {
   isAuthenticated: !!localStorage.getItem('token'),
   loading: false,
   error: null,
+  userLoaded: false,
 };
 
 export const login = createAsyncThunk(
@@ -57,7 +59,19 @@ export const register = createAsyncThunk(
 
 export const getMe = createAsyncThunk(
   'auth/getMe',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState() as { auth: AuthState };
+    // Skip if already loaded
+    if (state.auth.userLoaded) {
+      return state.auth.user;
+    }
+    
+    // Check if we have a token
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return rejectWithValue('No authentication token found');
+    }
+    
     try {
       const response = await authAPI.getMe();
       return response.data.data;
@@ -97,14 +111,29 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
-        state.error = null;
+        // Safely access payload properties
+        if (action.payload && action.payload.user && action.payload.token) {
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+          state.isAuthenticated = true;
+          state.userLoaded = true;
+          state.error = null;
+        } else {
+          // Handle malformed response
+          state.user = null;
+          state.token = null;
+          state.isAuthenticated = false;
+          state.userLoaded = false;
+          state.error = 'Invalid response from server';
+        }
       })
       .addCase(login.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.userLoaded = false;
+        state.error = action.payload || 'Login failed';
       })
       // Register
       .addCase(register.pending, (state) => {
@@ -113,14 +142,29 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
-        state.error = null;
+        // Safely access payload properties
+        if (action.payload && action.payload.user && action.payload.token) {
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+          state.isAuthenticated = true;
+          state.userLoaded = true;
+          state.error = null;
+        } else {
+          // Handle malformed response
+          state.user = null;
+          state.token = null;
+          state.isAuthenticated = false;
+          state.userLoaded = false;
+          state.error = 'Invalid response from server';
+        }
       })
       .addCase(register.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.userLoaded = false;
+        state.error = action.payload || 'Registration failed';
       })
       // Get Me
       .addCase(getMe.pending, (state) => {
@@ -128,15 +172,30 @@ const authSlice = createSlice({
       })
       .addCase(getMe.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.isAuthenticated = true;
+        // Safely access payload properties
+        if (action.payload && action.payload.user) {
+          state.user = action.payload.user;
+          state.isAuthenticated = true;
+          state.userLoaded = true;
+          state.error = null;
+        } else {
+          // Handle malformed response or unauthenticated
+          state.user = null;
+          state.isAuthenticated = false;
+          state.userLoaded = false;
+          state.token = null;
+          localStorage.removeItem('token');
+          state.error = 'User not authenticated';
+        }
       })
-      .addCase(getMe.rejected, (state) => {
+      .addCase(getMe.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
+        state.userLoaded = false;
         localStorage.removeItem('token');
+        state.error = action.payload || 'Failed to get user data';
       })
       // Logout
       .addCase(logout.fulfilled, (state) => {

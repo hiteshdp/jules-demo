@@ -17,9 +17,12 @@ const Dashboard = () => {
   const { isSubmitted } = useSelector((state: RootState) => state.quiz);
 
   useEffect(() => {
-    dispatch(fetchAppointments());
-    dispatch(fetchQuestions());
-  }, [dispatch]);
+    // Only fetch data if user is authenticated
+    if (user) {
+      dispatch(fetchAppointments());
+      dispatch(fetchQuestions());
+    }
+  }, [dispatch, user]);
 
   const upcomingAppointments = (Array.isArray(appointments) ? appointments : []).filter(
     appointment => new Date(appointment.scheduled_at) > new Date()
@@ -53,7 +56,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          Welcome back, {user?.name}!
+          Welcome back, {user?.name || 'User'}!
         </h1>
         <p className="mt-1 text-sm text-gray-500">
           Here's what's happening with your hair health journey.

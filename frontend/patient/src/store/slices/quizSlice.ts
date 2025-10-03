@@ -21,6 +21,7 @@ interface QuizState {
   loading: boolean;
   error: string | null;
   isSubmitted: boolean;
+  questionsLoaded: boolean;
 }
 
 const initialState: QuizState = {
@@ -29,11 +30,18 @@ const initialState: QuizState = {
   loading: false,
   error: null,
   isSubmitted: false,
+  questionsLoaded: false,
 };
 
 export const fetchQuestions = createAsyncThunk(
   'quiz/fetchQuestions',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState() as { quiz: QuizState };
+    // Skip if already loaded
+    if (state.quiz.questionsLoaded) {
+      return state.quiz.questions;
+    }
+    
     try {
       const response = await quizAPI.getQuestions();
       // Extract questions array from the API response
@@ -88,6 +96,7 @@ const quizSlice = createSlice({
       .addCase(fetchQuestions.fulfilled, (state, action: PayloadAction<QuizQuestion[]>) => {
         state.loading = false;
         state.questions = Array.isArray(action.payload) ? action.payload : [];
+        state.questionsLoaded = true;
       })
       .addCase(fetchQuestions.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
