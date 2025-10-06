@@ -1,140 +1,135 @@
 #!/bin/bash
 
-# Hair Loss Diagnosis & Treatment Platform - Admin Frontend Setup Script
-# This script sets up the React 19 admin frontend application
+# Hair Loss Diagnosis & Treatment Platform - Complete Setup Script
+# Sets up: Backend, Patient Frontend, Dermatologist Frontend, Admin Frontend
 
-set -e  # Exit on any error
+set -e
 
-echo "🚀 Setting up Hair Loss Diagnosis & Treatment Platform - Admin Frontend"
-echo "======================================================================="
+echo "🚀 Starting Complete Platform Setup"
+echo "==================================================================="
 
-# Colors for output
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+PURPLE='\033[0;35m'
+NC='\033[0m'
 
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+print_status()  { echo -e "${BLUE}[INFO]${NC} $1"; }
+print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
+print_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
+print_header()  { echo -e "${PURPLE}[SETUP]${NC} $1"; }
+
+# --- Root checks
+if [ ! -f "composer.json" ]; then
+    print_error "composer.json not found. Run from project root."
+    exit 1
+fi
+if [ ! -d "frontend" ]; then
+    print_error "frontend directory not found. Run from project root."
+    exit 1
+fi
+
+# --- Dependencies
+print_status "Checking system dependencies..."
+command -v php      >/dev/null || { print_error "PHP not installed. Install PHP 8.2+"; exit 1; }
+command -v composer >/dev/null || { print_error "Composer not installed. Install from https://getcomposer.org/"; exit 1; }
+command -v node     >/dev/null || { print_error "Node.js not installed. Install Node.js 18+"; exit 1; }
+command -v npm      >/dev/null || { print_error "npm not installed."; exit 1; }
+print_success "All system dependencies found"
+
+# --- Run module setup
+run_setup() {
+    local script=$1
+    local module=$2
+    if [ -f "$script" ]; then
+        chmod +x "$script"
+        print_status "Launching $module..."
+        "./$script" &
+    else
+        print_error "Setup script $script not found"
+    fi
 }
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+# --- Wait for backend
+wait_for_backend() {
+    local url="http://localhost:8000/api/me"
+    local attempt=1
+    local max_attempts=30
+    print_status "Waiting for Backend to be ready..."
+    until curl -s "$url" >/dev/null 2>&1; do
+        if [ $attempt -ge $max_attempts ]; then
+            print_warning "Backend may not be ready yet. Please check manually."
+            return 1
+        fi
+        echo "[INFO] Backend not ready yet, waiting... ($attempt/$max_attempts)"
+        sleep 5
+        attempt=$((attempt + 1))
+    done
+    print_success "Backend is ready!"
 }
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+# --- Cleanup on Ctrl+C
+cleanup() {
+    print_status "Stopping all background services..."
+    jobs -p | xargs -r kill
+    exit 0
 }
+trap cleanup SIGINT SIGTERM
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check if we're in the project root directory
-if [ ! -d "frontend/admin" ]; then
-    print_error "frontend/admin directory not found. Please run this script from the project root directory."
-    exit 1
-fi
-
-# Change to admin frontend directory
-cd frontend/admin
-
-# Check for required dependencies
-print_status "Checking dependencies..."
-
-# Check Node.js
-if ! command -v node &> /dev/null; then
-    print_error "Node.js is not installed. Please install Node.js 18 or higher from https://nodejs.org/"
-    exit 1
-fi
-
-NODE_VERSION=$(node --version | sed 's/v//')
-NODE_MAJOR_VERSION=$(echo $NODE_VERSION | cut -d. -f1)
-if [ "$NODE_MAJOR_VERSION" -lt 18 ]; then
-    print_error "Node.js version $NODE_VERSION is too old. Please install Node.js 18 or higher."
-    exit 1
-fi
-
-print_success "Node.js $NODE_VERSION found"
-
-# Check npm
-if ! command -v npm &> /dev/null; then
-    print_error "npm is not installed. Please install npm."
-    exit 1
-fi
-
-NPM_VERSION=$(npm --version)
-print_success "npm $NPM_VERSION found"
-
-# Check if package.json exists
-if [ ! -f "package.json" ]; then
-    print_error "package.json not found in frontend/admin directory"
-    exit 1
-fi
-
-# Install dependencies
-print_status "Installing Node.js dependencies..."
-npm install
-
-if [ $? -eq 0 ]; then
-    print_success "Node.js dependencies installed successfully"
-else
-    print_error "Failed to install Node.js dependencies"
-    exit 1
-fi
-
-# Create environment file if it doesn't exist
-if [ ! -f ".env" ]; then
-    print_status "Creating .env file..."
-    cat > .env << EOF
-# React App Environment Variables
-REACT_APP_API_URL=http://localhost:8000/api
-REACT_APP_APP_NAME=Hair Skin Health - Admin Panel
-REACT_APP_VERSION=1.0.0
-EOF
-    print_success ".env file created"
-else
-    print_warning ".env file already exists, skipping creation"
-fi
-
-# Check if backend is running
-print_status "Checking if backend is running..."
-if curl -s http://localhost:8000/api/me > /dev/null 2>&1; then
-    print_success "Backend is running and accessible"
-else
-    print_warning "Backend is not running or not accessible at http://localhost:8000"
-    print_warning "Please start the backend first by running: ./setup-backend.sh"
-    print_warning "The frontend will still start but API calls may fail."
-fi
-
-# Build the application for production check
-print_status "Building application for production check..."
-npm run build
-
-if [ $? -eq 0 ]; then
-    print_success "Application builds successfully"
-else
-    print_error "Application build failed"
-    exit 1
-fi
-
-# Display setup completion
+# --- Setup flow
 echo ""
-echo "======================================================================="
-print_success "Admin frontend setup completed successfully!"
-echo "======================================================================="
+print_header "Step 1/4: Setting up Laravel Backend"
+run_setup "setup-backend.sh" "Backend"
+wait_for_backend
+
 echo ""
-print_status "Application will be available at: http://localhost:3002"
-print_status "Make sure the backend is running at: http://localhost:8000"
+print_header "Step 2/4: Setting up Patient Frontend"
+run_setup "setup-patient.sh" "Patient Frontend"
+
 echo ""
-print_status "Default test credentials:"
-echo "  Email: admin@hairskinhealth.com"
-echo "  Password: password"
+print_header "Step 3/4: Setting up Dermatologist Frontend"
+run_setup "setup-dermatologist.sh" "Dermatologist Frontend"
+
 echo ""
-print_warning "Press Ctrl+C to stop the development server"
+print_header "Step 4/4: Setting up Admin Frontend"
+run_setup "setup-admin.sh" "Admin Frontend"
+
+sleep 10
+
+# --- Final info
+echo ""
+echo "==================================================================="
+print_success "All modules setup completed!"
+echo "==================================================================="
+echo ""
+print_status "Platform URLs:"
+echo "  🌐 Backend API:          http://localhost:8000"
+echo "  👤 Patient Portal:       http://localhost:3000"
+echo "  👨‍⚕️ Dermatologist Portal: http://localhost:3001"
+echo "  ⚙️  Admin Panel:          http://localhost:3002"
+echo ""
+print_status "Default Test Credentials:"
+echo "  Patient:        patient@hairskinhealth.com / password"
+echo "  Dermatologist:  dermatologist@hairskinhealth.com / password"
+echo "  Admin:          admin@hairskinhealth.com / password"
+echo ""
+print_status "All services are running in background."
+print_status "Press Ctrl+C to stop all services."
+echo ""
+print_warning "Note: If any service fails, run its individual script:"
+print_warning "  ./setup-backend.sh"
+print_warning "  ./setup-patient.sh"
+print_warning "  ./setup-dermatologist.sh"
+print_warning "  ./setup-admin.sh"
 echo ""
 
-# Start the React development server on port 3002
-PORT=3002 npm start
+# Keep monitoring backend
+while true; do
+    sleep 30
+    if ! curl -s http://localhost:8000/api/me >/dev/null 2>&1; then
+        print_warning "Backend service appears to be down"
+    fi
+done

@@ -3,36 +3,24 @@
 # Hair Loss Diagnosis & Treatment Platform - Dermatologist Frontend Setup Script
 # This script sets up the React 19 dermatologist frontend application
 
-set -e  # Exit on any error
+set -e  # Exit on any critical error
 
 echo "🚀 Setting up Hair Loss Diagnosis & Treatment Platform - Dermatologist Frontend"
 echo "==============================================================================="
 
-# Colors for output
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
+print_status()  { echo -e "${BLUE}[INFO]${NC} $1"; }
+print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
+print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
+print_error()   { echo -e "${RED}[ERROR]${NC} $1"; }
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check if we're in the project root directory
+# --- Root check
 if [ ! -d "frontend/dermatologist" ]; then
     print_error "frontend/dermatologist directory not found. Please run this script from the project root directory."
     exit 1
@@ -41,51 +29,46 @@ fi
 # Change to dermatologist frontend directory
 cd frontend/dermatologist
 
-# Check for required dependencies
+# --- Dependencies
 print_status "Checking dependencies..."
 
-# Check Node.js
-if ! command -v node &> /dev/null; then
+# Node.js check
+if ! command -v node &>/dev/null; then
     print_error "Node.js is not installed. Please install Node.js 18 or higher from https://nodejs.org/"
     exit 1
 fi
-
 NODE_VERSION=$(node --version | sed 's/v//')
-NODE_MAJOR_VERSION=$(echo $NODE_VERSION | cut -d. -f1)
-if [ "$NODE_MAJOR_VERSION" -lt 18 ]; then
+NODE_MAJOR=$(echo "$NODE_VERSION" | cut -d. -f1)
+if [ "$NODE_MAJOR" -lt 18 ]; then
     print_error "Node.js version $NODE_VERSION is too old. Please install Node.js 18 or higher."
     exit 1
 fi
-
 print_success "Node.js $NODE_VERSION found"
 
-# Check npm
-if ! command -v npm &> /dev/null; then
+# npm check
+if ! command -v npm &>/dev/null; then
     print_error "npm is not installed. Please install npm."
     exit 1
 fi
-
 NPM_VERSION=$(npm --version)
 print_success "npm $NPM_VERSION found"
 
-# Check if package.json exists
+# package.json check
 if [ ! -f "package.json" ]; then
     print_error "package.json not found in frontend/dermatologist directory"
     exit 1
 fi
 
-# Install dependencies
+# --- Install dependencies
 print_status "Installing Node.js dependencies..."
-npm install
-
-if [ $? -eq 0 ]; then
+if npm install; then
     print_success "Node.js dependencies installed successfully"
 else
     print_error "Failed to install Node.js dependencies"
     exit 1
 fi
 
-# Create environment file if it doesn't exist
+# --- Environment file
 if [ ! -f ".env" ]; then
     print_status "Creating .env file..."
     cat > .env << EOF
@@ -99,9 +82,9 @@ else
     print_warning ".env file already exists, skipping creation"
 fi
 
-# Check if backend is running
+# --- Backend check
 print_status "Checking if backend is running..."
-if curl -s http://localhost:8000/api/me > /dev/null 2>&1; then
+if curl -s http://localhost:8000/api/me >/dev/null 2>&1; then
     print_success "Backend is running and accessible"
 else
     print_warning "Backend is not running or not accessible at http://localhost:8000"
@@ -109,18 +92,16 @@ else
     print_warning "The frontend will still start but API calls may fail."
 fi
 
-# Build the application for production check
+# --- Build test
 print_status "Building application for production check..."
-npm run build
-
-if [ $? -eq 0 ]; then
+if npm run build; then
     print_success "Application builds successfully"
 else
     print_error "Application build failed"
     exit 1
 fi
 
-# Display setup completion
+# --- Completion
 echo ""
 echo "==============================================================================="
 print_success "Dermatologist frontend setup completed successfully!"
@@ -136,5 +117,5 @@ echo ""
 print_warning "Press Ctrl+C to stop the development server"
 echo ""
 
-# Start the React development server on port 3001
+# --- Start React dev server on port 3001
 PORT=3001 npm start
