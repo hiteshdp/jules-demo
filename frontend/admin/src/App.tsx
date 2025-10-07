@@ -18,12 +18,13 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Routes>
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
+        {/* <Route path="/login" element={ !isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} /> */}
+        <Route path="/login" element={<Login />} />
         
         <Route path="/" element={
           <ProtectedRoute>
             <Layout />
-          </ProtectedRoute>
+         </ProtectedRoute>
         }>
           <Route index element={<Navigate to="/dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />

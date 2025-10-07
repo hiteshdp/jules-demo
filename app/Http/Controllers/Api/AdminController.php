@@ -41,9 +41,9 @@ class AdminController extends Controller
 
         // Monthly appointments trend
         $monthlyAppointments = Appointment::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+            DB::raw('COUNT(*) as count')
+        )
             ->where('created_at', '>=', now()->subMonths(12))
             ->groupBy('month')
             ->orderBy('month')
@@ -51,9 +51,9 @@ class AdminController extends Controller
 
         // Monthly revenue trend
         $monthlyRevenue = Payment::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('SUM(amount) as total')
-            )
+            DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+            DB::raw('SUM(amount) as total')
+        )
             ->where('status', 'completed')
             ->where('created_at', '>=', now()->subMonths(12))
             ->groupBy('month')

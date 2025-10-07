@@ -1,62 +1,66 @@
+// Generated via prompt: prompts/antd_admin_full_conversion_v1.md
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Layout, Menu, Typography } from 'antd';
 import {
-  HomeIcon,
-  UserGroupIcon,
-  UserIcon,
-  CalendarDaysIcon,
-  ShoppingBagIcon,
-  CurrencyDollarIcon,
-  CogIcon,
-} from '@heroicons/react/24/outline';
+  DashboardOutlined,
+  UserOutlined,
+  TeamOutlined,
+  CalendarOutlined,
+  ShoppingOutlined,
+  DollarOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
+
+const { Sider } = Layout;
+const { Title } = Typography;
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Patients', href: '/patients', icon: UserGroupIcon },
-  { name: 'Dermatologists', href: '/dermatologists', icon: UserIcon },
-  { name: 'Appointments', href: '/appointments', icon: CalendarDaysIcon },
-  { name: 'Products', href: '/products', icon: ShoppingBagIcon },
-  { name: 'Payments', href: '/payments', icon: CurrencyDollarIcon },
-  { name: 'Settings', href: '/settings', icon: CogIcon },
+  { key: '/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
+  { key: '/patients', label: 'Patients', icon: <TeamOutlined /> },
+  { key: '/dermatologists', label: 'Dermatologists', icon: <UserOutlined /> },
+  { key: '/appointments', label: 'Appointments', icon: <CalendarOutlined /> },
+  { key: '/products', label: 'Products', icon: <ShoppingOutlined /> },
+  { key: '/payments', label: 'Payments', icon: <DollarOutlined /> },
+  { key: '/settings', label: 'Settings', icon: <SettingOutlined /> },
 ];
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
 
+  const handleMenuClick = ({ key }: { key: string }) => {
+    navigate(key);
+  };
+
   return (
-    <div className="hidden md:flex md:w-64 md:flex-col">
-      <div className="flex flex-col flex-grow pt-5 bg-white overflow-y-auto border-r border-gray-200">
-        <div className="flex items-center flex-shrink-0 px-4">
-          <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-        </div>
-        <div className="mt-5 flex-grow flex flex-col">
-          <nav className="flex-1 px-2 space-y-1">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <NavLink
-                  key={item.name}
-                  to={item.href}
-                  className={`${
-                    isActive
-                      ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  } group flex items-center px-2 py-2 text-sm font-medium rounded-md border-l-4`}
-                >
-                  <item.icon
-                    className={`${
-                      isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'
-                    } mr-3 flex-shrink-0 h-6 w-6`}
-                    aria-hidden="true"
-                  />
-                  {item.name}
-                </NavLink>
-              );
-            })}
-          </nav>
-        </div>
+    <Sider
+      width={256}
+      style={{
+        background: '#fff',
+        borderRight: '1px solid #f0f0f0',
+      }}
+    >
+      <div style={{ 
+        padding: '24px 16px 16px', 
+        borderBottom: '1px solid #f0f0f0',
+        textAlign: 'center' 
+      }}>
+        <Title level={4} style={{ margin: 0, color: '#1890ff' }}>
+          Admin Panel
+        </Title>
       </div>
-    </div>
+      <Menu
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        items={navigation}
+        onClick={handleMenuClick}
+        style={{
+          border: 'none',
+          background: '#fff',
+        }}
+      />
+    </Sider>
   );
 };
 

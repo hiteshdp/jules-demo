@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\DermatologistController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
-use App\Http\Controllers\Api\PatientController;
+// use App\Http\Controllers\Api\PatientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,12 +42,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index']);
         Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
         Route::post('/appointments', [AppointmentController::class, 'store']);
-        
+
         // Quiz
         Route::get('/quiz/questions', [QuizController::class, 'questions']);
         Route::post('/quiz/submit', [QuizController::class, 'submit']);
         Route::get('/quiz/responses', [QuizController::class, 'responses']);
-        
+
         // Dermatologists
         Route::get('/dermatologists', [PatientController::class, 'getDermatologists']);
     });
@@ -54,10 +56,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('dermatologist')->group(function () {
         // Authentication
         Route::get('/me', [DermatologistAuthController::class, 'me']);
-        
+
         // Appointments
         Route::get('/appointments', [DermatologistAppointmentController::class, 'index']);
         Route::get('/appointments/{id}', [DermatologistAppointmentController::class, 'show']);
         Route::put('/appointments/{id}/status', [DermatologistAppointmentController::class, 'updateStatus']);
+    });
+
+    // Admin routes (protected by auth:sanctum above)
+    Route::prefix('admin')->group(function () {
+        // Patient management CRUD
+        Route::apiResource('patients', PatientController::class);
+
+        // Dermatologist management CRUD
+        Route::apiResource('dermatologists', DermatologistController::class);
     });
 });

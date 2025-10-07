@@ -11,6 +11,44 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 
 /**
+ * @OA\Schema(
+ *     schema="QuizQuestion",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="question", type="string", example="Do you experience hair loss?"),
+ *     @OA\Property(property="type", type="string", enum={"multiple_choice","text","yes_no"}, example="yes_no"),
+ *     @OA\Property(property="order", type="integer", example=1),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="QuizResponse",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="user_id", type="integer", example=1),
+ *     @OA\Property(property="question_id", type="integer", example=1),
+ *     @OA\Property(property="answer", type="string", example="Yes"),
+ *     @OA\Property(property="selected_option_id", type="integer", example=1),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="QuizSubmitRequest",
+ *     type="object",
+ *     required={"responses"},
+ *     @OA\Property(
+ *         property="responses",
+ *         type="array",
+ *         @OA\Items(
+ *             @OA\Property(property="question_id", type="integer", example=1),
+ *             @OA\Property(property="answer", type="string", example="Yes"),
+ *             @OA\Property(property="selected_option_id", type="integer", example=1)
+ *         )
+ *     )
+ * )
+ * 
  * @OA\Tag(
  *     name="Quiz",
  *     description="Hair loss quiz endpoints"
@@ -194,14 +232,16 @@ class QuizController extends Controller
     private function calculateRiskFactors(array $responses): array
     {
         $riskFactors = [];
-        
+
         foreach ($responses as $response) {
             $question = HairLossQuizQuestion::find($response['question_id']);
             if ($question) {
                 // Simple risk factor calculation based on question type
-                if (str_contains(strtolower($response['answer']), 'yes') || 
+                if (
+                    str_contains(strtolower($response['answer']), 'yes') ||
                     str_contains(strtolower($response['answer']), 'often') ||
-                    str_contains(strtolower($response['answer']), 'daily')) {
+                    str_contains(strtolower($response['answer']), 'daily')
+                ) {
                     $riskFactors[] = $question->question;
                 }
             }

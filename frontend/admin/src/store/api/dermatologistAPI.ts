@@ -1,3 +1,4 @@
+// Generated via prompt: prompts/admin_dermatologists_crud_v1.md
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -10,7 +11,7 @@ const api = axios.create({
 });
 
 // Add token to requests
-api.interceptors.request.use((config) => {
+api.interceptors.request.use((config: any) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -18,10 +19,34 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle response errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      // Only redirect if not already on login page
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const dermatologistAPI = {
-  getDermatologists: () =>
-    api.get('/admin/dermatologists'),
-  
-  createDermatologist: (data: any) =>
+  getDermatologists: (params: { page?: number; search?: string } = {}) =>
+    api.get('/admin/dermatologists', { params }),
+
+  getDermatologist: (dermatologistId: number) =>
+    api.get(`/admin/dermatologists/${dermatologistId}`),
+
+  createDermatologist: (data: { name: string; email: string; phone_no: string; password: string; dob?: string; gender?: 'male' | 'female' | 'other' }) =>
     api.post('/admin/dermatologists', data),
+
+  updateDermatologist: (dermatologistId: number, data: Partial<{ name: string; email: string; phone_no: string; password: string; dob: string; gender: 'male' | 'female' | 'other' }>) =>
+    api.put(`/admin/dermatologists/${dermatologistId}`, data),
+
+  deleteDermatologist: (dermatologistId: number) =>
+    api.delete(`/admin/dermatologists/${dermatologistId}`),
 };

@@ -342,6 +342,318 @@
       "date": "2024-12-19T21:30:00Z",
       "user_prompt": "My frontend is failing with these API errors: 1. GET http://localhost:8000/api/patient/appointments → 404 Not Found 2. GET http://localhost:8000/api/patient/quiz/questions → 404 Not Found 3. GET http://localhost:8000/api/me → 401 Unauthorized Please fix this by: 1. Creating proper API routes in routes/api.php for: - GET /api/patient/appointments → handled by AppointmentController@index - GET /api/patient/quiz/questions → handled by QuizController@questions - GET /api/me → should return the authenticated user's details 2. Implementing missing controllers and methods if not already present: - AppointmentController with an index() method that returns sample or real appointments for the logged-in patient. - QuizController with a questions() method that returns quiz questions. - AuthController or UserController with a me() method that returns the current authenticated user. 3. Securing routes: - Use Sanctum/JWT middleware for authenticated routes. - Ensure /api/login returns a token and the frontend passes it in the Authorization header (Bearer token). 4. After this, requests to these routes should return proper JSON responses instead of 404 or 401 errors.",
       "prompt_type": "ai_response"
+    },
+    {
+      "id": "laravel_bootstrap_cache_fix_v2",
+      "path": "prompts/laravel_bootstrap_cache_fix_v2.md",
+      "used_in": [
+        "setup-backend.sh"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T22:00:00Z",
+      "user_prompt": "Fix the Laravel backend setup script that's failing with \"bootstrap/cache directory must be present and writable\" error.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "laravel_database_timeout_fix_v1",
+      "path": "prompts/laravel_database_timeout_fix_v1.md",
+      "used_in": [
+        "setup-backend.sh"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T22:15:00Z",
+      "user_prompt": "The setup-backend.sh script is hanging indefinitely at the database connection test step.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_typescript_errors_fix_v1",
+      "path": "prompts/dermatologist_typescript_errors_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/Profile.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T22:30:00Z",
+      "user_prompt": "The dermatologist frontend setup is failing with TypeScript build errors: Cannot find module './pages/AppointmentDetail' or its corresponding type declarations, Cannot find module './pages/Profile' or its corresponding type declarations, 'ClockIcon' is declared but its value is never read",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_user_interface_fix_v1",
+      "path": "prompts/dermatologist_user_interface_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/store/slices/authSlice.ts",
+        "frontend/dermatologist/src/pages/Profile.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T22:45:00Z",
+      "user_prompt": "The dermatologist frontend build is failing with TypeScript errors: Property 'specialization' does not exist on type 'User', Property 'experience' does not exist on type 'User', Property 'bio' does not exist on type 'User'",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_missing_entry_point_fix_v1",
+      "path": "prompts/dermatologist_missing_entry_point_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/index.tsx",
+        "frontend/dermatologist/src/index.css"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T23:00:00Z",
+      "user_prompt": "The dermatologist frontend build is failing with Vite error: Rollup failed to resolve import \"/src/index.tsx\" from index.html. This is most likely unintended because it can break your application at runtime.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_typescript_errors_fix_v1",
+      "path": "prompts/admin_typescript_errors_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Appointments.tsx",
+        "frontend/admin/src/pages/Patients.tsx",
+        "frontend/admin/src/pages/Settings.tsx",
+        "frontend/admin/src/store/store.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T23:15:00Z",
+      "user_prompt": "The admin frontend setup is failing with TypeScript build errors: 'CurrencyDollarIcon' is declared but its value is never read, 'setCurrentPage' is declared but its value is never read, 'CogIcon' is declared but its value is never read, Property 'settings' does not exist on type RootState",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_missing_entry_point_fix_v1",
+      "path": "prompts/admin_missing_entry_point_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/index.tsx",
+        "frontend/admin/src/index.css"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T23:30:00Z",
+      "user_prompt": "The admin frontend build is failing with Vite error: Rollup failed to resolve import \"/src/index.tsx\" from index.html. This is most likely unintended because it can break your application at runtime.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "test_users_credentials_v1",
+      "path": "prompts/test_users_credentials_v1.md",
+      "used_in": [
+        "database/seeders/DatabaseSeeder.php",
+        "database/seeders/UserSeeder.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T23:45:00Z",
+      "user_prompt": "Check my code and provide test user credentials for admin module login.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_jsx_syntax_fix_v1",
+      "path": "prompts/admin_jsx_syntax_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/App.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T23:50:00Z",
+      "user_prompt": "The admin frontend build is failing with JSX syntax errors: Expected corresponding JSX closing tag for 'Routes', Expected corresponding JSX closing tag for 'div', ')' expected, Expression expected",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_access_denied_fix_v1",
+      "path": "prompts/admin_access_denied_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/pages/Login.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-20T00:00:00Z",
+      "user_prompt": "After admin login, user is seeing 'Access Denied' error with message 'You don't have permission to access this area.'",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_api_response_structure_fix_v1",
+      "path": "prompts/admin_api_response_structure_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/store/slices/authSlice.ts",
+        "frontend/admin/src/components/ProtectedRoute.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-20T00:05:00Z",
+      "user_prompt": "Still facing 'Access Denied' error after admin login.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_user_data_loading_fix_v1",
+      "path": "prompts/admin_user_data_loading_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/store/slices/authSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-20T00:10:00Z",
+      "user_prompt": "Debug logs show: isAuthenticated: true, loading: false, user: null - user data is not being loaded properly.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_tailwind_config_v1",
+      "path": "prompts/admin_tailwind_config_v1.md",
+      "used_in": [
+        "frontend/admin/tailwind.config.js",
+        "frontend/admin/postcss.config.js",
+        "frontend/admin/vite.config.ts",
+        "frontend/admin/package.json"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-20T00:15:00Z",
+      "user_prompt": "in admin module , does the tailwindcss configured ?",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_tailwind_apply_error_fix_v1",
+      "path": "prompts/admin_tailwind_apply_error_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/index.css"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-20T00:20:00Z",
+      "user_prompt": "I am getting this error can you please look into this ?",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_patients_crud_v1",
+      "path": "prompts/admin_patients_crud_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/PatientController.php",
+        "routes/api.php",
+        "frontend/admin/src/store/api/patientAPI.ts",
+        "frontend/admin/src/store/slices/patientSlice.ts",
+        "frontend/admin/src/components/PatientModal.tsx",
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-20T01:30:00Z",
+      "user_prompt": "In the Admin Panel → Patients section, implement a complete CRUD (Create, Read, Update, Delete) module for managing patients.",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "patient_swagger_admin_patients_v1",
+      "path": "prompts/patient_swagger_admin_patients_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Controller.php",
+        "app/Http/Controllers/Api/PatientController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "Generate swagger for the api",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "admin_auth_response_structure_fix_v1",
+      "path": "prompts/admin_auth_response_structure_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/store/slices/authSlice.ts",
+        "frontend/admin/src/store/api/authAPI.ts",
+        "frontend/admin/src/store/api/patientAPI.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:15:00Z",
+      "user_prompt": "in frontend , giving correct credentials still",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_integration_v1",
+      "path": "prompts/antd_integration_v1.md",
+      "used_in": [
+        "frontend/patient/package.json",
+        "frontend/patient/src/index.tsx",
+        "frontend/patient/vite.config.ts",
+        "frontend/dermatologist/package.json",
+        "frontend/dermatologist/src/index.tsx",
+        "frontend/dermatologist/vite.config.ts",
+        "frontend/admin/package.json",
+        "frontend/admin/src/index.tsx",
+        "frontend/admin/vite.config.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T10:00:00Z",
+      "user_prompt": "Integrate **Ant Design (antd)** component library into this React project and set up a clean base configuration",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_patients_conversion_v1",
+      "path": "prompts/antd_patients_conversion_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/patients/PatientHeader.tsx",
+        "frontend/admin/src/components/patients/PatientSearch.tsx",
+        "frontend/admin/src/components/patients/PatientTable.tsx",
+        "frontend/admin/src/components/patients/PatientModal.tsx",
+        "frontend/admin/src/components/patients/index.ts",
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T10:30:00Z",
+      "user_prompt": "now in admin module ONLY , please convert the page patients.tsx - and use components in that , register all the component in separate component dolder which will manage all the components there , in the page , use that component only",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_admin_full_conversion_v1",
+      "path": "prompts/antd_admin_full_conversion_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/Layout.tsx",
+        "frontend/admin/src/components/Sidebar.tsx",
+        "frontend/admin/src/components/Header.tsx",
+        "frontend/admin/src/pages/Login.tsx",
+        "frontend/admin/src/pages/Dashboard.tsx",
+        "frontend/admin/src/App.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T11:00:00Z",
+      "user_prompt": "yes this worked can u please replace whole ADMIN MODULE UI by using the component of ant design , make sure the functionality and ui remains same",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_admin_remaining_pages_v1",
+      "path": "prompts/antd_admin_remaining_pages_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Appointments.tsx",
+        "frontend/admin/src/pages/Dermatologists.tsx",
+        "frontend/admin/src/pages/Payments.tsx",
+        "frontend/admin/src/pages/Products.tsx",
+        "frontend/admin/src/pages/Settings.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T11:30:00Z",
+      "user_prompt": "in admin module , Products page settings page convert this by using components of ant design",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_patients_ui_consistency_fix_v1",
+      "path": "prompts/antd_patients_ui_consistency_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T12:00:00Z",
+      "user_prompt": "In admin module , the patient page does not look consistent ui as others , please check this",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_admin_complete_audit_v1",
+      "path": "prompts/antd_admin_complete_audit_v1.md",
+      "used_in": [
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/components/ProtectedRoute.tsx",
+        "frontend/admin/src/components/PatientModal.tsx",
+        "frontend/admin/src/components/DermatologistModal.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T12:30:00Z",
+      "user_prompt": "In admin module , whole admin module check each and every page o ui is using the component of an design of not",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_modal_import_fix_v1",
+      "path": "prompts/dermatologist_modal_import_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Dermatologists.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T13:00:00Z",
+      "user_prompt": "Uncaught SyntaxError: The requested module 'http://localhost:3002/src/pages/Dermatologists.tsx?t=1759817839137' doesn't provide an export named: 'default'",
+      "prompt_type": "ai_response"
     }
     ,
     {
@@ -425,6 +737,25 @@
       "date": "2025-10-06T00:00:00Z",
       "user_prompt": "\"message\": \"Call to undefined relationship [user] on model [App\\\\Models\\\\User].\", receiving this error in the given line number",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "swagger_comprehensive_documentation_v1",
+      "path": "prompts/swagger_comprehensive_documentation_v1.md",
+      "used_in": [
+        "config/l5-swagger.php",
+        "app/Http/Controllers/SwaggerSchemas.php",
+        "app/Http/Controllers/Api/AuthController.php",
+        "app/Http/Controllers/Api/PatientController.php",
+        "app/Http/Controllers/Api/DermatologistController.php",
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "app/Http/Controllers/Api/QuizController.php",
+        "app/Http/Controllers/Api/DermatologistAuthController.php",
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T14:00:00Z",
+      "user_prompt": "for the backend , due to merge conflict i have discarded some code for swagger generation in api.docs can u add all the swagger for all apis",
+      "prompt_type": "ai_response"
     }
   ]
 }

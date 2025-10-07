@@ -1,239 +1,366 @@
 <?php
-// Generated via prompt: prompts/hair_skin_health_setup_v1.md
+// Generated via prompt: prompts/admin_dermatologists_crud_v1.md
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Appointment;
-use App\Models\ChatMessage;
-use App\Models\Dermatologist;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
+/**
+ * @OA\Schema(
+ *     schema="Dermatologist",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+ *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="subscription_status", type="string", example="-"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="DermatologistCreateRequest",
+ *     type="object",
+ *     required={"name","email","phone_no","password"},
+ *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+ *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="DermatologistUpdateRequest",
+ *     type="object",
+ *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+ *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
+ *     @OA\Property(property="is_active", type="boolean", example=true)
+ * )
+ * 
+ * @OA\Tag(
+ *     name="Dermatologists",
+ *     description="Dermatologist management endpoints (Admin)"
+ * )
+ */
 class DermatologistController extends Controller
 {
     /**
-     * Get dermatologist profile
+     * @OA\Get(
+     *     path="/admin/dermatologists",
+     *     summary="List dermatologists",
+     *     tags={"Dermatologists"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", example=1)),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", example=15)),
+     *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string", example="john")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dermatologists retrieved",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Dermatologists retrieved successfully"),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Dermatologist")),
+     *             @OA\Property(property="current_page", type="integer", example=1),
+     *             @OA\Property(property="last_page", type="integer", example=5),
+     *             @OA\Property(property="per_page", type="integer", example=15),
+     *             @OA\Property(property="total", type="integer", example=75)
+     *         )
+     *     ),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function getProfile(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $user->load('dermatologistProfile');
+        try {
+            $perPage = (int)($request->query('per_page', 15));
+            $query = User::where('role', 'dermatologist')
+                ->select([
+                    'id',
+                    'name',
+                    'email',
+                    'phone as phone_no',
+                    'date_of_birth as dob',
+                    'gender',
+                    'is_active',
+                    'created_at'
+                ])
+                ->orderBy('created_at', 'desc');
 
-        return response()->json([
-            'success' => true,
-            'data' => $user
-        ]);
-    }
+            if ($search = trim((string)$request->query('search', ''))) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
 
-    /**
-     * Update dermatologist profile
-     */
-    public function updateProfile(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'specialization' => 'sometimes|string|max:255',
-            'years_of_experience' => 'sometimes|integer|min:0',
-            'qualifications' => 'sometimes|string',
-            'bio' => 'nullable|string',
-            'consultation_fee' => 'sometimes|numeric|min:0',
-            'available_days' => 'sometimes|array',
-            'start_time' => 'sometimes|date_format:H:i',
-            'end_time' => 'sometimes|date_format:H:i',
-            'timezone' => 'sometimes|string',
-            'is_available' => 'sometimes|boolean',
-            'max_patients_per_day' => 'sometimes|integer|min:1',
-        ]);
+            $dermatologists = $query->paginate($perPage);
 
-        if ($validator->fails()) {
+            $dermatologists->getCollection()->transform(function ($dermatologist) {
+                $dermatologist->subscription_status = '-';
+                return $dermatologist;
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Dermatologists retrieved successfully',
+                'data' => $dermatologists->items(),
+                'current_page' => $dermatologists->currentPage(),
+                'last_page' => $dermatologists->lastPage(),
+                'per_page' => $dermatologists->perPage(),
+                'total' => $dermatologists->total(),
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Failed to retrieve dermatologists',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $user = $request->user();
-        
-        // Update user data
-        $user->update($request->only(['name', 'phone']));
-        
-        // Update dermatologist profile
-        $profileData = $request->only([
-            'specialization', 'years_of_experience', 'qualifications', 'bio',
-            'consultation_fee', 'available_days', 'start_time', 'end_time',
-            'timezone', 'is_available', 'max_patients_per_day'
-        ]);
-        
-        $user->dermatologistProfile()->updateOrCreate(
-            ['user_id' => $user->id],
-            $profileData
-        );
-
-        $user->load('dermatologistProfile');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Profile updated successfully',
-            'data' => $user
-        ]);
     }
 
     /**
-     * Get assigned appointments
+     * @OA\Post(
+     *     path="/admin/dermatologists",
+     *     summary="Create dermatologist",
+     *     tags={"Dermatologists"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/DermatologistCreateRequest")),
+     *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/Dermatologist")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function getAppointments(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $appointments = Appointment::with(['patient', 'chatMessages'])
-            ->where('dermatologist_id', $request->user()->id)
-            ->orderBy('scheduled_at', 'desc')
-            ->get();
+        try {
+            $dermatologistData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email'),
+                ],
+                'phone_no' => 'required|string|max:20',
+                'password' => 'required|string|min:6',
+                'dob' => 'nullable|date|before:today',
+                'gender' => 'nullable|in:male,female,other',
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'data' => $appointments
-        ]);
-    }
+            $dermatologistData['role'] = 'dermatologist';
+            $dermatologistData['is_active'] = true;
+            $dermatologistData['phone'] = $dermatologistData['phone_no'];
+            $dermatologistData['date_of_birth'] = $dermatologistData['dob'] ?? null;
+            $dermatologistData['password'] = Hash::make($dermatologistData['password']);
 
-    /**
-     * Get appointment details
-     */
-    public function getAppointment(Request $request, $id)
-    {
-        $appointment = Appointment::with(['patient.patientProfile', 'patient.quizResponses.question', 'chatMessages.sender'])
-            ->where('dermatologist_id', $request->user()->id)
-            ->findOrFail($id);
+            $dermatologist = User::create($dermatologistData);
 
-        return response()->json([
-            'success' => true,
-            'data' => $appointment
-        ]);
-    }
-
-    /**
-     * Update appointment status
-     */
-    public function updateAppointmentStatus(Request $request, $id)
-    {
-        $validator = Validator::make($request->all(), [
-            'status' => 'required|in:scheduled,in_progress,completed,cancelled,no_show',
-            'notes' => 'nullable|string',
-            'prescription' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Dermatologist created successfully',
+                'data' => [
+                    'id' => $dermatologist->id,
+                    'name' => $dermatologist->name,
+                    'email' => $dermatologist->email,
+                    'phone_no' => $dermatologist->phone,
+                    'dob' => $dermatologist->date_of_birth,
+                    'gender' => $dermatologist->gender,
+                    'is_active' => $dermatologist->is_active,
+                    'subscription_status' => '-',
+                    'created_at' => $dermatologist->created_at,
+                ]
+            ], 201);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Failed to create dermatologist',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $appointment = Appointment::where('dermatologist_id', $request->user()->id)
-            ->findOrFail($id);
-
-        $appointment->update($request->only(['status', 'notes', 'prescription']));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Appointment updated successfully',
-            'data' => $appointment
-        ]);
     }
 
     /**
-     * Send chat message
+     * @OA\Get(
+     *     path="/admin/dermatologists/{id}",
+     *     summary="Get dermatologist",
+     *     tags={"Dermatologists"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Dermatologist")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function sendMessage(Request $request, $appointmentId)
+    public function show(string $id): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'message' => 'required|string',
-            'type' => 'sometimes|in:text,image,file,prescription',
-            'attachment' => 'nullable|file|max:10240', // 10MB max
-        ]);
+        try {
+            $dermatologist = User::where('role', 'dermatologist')
+                ->where('id', $id)
+                ->select([
+                    'id',
+                    'name',
+                    'email',
+                    'phone as phone_no',
+                    'date_of_birth as dob',
+                    'gender',
+                    'is_active',
+                    'created_at'
+                ])
+                ->first();
 
-        if ($validator->fails()) {
+            if (!$dermatologist) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dermatologist not found'
+                ], 404);
+            }
+
+            $dermatologist->subscription_status = '-';
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Dermatologist retrieved successfully',
+                'data' => $dermatologist
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Failed to retrieve dermatologist',
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
 
-        $appointment = Appointment::where('dermatologist_id', $request->user()->id)
-            ->findOrFail($appointmentId);
+    /**
+     * @OA\Put(
+     *     path="/admin/dermatologists/{id}",
+     *     summary="Update dermatologist",
+     *     tags={"Dermatologists"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/DermatologistUpdateRequest")),
+     *     @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/Dermatologist")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        try {
+            $dermatologist = User::where('role', 'dermatologist')->where('id', $id)->first();
+            if (!$dermatologist) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dermatologist not found'
+                ], 404);
+            }
 
-        $attachmentPath = null;
-        if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('chat-attachments', 'public');
+            $updateData = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'email' => [
+                    'sometimes',
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($dermatologist->id),
+                ],
+                'phone_no' => 'sometimes|required|string|max:20',
+                'password' => 'sometimes|nullable|string|min:6',
+                'dob' => 'nullable|date|before:today',
+                'gender' => 'nullable|in:male,female,other',
+                'is_active' => 'sometimes|boolean',
+            ]);
+
+            if (isset($updateData['phone_no'])) {
+                $updateData['phone'] = $updateData['phone_no'];
+                unset($updateData['phone_no']);
+            }
+            if (isset($updateData['dob'])) {
+                $updateData['date_of_birth'] = $updateData['dob'];
+                unset($updateData['dob']);
+            }
+            if (array_key_exists('password', $updateData)) {
+                if ($updateData['password']) {
+                    $updateData['password'] = Hash::make($updateData['password']);
+                } else {
+                    unset($updateData['password']);
+                }
+            }
+
+            $dermatologist->update($updateData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Dermatologist updated successfully',
+                'data' => [
+                    'id' => $dermatologist->id,
+                    'name' => $dermatologist->name,
+                    'email' => $dermatologist->email,
+                    'phone_no' => $dermatologist->phone,
+                    'dob' => $dermatologist->date_of_birth,
+                    'gender' => $dermatologist->gender,
+                    'is_active' => $dermatologist->is_active,
+                    'subscription_status' => '-',
+                    'created_at' => $dermatologist->created_at,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update dermatologist',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $message = ChatMessage::create([
-            'appointment_id' => $appointmentId,
-            'sender_id' => $request->user()->id,
-            'message' => $request->message,
-            'attachment' => $attachmentPath,
-            'type' => $request->type ?? 'text',
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Message sent successfully',
-            'data' => $message
-        ]);
     }
 
     /**
-     * Get chat messages for appointment
+     * @OA\Delete(
+     *     path="/admin/dermatologists/{id}",
+     *     summary="Delete dermatologist",
+     *     tags={"Dermatologists"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *     @OA\Response(response=200, description="Deleted", @OA\JsonContent(@OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Dermatologist deleted successfully"))),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function getChatMessages(Request $request, $appointmentId)
+    public function destroy(string $id): JsonResponse
     {
-        $appointment = Appointment::where('dermatologist_id', $request->user()->id)
-            ->findOrFail($appointmentId);
+        try {
+            $dermatologist = User::where('role', 'dermatologist')->where('id', $id)->first();
+            if (!$dermatologist) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dermatologist not found'
+                ], 404);
+            }
 
-        $messages = ChatMessage::with('sender')
-            ->where('appointment_id', $appointmentId)
-            ->orderBy('created_at', 'asc')
-            ->get();
+            $dermatologist->delete();
 
-        return response()->json([
-            'success' => true,
-            'data' => $messages
-        ]);
-    }
-
-    /**
-     * Mark messages as read
-     */
-    public function markMessagesAsRead(Request $request, $appointmentId)
-    {
-        ChatMessage::where('appointment_id', $appointmentId)
-            ->where('sender_id', '!=', $request->user()->id)
-            ->update(['is_read' => true]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Messages marked as read'
-        ]);
-    }
-
-    /**
-     * Get payment history (read-only)
-     */
-    public function getPaymentHistory(Request $request)
-    {
-        $appointments = Appointment::with(['patient', 'payments'])
-            ->where('dermatologist_id', $request->user()->id)
-            ->where('is_paid', true)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $appointments
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Dermatologist deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete dermatologist',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
