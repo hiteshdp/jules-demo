@@ -6,7 +6,8 @@ import {
   CalendarDaysIcon, 
   UserGroupIcon,
   CurrencyDollarIcon,
-  ClockIcon
+  ClipboardDocumentListIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 
 const Dashboard: React.FC = () => {
@@ -30,9 +31,6 @@ const Dashboard: React.FC = () => {
     appointment => appointment.status === 'completed'
   );
 
-  const totalRevenue = appointments
-    .filter(appointment => appointment.is_paid)
-    .reduce((sum, appointment) => sum + appointment.consultation_fee, 0);
 
   const stats = [
     {
@@ -52,16 +50,9 @@ const Dashboard: React.FC = () => {
     {
       name: 'Completed Appointments',
       value: completedAppointments.length,
-      icon: ClockIcon,
+      icon: ClipboardDocumentListIcon,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
-    },
-    {
-      name: 'Total Revenue',
-      value: `₹${totalRevenue.toLocaleString()}`,
-      icon: CurrencyDollarIcon,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-100',
     },
   ];
 
@@ -92,7 +83,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
           <div key={stat.name} className="bg-white overflow-hidden shadow rounded-lg">
             <div className="p-5">
@@ -116,6 +107,76 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Quick Actions
+          </h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a
+              href="/appointments"
+              className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300"
+            >
+              <div>
+                <span className="rounded-lg inline-flex p-3 bg-blue-50 text-blue-700 ring-4 ring-white">
+                  <CalendarDaysIcon className="h-6 w-6" aria-hidden="true" />
+                </span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-lg font-medium">
+                  <span className="absolute inset-0" aria-hidden="true" />
+                  View Appointments
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Manage your patient appointments and consultations.
+                </p>
+              </div>
+            </a>
+
+            <a
+              href="/appointments"
+              className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-green-500 rounded-lg border border-gray-200 hover:border-gray-300"
+            >
+              <div>
+                <span className="rounded-lg inline-flex p-3 bg-green-50 text-green-700 ring-4 ring-white">
+                  <ChatBubbleLeftRightIcon className="h-6 w-6" aria-hidden="true" />
+                </span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-lg font-medium">
+                  <span className="absolute inset-0" aria-hidden="true" />
+                  Patient Chat
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Communicate with your patients in real-time.
+                </p>
+              </div>
+            </a>
+
+            <a
+              href="/profile"
+              className="relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-purple-500 rounded-lg border border-gray-200 hover:border-gray-300"
+            >
+              <div>
+                <span className="rounded-lg inline-flex p-3 bg-purple-50 text-purple-700 ring-4 ring-white">
+                  <UserGroupIcon className="h-6 w-6" aria-hidden="true" />
+                </span>
+              </div>
+              <div className="mt-4">
+                <h3 className="text-lg font-medium">
+                  <span className="absolute inset-0" aria-hidden="true" />
+                  Manage Profile
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">
+                  Update your professional information and credentials.
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Today's Appointments */}

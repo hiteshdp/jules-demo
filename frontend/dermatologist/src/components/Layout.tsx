@@ -1,21 +1,30 @@
-import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { getMe } from '../store/slices/authSlice';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-const Layout = () => {
+const Layout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  // const navigate = useNavigate(); // TODO: Will be used for navigation logic
-  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
+  const { user, loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    // Check if we have a token and need to verify authentication
+    const token = localStorage.getItem('token');
+    if (token && !loading && !user) {
       dispatch(getMe());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, loading, user]); // Remove isAuthenticated from dependencies to avoid loops
+
+  useEffect(() => {
+    // Align with patient app: redirect to login when not authenticated
+    if (!user && !loading) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (

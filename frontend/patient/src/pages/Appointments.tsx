@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { appointments, dermatologists, loading } = useSelector((state: RootState) => state.appointment);
+  const { appointments, dermatologists, loading, error } = useSelector((state: RootState) => state.appointment);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [bookingData, setBookingData] = useState({
     dermatologist_id: '',
@@ -29,11 +29,18 @@ const Appointments: React.FC = () => {
     dispatch(bookAppointment({
       dermatologist_id: parseInt(bookingData.dermatologist_id),
       scheduled_at: bookingData.scheduled_at,
-    })).then(() => {
-      setShowBookingForm(false);
-      setBookingData({ dermatologist_id: '', scheduled_at: '' });
-      toast.success('Appointment booked successfully!');
-    });
+    }))
+      .unwrap()
+      .then(() => {
+        setShowBookingForm(false);
+        setBookingData({ dermatologist_id: '', scheduled_at: '' });
+        toast.success('Appointment booked successfully!');
+        // Refresh appointments list
+        dispatch(fetchAppointments());
+      })
+      .catch((error) => {
+        toast.error(error || 'Failed to book appointment');
+      });
   };
 
   const formatDateTime = (dateTime: string) => {
@@ -83,6 +90,9 @@ const Appointments: React.FC = () => {
               <form onSubmit={handleBookingSubmit}>
                 <div className="mb-4">
                   <label className="form-label">Select Dermatologist</label>
+                  <div className="text-xs text-gray-500 mb-2">
+                    {Array.isArray(dermatologists) ? dermatologists.length : 0} dermatologist(s) available
+                  </div>
                   <select
                     value={bookingData.dermatologist_id}
                     onChange={(e) => setBookingData({ ...bookingData, dermatologist_id: e.target.value })}
@@ -91,7 +101,7 @@ const Appointments: React.FC = () => {
                   >
                     <option value="">Choose a dermatologist</option>
                     {(Array.isArray(dermatologists) ? dermatologists : []).map((derm) => (
-                      <option key={derm.id} value={derm.id}>
+                      <option key={derm.id} value={derm.user_id}>
                         {derm.user.name} - {derm.specialization} (₹{derm.consultation_fee})
                       </option>
                     ))}
@@ -133,14 +143,36 @@ const Appointments: React.FC = () => {
       {/* Appointments List */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Your Appointments</h3>
+            <div className="text-sm text-gray-500">
+              {Array.isArray(appointments) ? appointments.length : 0} appointment(s)
+            </div>
+          </div>
+          
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-600">Error: {error}</p>
+              <button
+                onClick={() => {
+                  dispatch(fetchAppointments());
+                  dispatch(fetchDermatologists());
+                }}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
           {loading ? (
             <div className="flex items-center justify-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
-          ) : appointments.length === 0 ? (
+          ) : !Array.isArray(appointments) || appointments.length === 0 ? (
             <div className="text-center py-12">
               <CalendarDaysIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No appointments</h3>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No appointments found</h3>
               <p className="mt-1 text-sm text-gray-500">
                 Get started by booking your first appointment.
               </p>
@@ -148,7 +180,7 @@ const Appointments: React.FC = () => {
           ) : (
             <div className="flow-root">
               <ul className="-my-5 divide-y divide-gray-200">
-                {(Array.isArray(appointments) ? appointments : []).map((appointment) => (
+                {appointments.map((appointment) => (
                   <li key={appointment.id} className="py-4">
                     <div className="flex items-center space-x-4">
                       <div className="flex-shrink-0">
@@ -159,7 +191,7 @@ const Appointments: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium text-gray-900 truncate">
-                            {appointment.dermatologist?.user?.name}
+                            {appointment.dermatologist?.name || 'Unknown Doctor'}
                           </p>
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
                             {appointment.status}

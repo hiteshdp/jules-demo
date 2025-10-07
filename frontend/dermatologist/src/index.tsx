@@ -1,3 +1,4 @@
+// Generated via prompt: prompts/dermatologist_index_fix_v1.md
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';

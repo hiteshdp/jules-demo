@@ -9,11 +9,17 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
+// Add token to requests (dermatologist-specific key)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token =
+    localStorage.getItem('dermatologist_token') ||
+    localStorage.getItem('token'); // fallback if old key still present
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    const headers = {
+      ...(config.headers || {}),
+      Authorization: `Bearer ${token}`,
+    } as any;
+    config.headers = headers;
   }
   return config;
 });
