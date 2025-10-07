@@ -1,19 +1,28 @@
+// Generated via prompt: prompts/antd_admin_complete_audit_v1.md
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { Spin, Typography, Space } from 'antd';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
+
+const { Title, Text } = Typography;
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading, user } = useSelector((state: RootState) => state.auth);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <Spin size="large" />
       </div>
     );
   }
@@ -31,11 +40,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (user?.role !== 'admin') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Access Denied</h1>
-          <p className="mt-2 text-gray-600">You don't have permission to access this area.</p>
-        </div>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center' 
+      }}>
+        <Space direction="vertical" align="center">
+          <Title level={2} style={{ margin: 0 }}>
+            Access Denied
+          </Title>
+          <Text type="secondary">
+            You don't have permission to access this area.
+          </Text>
+        </Space>
       </div>
     );
   }

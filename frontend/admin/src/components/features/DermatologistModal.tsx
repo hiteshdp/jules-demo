@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 
 const { Option } = Select;
 
-interface PatientForm {
+interface DermatologistForm {
   name: string;
   email: string;
   phone_no: string;
@@ -17,13 +17,13 @@ interface PatientForm {
 interface Props {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: PatientForm) => Promise<void> | void;
-  initialData?: Partial<PatientForm> | null;
+  onSubmit: (data: DermatologistForm) => Promise<void> | void;
+  initialData?: Partial<DermatologistForm> | null;
   title?: string;
   submitting?: boolean;
 }
 
-const PatientModal: React.FC<Props> = ({ open, onClose, onSubmit, initialData, title = 'Create Patient', submitting }) => {
+const DermatologistModal: React.FC<Props> = ({ open, onClose, onSubmit, initialData, title = 'Create Dermatologist', submitting }) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const PatientModal: React.FC<Props> = ({ open, onClose, onSubmit, initialData, t
         <Form.Item
           name="name"
           label="Name"
-          rules={[{ required: true, message: 'Please enter patient name' }]}
+          rules={[{ required: true, message: 'Please enter dermatologist name' }]}
         >
           <Input />
         </Form.Item>
@@ -71,7 +71,7 @@ const PatientModal: React.FC<Props> = ({ open, onClose, onSubmit, initialData, t
           name="email"
           label="Email"
           rules={[
-            { required: true, message: 'Please enter patient email' },
+            { required: true, message: 'Please enter dermatologist email' },
             { type: 'email', message: 'Please enter a valid email' },
           ]}
         >
@@ -110,4 +110,4 @@ const PatientModal: React.FC<Props> = ({ open, onClose, onSubmit, initialData, t
   );
 };
 
-export default PatientModal;
+export default DermatologistModal;

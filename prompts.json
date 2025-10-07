@@ -552,6 +552,108 @@
       "date": "2025-10-06T00:15:00Z",
       "user_prompt": "in frontend , giving correct credentials still",
       "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_integration_v1",
+      "path": "prompts/antd_integration_v1.md",
+      "used_in": [
+        "frontend/patient/package.json",
+        "frontend/patient/src/index.tsx",
+        "frontend/patient/vite.config.ts",
+        "frontend/dermatologist/package.json",
+        "frontend/dermatologist/src/index.tsx",
+        "frontend/dermatologist/vite.config.ts",
+        "frontend/admin/package.json",
+        "frontend/admin/src/index.tsx",
+        "frontend/admin/vite.config.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T10:00:00Z",
+      "user_prompt": "Integrate **Ant Design (antd)** component library into this React project and set up a clean base configuration",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_patients_conversion_v1",
+      "path": "prompts/antd_patients_conversion_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/patients/PatientHeader.tsx",
+        "frontend/admin/src/components/patients/PatientSearch.tsx",
+        "frontend/admin/src/components/patients/PatientTable.tsx",
+        "frontend/admin/src/components/patients/PatientModal.tsx",
+        "frontend/admin/src/components/patients/index.ts",
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T10:30:00Z",
+      "user_prompt": "now in admin module ONLY , please convert the page patients.tsx - and use components in that , register all the component in separate component dolder which will manage all the components there , in the page , use that component only",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_admin_full_conversion_v1",
+      "path": "prompts/antd_admin_full_conversion_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/Layout.tsx",
+        "frontend/admin/src/components/Sidebar.tsx",
+        "frontend/admin/src/components/Header.tsx",
+        "frontend/admin/src/pages/Login.tsx",
+        "frontend/admin/src/pages/Dashboard.tsx",
+        "frontend/admin/src/App.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T11:00:00Z",
+      "user_prompt": "yes this worked can u please replace whole ADMIN MODULE UI by using the component of ant design , make sure the functionality and ui remains same",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_admin_remaining_pages_v1",
+      "path": "prompts/antd_admin_remaining_pages_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Appointments.tsx",
+        "frontend/admin/src/pages/Dermatologists.tsx",
+        "frontend/admin/src/pages/Payments.tsx",
+        "frontend/admin/src/pages/Products.tsx",
+        "frontend/admin/src/pages/Settings.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T11:30:00Z",
+      "user_prompt": "in admin module , Products page settings page convert this by using components of ant design",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_patients_ui_consistency_fix_v1",
+      "path": "prompts/antd_patients_ui_consistency_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T12:00:00Z",
+      "user_prompt": "In admin module , the patient page does not look consistent ui as others , please check this",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "antd_admin_complete_audit_v1",
+      "path": "prompts/antd_admin_complete_audit_v1.md",
+      "used_in": [
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/components/ProtectedRoute.tsx",
+        "frontend/admin/src/components/PatientModal.tsx",
+        "frontend/admin/src/components/DermatologistModal.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T12:30:00Z",
+      "user_prompt": "In admin module , whole admin module check each and every page o ui is using the component of an design of not",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_modal_import_fix_v1",
+      "path": "prompts/dermatologist_modal_import_fix_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Dermatologists.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T13:00:00Z",
+      "user_prompt": "Uncaught SyntaxError: The requested module 'http://localhost:3002/src/pages/Dermatologists.tsx?t=1759817839137' doesn't provide an export named: 'default'",
+      "prompt_type": "ai_response"
     }
   ]
 }
