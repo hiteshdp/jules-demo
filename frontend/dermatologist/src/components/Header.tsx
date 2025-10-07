@@ -19,7 +19,7 @@ const Header: React.FC = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <h2 className="text-lg font-semibold text-gray-900">
-              Dr. {user?.name}
+              Dermatologist Portal
             </h2>
           </div>
           

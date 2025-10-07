@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\DermatologistAuthController;
+use App\Http\Controllers\Api\DermatologistAppointmentController;
 use App\Http\Controllers\Api\PatientController;
 
 /*
@@ -46,5 +48,16 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Dermatologists
         Route::get('/dermatologists', [PatientController::class, 'getDermatologists']);
+    });
+
+    // Dermatologist routes
+    Route::prefix('dermatologist')->group(function () {
+        // Authentication
+        Route::get('/me', [DermatologistAuthController::class, 'me']);
+        
+        // Appointments
+        Route::get('/appointments', [DermatologistAppointmentController::class, 'index']);
+        Route::get('/appointments/{id}', [DermatologistAppointmentController::class, 'show']);
+        Route::put('/appointments/{id}/status', [DermatologistAppointmentController::class, 'updateStatus']);
     });
 });

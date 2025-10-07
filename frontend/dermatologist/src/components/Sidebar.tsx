@@ -4,13 +4,13 @@ import {
   HomeIcon,
   CalendarDaysIcon,
   UserIcon,
-  CurrencyDollarIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Appointments', href: '/appointments', icon: CalendarDaysIcon },
-  { name: 'Payments', href: '/payments', icon: CurrencyDollarIcon },
+  { name: 'Patient Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
   { name: 'Profile', href: '/profile', icon: UserIcon },
 ];
 
@@ -21,7 +21,7 @@ const Sidebar: React.FC = () => {
     <div className="hidden md:flex md:w-64 md:flex-col">
       <div className="flex flex-col flex-grow pt-5 bg-white overflow-y-auto border-r border-gray-200">
         <div className="flex items-center flex-shrink-0 px-4">
-          <h1 className="text-xl font-bold text-gray-900">Dermatologist Portal</h1>
+          <h1 className="text-xl font-bold text-gray-900">Hair Skin Health</h1>
         </div>
         <div className="mt-5 flex-grow flex flex-col">
           <nav className="flex-1 px-2 space-y-1">
