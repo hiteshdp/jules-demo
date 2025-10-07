@@ -69,10 +69,10 @@ const Payments: React.FC = () => {
   };
 
   const totalRevenue = payments
-    .filter(payment => payment.status === 'completed')
-    .reduce((sum, payment) => sum + payment.amount, 0);
+    .filter((payment: Payment) => payment.status === 'completed')
+    .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
 
-  const pendingPayments = payments.filter(payment => payment.status === 'pending').length;
+  const pendingPayments = payments.filter((payment: Payment) => payment.status === 'pending').length;
 
   const columns: ColumnsType<Payment> = [
     {

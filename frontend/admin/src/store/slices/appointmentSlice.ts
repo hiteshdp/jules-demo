@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { appointmentAPI } from '../api/appointmentAPI';
 
 interface Patient {
@@ -44,7 +44,7 @@ const initialState: AppointmentState = {
 
 export const fetchAppointments = createAsyncThunk(
   'appointment/fetchAppointments',
-  async (_, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await appointmentAPI.getAppointments();
       return response.data;
@@ -58,21 +58,21 @@ const appointmentSlice = createSlice({
   name: 'appointment',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: (state: AppointmentState) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: (builder: any) => {
     builder
-      .addCase(fetchAppointments.pending, (state) => {
+      .addCase(fetchAppointments.pending, (state: AppointmentState) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAppointments.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchAppointments.fulfilled, (state: AppointmentState, action: any) => {
         state.loading = false;
         state.appointments = action.payload.data;
       })
-      .addCase(fetchAppointments.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchAppointments.rejected, (state: AppointmentState, action: any) => {
         state.loading = false;
         state.error = action.payload;
       });

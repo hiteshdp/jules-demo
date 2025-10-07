@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { settingsAPI } from '../api/settingsAPI';
 
 interface SettingsState {
@@ -15,7 +15,7 @@ const initialState: SettingsState = {
 
 export const fetchSettings = createAsyncThunk(
   'settings/fetchSettings',
-  async (_, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await settingsAPI.getSettings();
       return response.data;
@@ -27,7 +27,7 @@ export const fetchSettings = createAsyncThunk(
 
 export const updateSettings = createAsyncThunk(
   'settings/updateSettings',
-  async (settingsData: Record<string, any>, { rejectWithValue }) => {
+  async (settingsData: Record<string, any>, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await settingsAPI.updateSettings(settingsData);
       return response.data;
@@ -41,35 +41,35 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: (state: any) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: (builder: any) => {
     builder
       // Fetch Settings
-      .addCase(fetchSettings.pending, (state) => {
+      .addCase(fetchSettings.pending, (state: any) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchSettings.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchSettings.fulfilled, (state: any, action: any) => {
         state.loading = false;
         state.settings = action.payload;
       })
-      .addCase(fetchSettings.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchSettings.rejected, (state: any, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Update Settings
-      .addCase(updateSettings.pending, (state) => {
+      .addCase(updateSettings.pending, (state: any) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateSettings.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(updateSettings.fulfilled, (state: any, action: any) => {
         state.loading = false;
         state.settings = { ...state.settings, ...action.payload };
       })
-      .addCase(updateSettings.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(updateSettings.rejected, (state: any, action: any) => {
         state.loading = false;
         state.error = action.payload;
       });

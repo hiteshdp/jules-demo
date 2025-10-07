@@ -1,5 +1,5 @@
 // Generated via prompt: prompts/antd_admin_remaining_pages_v1.md
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchSettings, updateSettings } from '../store/slices/settingsSlice';
@@ -13,10 +13,7 @@ import {
   Button, 
   Row, 
   Col, 
-  Spin,
-  message
 } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 
 const { Title, Text } = Typography;
@@ -91,7 +88,7 @@ const Settings: React.FC = () => {
         justifyContent: 'center', 
         height: '400px' 
       }}>
-        <Spin size="large" />
+        <div>Loading...</div>
       </div>
     );
   }
