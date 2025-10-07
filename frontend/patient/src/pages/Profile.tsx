@@ -1,39 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { PencilIcon } from '@heroicons/react/24/outline';
+import { Form, Card, Row, Col, Switch, Button, Space } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import { PageHeader, FormField } from '../components/common';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
 
 const Profile = () => {
-  // const dispatch = useDispatch<AppDispatch>(); // TODO: Will be used for profile update actions
   const { user } = useSelector((state: RootState) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    gender: '',
-    medical_history: '',
-    allergies: '',
-    current_medications: '',
-    lifestyle: '',
-    smoking: false,
-    alcohol_consumption: false,
-    dietary_habits: '',
-    stress_level: '',
-    sleep_pattern: '',
-    hair_care_routine: '',
-    family_history: '',
-  });
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (user) {
-      setFormData({
+      form.setFieldsValue({
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        date_of_birth: user.date_of_birth || '',
+        date_of_birth: user.date_of_birth ? dayjs(user.date_of_birth) : null,
         gender: user.gender || '',
         medical_history: user.patientProfile?.medical_history || '',
         allergies: user.patientProfile?.allergies || '',
@@ -48,18 +33,9 @@ const Profile = () => {
         family_history: user.patientProfile?.family_history || '',
       });
     }
-  }, [user]);
+  }, [user, form]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     // In a real app, this would dispatch an update action
     toast.success('Profile updated successfully!');
     setIsEditing(false);
@@ -67,11 +43,11 @@ const Profile = () => {
 
   const handleCancel = () => {
     if (user) {
-      setFormData({
+      form.setFieldsValue({
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        date_of_birth: user.date_of_birth || '',
+        date_of_birth: user.date_of_birth ? dayjs(user.date_of_birth) : null,
         gender: user.gender || '',
         medical_history: user.patientProfile?.medical_history || '',
         allergies: user.patientProfile?.allergies || '',
@@ -91,261 +67,193 @@ const Profile = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage your personal information and medical history.
-          </p>
-        </div>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+      <PageHeader
+        title="Profile"
+        description="Manage your personal information and medical history."
+        extra={
+          <Button
+            type={isEditing ? "default" : "primary"}
+            icon={<EditOutlined />}
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            {isEditing ? 'Cancel' : 'Edit Profile'}
+          </Button>
+        }
+      />
+
+      <Card>
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+          layout="vertical"
+          disabled={!isEditing}
         >
-          <PencilIcon className="h-4 w-4 mr-2" />
-          {isEditing ? 'Cancel' : 'Edit Profile'}
-        </button>
-      </div>
+          {/* Basic Information */}
+          <Card title="Basic Information" className="mb-6">
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <FormField
+                  name="name"
+                  label="Full Name"
+                  type="input"
+                  placeholder="Enter your full name"
+                />
+              </Col>
+              <Col xs={24} sm={12}>
+                <FormField
+                  name="email"
+                  label="Email"
+                  type="email"
+                  placeholder="Enter your email"
+                />
+              </Col>
+            </Row>
 
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Information */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <label className="form-label">Full Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Phone</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Date of Birth</label>
-                  <input
-                    type="date"
-                    name="date_of_birth"
-                    value={formData.date_of_birth}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Gender</label>
-                  <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                  >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <FormField
+                  name="phone"
+                  label="Phone"
+                  type="input"
+                  placeholder="Enter your phone number"
+                />
+              </Col>
+              <Col xs={24} sm={12}>
+                <FormField
+                  name="date_of_birth"
+                  label="Date of Birth"
+                  type="date"
+                />
+              </Col>
+            </Row>
 
-            {/* Medical History */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Medical History</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="form-label">Medical History</label>
-                  <textarea
-                    name="medical_history"
-                    value={formData.medical_history}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={3}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Describe any relevant medical history..."
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Allergies</label>
-                  <textarea
-                    name="allergies"
-                    value={formData.allergies}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={2}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="List any allergies..."
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Current Medications</label>
-                  <textarea
-                    name="current_medications"
-                    value={formData.current_medications}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={2}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="List current medications..."
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Family History</label>
-                  <textarea
-                    name="family_history"
-                    value={formData.family_history}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={2}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Describe family history of hair loss or related conditions..."
-                  />
-                </div>
-              </div>
-            </div>
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <FormField
+                  name="gender"
+                  label="Gender"
+                  type="select"
+                  placeholder="Select gender"
+                  options={[
+                    { label: 'Male', value: 'male' },
+                    { label: 'Female', value: 'female' },
+                    { label: 'Other', value: 'other' }
+                  ]}
+                />
+              </Col>
+            </Row>
+          </Card>
 
-            {/* Lifestyle Information */}
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Lifestyle Information</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="form-label">Lifestyle</label>
-                  <select
-                    name="lifestyle"
-                    value={formData.lifestyle}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                  >
-                    <option value="">Select lifestyle</option>
-                    <option value="sedentary">Sedentary</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="active">Active</option>
-                    <option value="very_active">Very Active</option>
-                  </select>
-                </div>
-                <div className="flex items-center space-x-6">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="smoking"
-                      checked={formData.smoking}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Smoking</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="alcohol_consumption"
-                      checked={formData.alcohol_consumption}
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Alcohol Consumption</span>
-                  </label>
-                </div>
-                <div>
-                  <label className="form-label">Dietary Habits</label>
-                  <textarea
-                    name="dietary_habits"
-                    value={formData.dietary_habits}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={2}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Describe your dietary habits..."
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Stress Level</label>
-                  <textarea
-                    name="stress_level"
-                    value={formData.stress_level}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={2}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Describe your stress level and sources..."
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Sleep Pattern</label>
-                  <textarea
-                    name="sleep_pattern"
-                    value={formData.sleep_pattern}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={2}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Describe your sleep pattern..."
-                  />
-                </div>
-                <div>
-                  <label className="form-label">Hair Care Routine</label>
-                  <textarea
-                    name="hair_care_routine"
-                    value={formData.hair_care_routine}
-                    onChange={handleChange}
-                    disabled={!isEditing}
-                    rows={2}
-                    className="input-field disabled:bg-gray-50 disabled:text-gray-500"
-                    placeholder="Describe your current hair care routine..."
-                  />
-                </div>
-              </div>
-            </div>
+          {/* Medical History */}
+          <Card title="Medical History" className="mb-6">
+            <FormField
+              name="medical_history"
+              label="Medical History"
+              type="textarea"
+              rows={3}
+              placeholder="Describe any relevant medical history..."
+            />
+            
+            <FormField
+              name="allergies"
+              label="Allergies"
+              type="textarea"
+              rows={2}
+              placeholder="List any allergies..."
+            />
+            
+            <FormField
+              name="current_medications"
+              label="Current Medications"
+              type="textarea"
+              rows={2}
+              placeholder="List current medications..."
+            />
+            
+            <FormField
+              name="family_history"
+              label="Family History"
+              type="textarea"
+              rows={2}
+              placeholder="Describe family history of hair loss or related conditions..."
+            />
+          </Card>
 
-            {isEditing && (
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="btn-secondary"
-                >
+          {/* Lifestyle Information */}
+          <Card title="Lifestyle Information">
+            <FormField
+              name="lifestyle"
+              label="Lifestyle"
+              type="select"
+              placeholder="Select lifestyle"
+              options={[
+                { label: 'Sedentary', value: 'sedentary' },
+                { label: 'Moderate', value: 'moderate' },
+                { label: 'Active', value: 'active' },
+                { label: 'Very Active', value: 'very_active' }
+              ]}
+            />
+
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <Form.Item name="smoking" label="Smoking" valuePropName="checked">
+                  <Switch />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item name="alcohol_consumption" label="Alcohol Consumption" valuePropName="checked">
+                  <Switch />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <FormField
+              name="dietary_habits"
+              label="Dietary Habits"
+              type="textarea"
+              rows={2}
+              placeholder="Describe your dietary habits..."
+            />
+            
+            <FormField
+              name="stress_level"
+              label="Stress Level"
+              type="textarea"
+              rows={2}
+              placeholder="Describe your stress level and sources..."
+            />
+            
+            <FormField
+              name="sleep_pattern"
+              label="Sleep Pattern"
+              type="textarea"
+              rows={2}
+              placeholder="Describe your sleep pattern..."
+            />
+            
+            <FormField
+              name="hair_care_routine"
+              label="Hair Care Routine"
+              type="textarea"
+              rows={2}
+              placeholder="Describe your current hair care routine..."
+            />
+          </Card>
+
+          {isEditing && (
+            <div className="flex justify-end mt-6">
+              <Space>
+                <Button onClick={handleCancel}>
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn-primary"
-                >
+                </Button>
+                <Button type="primary" htmlType="submit">
                   Save Changes
-                </button>
-              </div>
-            )}
-          </form>
-        </div>
-      </div>
+                </Button>
+              </Space>
+            </div>
+          )}
+        </Form>
+      </Card>
     </div>
   );
 };
