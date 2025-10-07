@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
 import toast from 'react-hot-toast';
 
-const Login = () => {
+const Login: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -45,10 +45,10 @@ const Login = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Dermatologist Login
+            Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to access your dermatologist portal
+            Dermatologist Portal
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

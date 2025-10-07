@@ -605,6 +605,382 @@
                 ]
             }
         },
+        "/api/dermatologist/appointments": {
+            "get": {
+                "tags": [
+                    "Dermatologist Appointments"
+                ],
+                "summary": "Get dermatologist's appointments",
+                "operationId": "afd716d08a0d01624793308a17696c7e",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by appointment status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "scheduled",
+                                "in_progress",
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Filter by appointment date (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointments retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointments retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Appointment"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dermatologist/appointments/{id}": {
+            "get": {
+                "tags": [
+                    "Dermatologist Appointments"
+                ],
+                "summary": "Get specific appointment details",
+                "operationId": "b99b4829825d9d7716dab48b56b990e1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Appointment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment details retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointment": {
+                                                    "$ref": "#/components/schemas/Appointment"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Appointment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dermatologist/appointments/{id}/status": {
+            "put": {
+                "tags": [
+                    "Dermatologist Appointments"
+                ],
+                "summary": "Update appointment status",
+                "operationId": "55488f96dac84642c9b0e9947a0f4b59",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Appointment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "scheduled",
+                                            "in_progress",
+                                            "completed",
+                                            "cancelled"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "description": "Optional consultation notes",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Appointment status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment status updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointment": {
+                                                    "$ref": "#/components/schemas/Appointment"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Appointment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dermatologist/me": {
+            "get": {
+                "tags": [
+                    "Dermatologist Authentication"
+                ],
+                "summary": "Get authenticated dermatologist details",
+                "operationId": "2cf80e3bd93546db672d0aa9eaae117a",
+                "responses": {
+                    "200": {
+                        "description": "Dermatologist details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dermatologist details retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "$ref": "#/components/schemas/User"
+                                                },
+                                                "dermatologist_profile": {
+                                                    "$ref": "#/components/schemas/DermatologistProfile"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/patient/quiz/questions": {
             "get": {
                 "tags": [
@@ -809,6 +1185,207 @@
         }
     },
     "components": {
+        "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "patient",
+                            "dermatologist",
+                            "admin"
+                        ],
+                        "example": "patient"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "enum": [
+                            "male",
+                            "female",
+                            "other"
+                        ],
+                        "example": "male"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Appointment": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "patient_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "dermatologist_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "scheduled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:00:00Z"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "scheduled",
+                            "in_progress",
+                            "completed",
+                            "cancelled"
+                        ],
+                        "example": "scheduled"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "Patient consultation notes"
+                    },
+                    "prescription": {
+                        "type": "string",
+                        "example": "Prescription details"
+                    },
+                    "zoom_link": {
+                        "type": "string",
+                        "example": "https://zoom.us/j/123456789"
+                    },
+                    "consultation_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500
+                    },
+                    "is_paid": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "patient": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "dermatologist": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DermatologistProfile": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "license_number": {
+                        "type": "string",
+                        "example": "DR123456"
+                    },
+                    "specialization": {
+                        "type": "string",
+                        "example": "Hair Loss & Scalp Disorders"
+                    },
+                    "years_of_experience": {
+                        "type": "integer",
+                        "example": 8
+                    },
+                    "qualifications": {
+                        "type": "string",
+                        "example": "MD Dermatology, Fellowship in Trichology"
+                    },
+                    "bio": {
+                        "type": "string",
+                        "example": "Specialized in hair loss treatment"
+                    },
+                    "consultation_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500
+                    },
+                    "available_days": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "monday",
+                            "tuesday",
+                            "wednesday"
+                        ]
+                    },
+                    "start_time": {
+                        "type": "string",
+                        "format": "time",
+                        "example": "09:00:00"
+                    },
+                    "end_time": {
+                        "type": "string",
+                        "format": "time",
+                        "example": "17:00:00"
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "example": "Asia/Kolkata"
+                    },
+                    "is_available": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "max_patients_per_day": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
@@ -826,6 +1403,14 @@
         {
             "name": "Authentication",
             "description": "User authentication endpoints"
+        },
+        {
+            "name": "Dermatologist Appointments",
+            "description": "Dermatologist appointment management endpoints"
+        },
+        {
+            "name": "Dermatologist Authentication",
+            "description": "Dermatologist authentication endpoints"
         },
         {
             "name": "Quiz",

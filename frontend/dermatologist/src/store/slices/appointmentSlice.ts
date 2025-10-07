@@ -47,7 +47,7 @@ export const fetchAppointments = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await appointmentAPI.getAppointments();
-      return response.data;
+      return response.data.data?.appointments || [];
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch appointments');
     }
@@ -59,7 +59,7 @@ export const fetchAppointment = createAsyncThunk(
   async (appointmentId: number, { rejectWithValue }) => {
     try {
       const response = await appointmentAPI.getAppointment(appointmentId);
-      return response.data;
+      return response.data.data.appointment;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch appointment');
     }
@@ -80,7 +80,7 @@ export const updateAppointmentStatus = createAsyncThunk(
         notes,
         prescription,
       });
-      return response.data;
+      return response.data.data.appointment;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update appointment');
     }

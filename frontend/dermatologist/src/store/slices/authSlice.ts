@@ -23,8 +23,8 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem('token'),
-  isAuthenticated: !!localStorage.getItem('token'),
+  token: localStorage.getItem('dermatologist_token'),
+  isAuthenticated: false, // Start as false, will be set to true after successful getMe
   loading: false,
   error: null,
 };
@@ -34,8 +34,8 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const response = await authAPI.login(credentials);
-      localStorage.setItem('token', response.data.token);
-      return response.data;
+      localStorage.setItem('dermatologist_token', response.data.data.token);
+      return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
@@ -47,7 +47,7 @@ export const getMe = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await authAPI.getMe();
-      return response.data;
+      return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get user data');
     }
@@ -59,7 +59,7 @@ export const logout = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await authAPI.logout();
-      localStorage.removeItem('token');
+      localStorage.removeItem('dermatologist_token');
     } catch (error: any) {
       localStorage.removeItem('token');
       return rejectWithValue(error.response?.data?.message || 'Logout failed');
@@ -99,7 +99,7 @@ const authSlice = createSlice({
       })
       .addCase(getMe.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload.user;
         state.isAuthenticated = true;
       })
       .addCase(getMe.rejected, (state) => {
@@ -107,7 +107,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
-        localStorage.removeItem('token');
+        localStorage.removeItem('dermatologist_token');
       })
       // Logout
       .addCase(logout.fulfilled, (state) => {
