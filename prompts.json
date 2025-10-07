@@ -737,6 +737,25 @@
       "date": "2025-10-06T00:00:00Z",
       "user_prompt": "\"message\": \"Call to undefined relationship [user] on model [App\\\\Models\\\\User].\", receiving this error in the given line number",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "swagger_comprehensive_documentation_v1",
+      "path": "prompts/swagger_comprehensive_documentation_v1.md",
+      "used_in": [
+        "config/l5-swagger.php",
+        "app/Http/Controllers/SwaggerSchemas.php",
+        "app/Http/Controllers/Api/AuthController.php",
+        "app/Http/Controllers/Api/PatientController.php",
+        "app/Http/Controllers/Api/DermatologistController.php",
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "app/Http/Controllers/Api/QuizController.php",
+        "app/Http/Controllers/Api/DermatologistAuthController.php",
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T14:00:00Z",
+      "user_prompt": "for the backend , due to merge conflict i have discarded some code for swagger generation in api.docs can u add all the swagger for all apis",
+      "prompt_type": "ai_response"
     }
   ]
 }

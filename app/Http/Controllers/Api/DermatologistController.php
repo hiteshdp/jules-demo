@@ -11,6 +11,44 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 /**
+ * @OA\Schema(
+ *     schema="Dermatologist",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+ *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="subscription_status", type="string", example="-"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="DermatologistCreateRequest",
+ *     type="object",
+ *     required={"name","email","phone_no","password"},
+ *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+ *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="DermatologistUpdateRequest",
+ *     type="object",
+ *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+ *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
+ *     @OA\Property(property="is_active", type="boolean", example=true)
+ * )
+ * 
  * @OA\Tag(
  *     name="Dermatologists",
  *     description="Dermatologist management endpoints (Admin)"
@@ -20,7 +58,7 @@ class DermatologistController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/admin/dermatologists",
+     *     path="/admin/dermatologists",
      *     summary="List dermatologists",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
@@ -94,7 +132,7 @@ class DermatologistController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/admin/dermatologists",
+     *     path="/admin/dermatologists",
      *     summary="Create dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
@@ -155,7 +193,7 @@ class DermatologistController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/admin/dermatologists/{id}",
+     *     path="/admin/dermatologists/{id}",
      *     summary="Get dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
@@ -207,7 +245,7 @@ class DermatologistController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/admin/dermatologists/{id}",
+     *     path="/admin/dermatologists/{id}",
      *     summary="Update dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
@@ -290,7 +328,7 @@ class DermatologistController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/admin/dermatologists/{id}",
+     *     path="/admin/dermatologists/{id}",
      *     summary="Delete dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},

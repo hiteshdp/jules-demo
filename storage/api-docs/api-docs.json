@@ -1,21 +1,14 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Hair Skin Health API",
-        "description": "API documentation for Hair Loss Diagnosis & Treatment Platform",
-        "contact": {
-            "email": "support@hairskinhealth.com"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
-        },
+        "title": "Hair Loss Diagnosis & Treatment Platform API",
+        "description": "Complete API documentation for the Hair Loss Diagnosis & Treatment Platform",
         "version": "1.0.0"
     },
     "servers": [
         {
             "url": "http://localhost:8000/api",
-            "description": "Development Server"
+            "description": "Development server"
         }
     ],
     "paths": {
@@ -605,13 +598,625 @@
                 ]
             }
         },
-        "/api/admin/dermatologists": {
+        "/dermatologist/appointments": {
+            "get": {
+                "tags": [
+                    "Dermatologist Appointments"
+                ],
+                "summary": "Get dermatologist's appointments",
+                "operationId": "e983c6233046a0a4bcc9d1dadbd38f84",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by appointment status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "scheduled",
+                                "in_progress",
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Filter by appointment date (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointments retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointments retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointments": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "patient_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "dermatologist_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "scheduled_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-01-15T10:00:00Z"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                    "scheduled",
+                                                                    "in_progress",
+                                                                    "completed",
+                                                                    "cancelled"
+                                                                ],
+                                                                "example": "scheduled"
+                                                            },
+                                                            "consultation_fee": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 100
+                                                            },
+                                                            "notes": {
+                                                                "type": "string",
+                                                                "example": "Follow-up consultation"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-01-01T00:00:00Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2024-01-01T00:00:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/dermatologist/appointments/{id}": {
+            "get": {
+                "tags": [
+                    "Dermatologist Appointments"
+                ],
+                "summary": "Get specific appointment details",
+                "operationId": "e5d5a5ee3177991fd9751d604c3e149e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Appointment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment details retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointment": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "patient_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "dermatologist_id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "scheduled_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-15T10:00:00Z"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "scheduled",
+                                                                "in_progress",
+                                                                "completed",
+                                                                "cancelled"
+                                                            ],
+                                                            "example": "scheduled"
+                                                        },
+                                                        "consultation_fee": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 100
+                                                        },
+                                                        "notes": {
+                                                            "type": "string",
+                                                            "example": "Follow-up consultation"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Appointment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/dermatologist/appointments/{id}/status": {
+            "put": {
+                "tags": [
+                    "Dermatologist Appointments"
+                ],
+                "summary": "Update appointment status",
+                "operationId": "afe1e408a4b207c09f7b0e619d5f8993",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Appointment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "scheduled",
+                                            "in_progress",
+                                            "completed",
+                                            "cancelled"
+                                        ]
+                                    },
+                                    "notes": {
+                                        "description": "Optional consultation notes",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Appointment status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment status updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointment": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "patient_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "dermatologist_id": {
+                                                            "type": "integer",
+                                                            "example": 2
+                                                        },
+                                                        "scheduled_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-15T10:00:00Z"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "scheduled",
+                                                                "in_progress",
+                                                                "completed",
+                                                                "cancelled"
+                                                            ],
+                                                            "example": "scheduled"
+                                                        },
+                                                        "consultation_fee": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 100
+                                                        },
+                                                        "notes": {
+                                                            "type": "string",
+                                                            "example": "Follow-up consultation"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Appointment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/dermatologist/me": {
+            "get": {
+                "tags": [
+                    "Dermatologist Authentication"
+                ],
+                "summary": "Get authenticated dermatologist details",
+                "operationId": "fb82049aad24e50a19e6043ffb25dd1f",
+                "responses": {
+                    "200": {
+                        "description": "Dermatologist details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dermatologist details retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Dr. Jane Smith"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "example": "dermatologist@example.com"
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "+1234567890"
+                                                        },
+                                                        "date_of_birth": {
+                                                            "type": "string",
+                                                            "format": "date",
+                                                            "example": "1985-01-01"
+                                                        },
+                                                        "gender": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "male",
+                                                                "female",
+                                                                "other"
+                                                            ],
+                                                            "example": "female"
+                                                        },
+                                                        "role": {
+                                                            "type": "string",
+                                                            "example": "dermatologist"
+                                                        },
+                                                        "is_active": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "dermatologist_profile": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "user_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "license_number": {
+                                                            "type": "string",
+                                                            "example": "DR123456"
+                                                        },
+                                                        "specialization": {
+                                                            "type": "string",
+                                                            "example": "Hair Loss Treatment"
+                                                        },
+                                                        "years_of_experience": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "qualifications": {
+                                                            "type": "string",
+                                                            "example": "MD, Dermatology"
+                                                        },
+                                                        "consultation_fee": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 100
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2024-01-01T00:00:00Z"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/dermatologists": {
             "get": {
                 "tags": [
                     "Dermatologists"
                 ],
                 "summary": "List dermatologists",
-                "operationId": "d89a91ce9f40516d55cc7b94aa4c16ba",
+                "operationId": "3cea184b2debc38ffe48719f48d27afd",
                 "parameters": [
                     {
                         "name": "page",
@@ -703,7 +1308,7 @@
                     "Dermatologists"
                 ],
                 "summary": "Create dermatologist",
-                "operationId": "14cd03bc0eaa4d259ac64cd799c5f0b6",
+                "operationId": "4cb44bd5f1f3f658b9565152240f1655",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -753,13 +1358,13 @@
                 ]
             }
         },
-        "/api/admin/dermatologists/{id}": {
+        "/admin/dermatologists/{id}": {
             "get": {
                 "tags": [
                     "Dermatologists"
                 ],
                 "summary": "Get dermatologist",
-                "operationId": "5e97a13daabed4a6087dd6fca6d53360",
+                "operationId": "7bf68b56d390ff24a411e562d68079a4",
                 "parameters": [
                     {
                         "name": "id",
@@ -814,7 +1419,7 @@
                     "Dermatologists"
                 ],
                 "summary": "Update dermatologist",
-                "operationId": "e8b7f163b1fd06a6d26a3e0012f02dfe",
+                "operationId": "271f7b98dcf6c01f9b6d75f09cc66b1c",
                 "parameters": [
                     {
                         "name": "id",
@@ -889,7 +1494,7 @@
                     "Dermatologists"
                 ],
                 "summary": "Delete dermatologist",
-                "operationId": "dae92847ebfe6c47abea17ff511a83e6",
+                "operationId": "b00c83312f226ad36f9570a8926abe1c",
                 "parameters": [
                     {
                         "name": "id",
@@ -1295,6 +1900,101 @@
                 ]
             }
         },
+        "/patient/dermatologists": {
+            "get": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Get available dermatologists",
+                "description": "Get list of available dermatologists for appointment booking",
+                "operationId": "b0d2b0056bc37172a0f5746fc2a22996",
+                "responses": {
+                    "200": {
+                        "description": "Dermatologists retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dermatologists retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "dermatologists": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Dr. Jane Smith"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "dermatologist@example.com"
+                                                            },
+                                                            "specialization": {
+                                                                "type": "string",
+                                                                "example": "Hair Loss Treatment"
+                                                            },
+                                                            "consultation_fee": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 100
+                                                            },
+                                                            "years_of_experience": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "qualifications": {
+                                                                "type": "string",
+                                                                "example": "MD, Dermatology"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/patient/quiz/questions": {
             "get": {
                 "tags": [
@@ -1500,7 +2200,157 @@
     },
     "components": {
         "schemas": {
-            "Patient": {
+            "Appointment": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "patient_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "dermatologist_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "scheduled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:00:00Z"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "scheduled",
+                            "in_progress",
+                            "completed",
+                            "cancelled"
+                        ],
+                        "example": "scheduled"
+                    },
+                    "consultation_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 100
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "Follow-up consultation"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "AppointmentCreateRequest": {
+                "required": [
+                    "dermatologist_id",
+                    "scheduled_at"
+                ],
+                "properties": {
+                    "dermatologist_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "scheduled_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:00:00Z"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "Follow-up consultation"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "patient@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "password",
+                    "password_confirmation",
+                    "role"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "patient@example.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "enum": [
+                            "male",
+                            "female",
+                            "other"
+                        ],
+                        "example": "male"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "patient",
+                            "dermatologist",
+                            "admin"
+                        ],
+                        "example": "patient"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
                 "properties": {
                     "id": {
                         "type": "integer",
@@ -1515,14 +2365,14 @@
                         "format": "email",
                         "example": "john@example.com"
                     },
-                    "phone_no": {
+                    "phone": {
                         "type": "string",
                         "example": "+1234567890"
                     },
-                    "dob": {
+                    "date_of_birth": {
                         "type": "string",
                         "format": "date",
-                        "example": "1990-01-15"
+                        "example": "1990-01-01"
                     },
                     "gender": {
                         "type": "string",
@@ -1533,91 +2383,94 @@
                         ],
                         "example": "male"
                     },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "patient",
+                            "dermatologist",
+                            "admin"
+                        ],
+                        "example": "patient"
+                    },
                     "is_active": {
                         "type": "boolean",
                         "example": true
                     },
-                    "subscription_status": {
+                    "created_at": {
                         "type": "string",
-                        "example": "-"
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "AppointmentStatusUpdateRequest": {
+                "required": [
+                    "status"
+                ],
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "scheduled",
+                            "in_progress",
+                            "completed",
+                            "cancelled"
+                        ],
+                        "example": "completed"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "example": "Consultation completed successfully"
+                    }
+                },
+                "type": "object"
+            },
+            "DermatologistProfile": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "license_number": {
+                        "type": "string",
+                        "example": "DR123456"
+                    },
+                    "specialization": {
+                        "type": "string",
+                        "example": "Hair Loss Treatment"
+                    },
+                    "years_of_experience": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "qualifications": {
+                        "type": "string",
+                        "example": "MD, Dermatology"
+                    },
+                    "consultation_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 100
                     },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-01-15T10:30:00Z"
-                    }
-                },
-                "type": "object"
-            },
-            "PatientCreateRequest": {
-                "required": [
-                    "name",
-                    "email",
-                    "phone_no",
-                    "password"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string"
+                        "example": "2024-01-01T00:00:00Z"
                     },
-                    "email": {
+                    "updated_at": {
                         "type": "string",
-                        "format": "email"
-                    },
-                    "phone_no": {
-                        "type": "string"
-                    },
-                    "password": {
-                        "type": "string",
-                        "format": "password",
-                        "minLength": 6
-                    },
-                    "dob": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "gender": {
-                        "type": "string",
-                        "enum": [
-                            "male",
-                            "female",
-                            "other"
-                        ]
-                    }
-                },
-                "type": "object"
-            },
-            "PatientUpdateRequest": {
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "phone_no": {
-                        "type": "string"
-                    },
-                    "password": {
-                        "type": "string",
-                        "format": "password",
-                        "minLength": 6
-                    },
-                    "dob": {
-                        "type": "string",
-                        "format": "date"
-                    },
-                    "gender": {
-                        "type": "string",
-                        "enum": [
-                            "male",
-                            "female",
-                            "other"
-                        ]
-                    },
-                    "is_active": {
-                        "type": "boolean"
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
                     }
                 },
                 "type": "object"
@@ -1630,12 +2483,12 @@
                     },
                     "name": {
                         "type": "string",
-                        "example": "Dr. John Doe"
+                        "example": "Dr. Jane Smith"
                     },
                     "email": {
                         "type": "string",
                         "format": "email",
-                        "example": "john@example.com"
+                        "example": "dermatologist@example.com"
                     },
                     "phone_no": {
                         "type": "string",
@@ -1644,7 +2497,7 @@
                     "dob": {
                         "type": "string",
                         "format": "date",
-                        "example": "1990-01-15"
+                        "example": "1985-01-01"
                     },
                     "gender": {
                         "type": "string",
@@ -1653,7 +2506,7 @@
                             "female",
                             "other"
                         ],
-                        "example": "male"
+                        "example": "female"
                     },
                     "is_active": {
                         "type": "boolean",
@@ -1666,7 +2519,7 @@
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
-                        "example": "2024-01-15T10:30:00Z"
+                        "example": "2024-01-01T00:00:00Z"
                     }
                 },
                 "type": "object"
@@ -1680,23 +2533,27 @@
                 ],
                 "properties": {
                     "name": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Dr. Jane Smith"
                     },
                     "email": {
                         "type": "string",
-                        "format": "email"
+                        "format": "email",
+                        "example": "dermatologist@example.com"
                     },
                     "phone_no": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "+1234567890"
                     },
                     "password": {
                         "type": "string",
                         "format": "password",
-                        "minLength": 6
+                        "example": "password123"
                     },
                     "dob": {
                         "type": "string",
-                        "format": "date"
+                        "format": "date",
+                        "example": "1985-01-01"
                     },
                     "gender": {
                         "type": "string",
@@ -1704,7 +2561,8 @@
                             "male",
                             "female",
                             "other"
-                        ]
+                        ],
+                        "example": "female"
                     }
                 },
                 "type": "object"
@@ -1712,23 +2570,27 @@
             "DermatologistUpdateRequest": {
                 "properties": {
                     "name": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "Dr. Jane Smith"
                     },
                     "email": {
                         "type": "string",
-                        "format": "email"
+                        "format": "email",
+                        "example": "dermatologist@example.com"
                     },
                     "phone_no": {
-                        "type": "string"
+                        "type": "string",
+                        "example": "+1234567890"
                     },
                     "password": {
                         "type": "string",
                         "format": "password",
-                        "minLength": 6
+                        "example": "password123"
                     },
                     "dob": {
                         "type": "string",
-                        "format": "date"
+                        "format": "date",
+                        "example": "1985-01-01"
                     },
                     "gender": {
                         "type": "string",
@@ -1736,10 +2598,145 @@
                             "male",
                             "female",
                             "other"
-                        ]
+                        ],
+                        "example": "female"
                     },
                     "is_active": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "Patient": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "patient@example.com"
+                    },
+                    "phone_no": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "dob": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "enum": [
+                            "male",
+                            "female",
+                            "other"
+                        ],
+                        "example": "male"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "subscription_status": {
+                        "type": "string",
+                        "example": "-"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "PatientCreateRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "phone_no",
+                    "password"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "patient@example.com"
+                    },
+                    "phone_no": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    },
+                    "dob": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "enum": [
+                            "male",
+                            "female",
+                            "other"
+                        ],
+                        "example": "male"
+                    }
+                },
+                "type": "object"
+            },
+            "PatientUpdateRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "patient@example.com"
+                    },
+                    "phone_no": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "password": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "password123"
+                    },
+                    "dob": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-01-01"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "enum": [
+                            "male",
+                            "female",
+                            "other"
+                        ],
+                        "example": "male"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
                     }
                 },
                 "type": "object"
@@ -1756,7 +2753,7 @@
                     },
                     "error": {
                         "type": "string",
-                        "example": "Detailed error info"
+                        "example": "Detailed error information"
                     }
                 },
                 "type": "object"
@@ -1769,10 +2766,111 @@
                     },
                     "message": {
                         "type": "string",
-                        "example": "The given data was invalid."
+                        "example": "Validation errors"
                     },
                     "errors": {
-                        "type": "object"
+                        "type": "object",
+                        "example": {
+                            "field": "The field is required."
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "QuizQuestion": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question": {
+                        "type": "string",
+                        "example": "Do you experience hair loss?"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "multiple_choice",
+                            "text",
+                            "yes_no"
+                        ],
+                        "example": "yes_no"
+                    },
+                    "order": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "QuizResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "question_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "answer": {
+                        "type": "string",
+                        "example": "Yes"
+                    },
+                    "selected_option_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "QuizSubmitRequest": {
+                "required": [
+                    "responses"
+                ],
+                "properties": {
+                    "responses": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "question_id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "answer": {
+                                    "type": "string",
+                                    "example": "Yes"
+                                },
+                                "selected_option_id": {
+                                    "type": "integer",
+                                    "example": 1
+                                }
+                            },
+                            "type": "object"
+                        }
                     }
                 },
                 "type": "object"
@@ -1781,7 +2879,6 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Enter JWT token",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
             }
@@ -1797,16 +2894,29 @@
             "description": "User authentication endpoints"
         },
         {
+            "name": "Dermatologist Appointments",
+            "description": "Dermatologist appointment management endpoints"
+        },
+        {
+            "name": "Dermatologist Authentication",
+            "description": "Dermatologist authentication endpoints"
+        },
+        {
             "name": "Dermatologists",
-            "description": "Dermatologist-specific endpoints"
+            "description": "Dermatologist management endpoints (Admin)"
         },
         {
             "name": "Patients",
-            "description": "Patient-specific endpoints"
+            "description": "Patient management endpoints (Admin)"
         },
         {
             "name": "Quiz",
             "description": "Hair loss quiz endpoints"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
         }
     ]
 }

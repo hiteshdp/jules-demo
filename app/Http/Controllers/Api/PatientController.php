@@ -11,6 +11,78 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 /**
+ * @OA\Info(
+ *     title="Hair Loss Diagnosis & Treatment Platform API",
+ *     version="1.0.0",
+ *     description="Complete API documentation for the Hair Loss Diagnosis & Treatment Platform"
+ * )
+ * 
+ * @OA\Server(
+ *     url="http://localhost:8000/api",
+ *     description="Development server"
+ * )
+ * 
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="Patient",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="subscription_status", type="string", example="-"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="PatientCreateRequest",
+ *     type="object",
+ *     required={"name","email","phone_no","password"},
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="PatientUpdateRequest",
+ *     type="object",
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
+ *     @OA\Property(property="is_active", type="boolean", example=true)
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ApiError",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=false),
+ *     @OA\Property(property="message", type="string", example="Error message"),
+ *     @OA\Property(property="error", type="string", example="Detailed error information")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ValidationError",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=false),
+ *     @OA\Property(property="message", type="string", example="Validation errors"),
+ *     @OA\Property(property="errors", type="object", example={"field": "The field is required."})
+ * )
+ * 
  * @OA\Tag(
  *     name="Patients",
  *     description="Patient management endpoints (Admin)"
@@ -321,6 +393,83 @@ class PatientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete patient',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/patient/dermatologists",
+     *     summary="Get available dermatologists",
+     *     description="Get list of available dermatologists for appointment booking",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dermatologists retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Dermatologists retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="dermatologists",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+     *                         @OA\Property(property="email", type="string", example="dermatologist@example.com"),
+     *                         @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+     *                         @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *                         @OA\Property(property="years_of_experience", type="integer", example=5),
+     *                         @OA\Property(property="qualifications", type="string", example="MD, Dermatology")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated")
+     *         )
+     *     )
+     * )
+     */
+    public function getDermatologists(Request $request): JsonResponse
+    {
+        try {
+            $dermatologists = User::where('role', 'dermatologist')
+                ->where('is_active', true)
+                ->with('dermatologistProfile')
+                ->get()
+                ->map(function ($user) {
+                    $profile = $user->dermatologistProfile;
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'specialization' => $profile ? $profile->specialization : 'General Dermatology',
+                        'consultation_fee' => $profile ? $profile->consultation_fee : 0,
+                        'years_of_experience' => $profile ? $profile->years_of_experience : 0,
+                        'qualifications' => $profile ? $profile->qualifications : 'MD'
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Dermatologists retrieved successfully',
+                'data' => [
+                    'dermatologists' => $dermatologists
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve dermatologists',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -9,6 +9,29 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 /**
+ * @OA\Schema(
+ *     schema="Appointment",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="patient_id", type="integer", example=1),
+ *     @OA\Property(property="dermatologist_id", type="integer", example=2),
+ *     @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
+ *     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="scheduled"),
+ *     @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+ *     @OA\Property(property="notes", type="string", example="Follow-up consultation"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="AppointmentCreateRequest",
+ *     type="object",
+ *     required={"dermatologist_id","scheduled_at"},
+ *     @OA\Property(property="dermatologist_id", type="integer", example=1),
+ *     @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
+ *     @OA\Property(property="notes", type="string", example="Follow-up consultation")
+ * )
+ * 
  * @OA\Tag(
  *     name="Appointments",
  *     description="Appointment management endpoints"
@@ -47,7 +70,7 @@ class AppointmentController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        
+
         // Get appointments for the authenticated patient
         $appointments = Appointment::where('patient_id', $user->id)
             ->with(['dermatologist'])
@@ -97,7 +120,7 @@ class AppointmentController extends Controller
     public function show(Request $request, $id): JsonResponse
     {
         $user = $request->user();
-        
+
         $appointment = Appointment::where('id', $id)
             ->where('patient_id', $user->id)
             ->with(['dermatologist'])
@@ -165,7 +188,7 @@ class AppointmentController extends Controller
 
         // Get the dermatologist to fetch consultation fee
         $dermatologist = \App\Models\Dermatologist::where('user_id', $validated['dermatologist_id'])->first();
-        
+
         if (!$dermatologist) {
             return response()->json([
                 'success' => false,
