@@ -4,6 +4,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\UserSeeder;
+use Database\Seeders\ProductSeeder;
+use Database\Seeders\AdminSettingSeeder;
+use Database\Seeders\HairLossQuizQuestionSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,8 +16,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
+        // \App\Models\User::factory(10)->create();
+
+        // \App\Models\User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
+		$this->call([
             DermatologistSeeder::class,
-        ]);
+			AdminSettingSeeder::class,
+			UserSeeder::class,
+			ProductSeeder::class,
+			HairLossQuizQuestionSeeder::class,
+		]);
     }
 }

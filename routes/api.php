@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
+use App\Http\Controllers\Api\PatientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/quiz/questions', [QuizController::class, 'questions']);
         Route::post('/quiz/submit', [QuizController::class, 'submit']);
         Route::get('/quiz/responses', [QuizController::class, 'responses']);
+        
+        // Dermatologists
+        Route::get('/dermatologists', [PatientController::class, 'getDermatologists']);
     });
 
     // Dermatologist routes

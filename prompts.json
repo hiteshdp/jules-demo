@@ -343,5 +343,88 @@
       "user_prompt": "My frontend is failing with these API errors: 1. GET http://localhost:8000/api/patient/appointments → 404 Not Found 2. GET http://localhost:8000/api/patient/quiz/questions → 404 Not Found 3. GET http://localhost:8000/api/me → 401 Unauthorized Please fix this by: 1. Creating proper API routes in routes/api.php for: - GET /api/patient/appointments → handled by AppointmentController@index - GET /api/patient/quiz/questions → handled by QuizController@questions - GET /api/me → should return the authenticated user's details 2. Implementing missing controllers and methods if not already present: - AppointmentController with an index() method that returns sample or real appointments for the logged-in patient. - QuizController with a questions() method that returns quiz questions. - AuthController or UserController with a me() method that returns the current authenticated user. 3. Securing routes: - Use Sanctum/JWT middleware for authenticated routes. - Ensure /api/login returns a token and the frontend passes it in the Authorization header (Bearer token). 4. After this, requests to these routes should return proper JSON responses instead of 404 or 401 errors.",
       "prompt_type": "ai_response"
     }
+    ,
+    {
+      "id": "dermatologist_pages_fix_v1",
+      "path": "prompts/dermatologist_pages_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/Profile.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "receving this error",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_index_fix_v1",
+      "path": "prompts/dermatologist_index_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/index.tsx",
+        "frontend/dermatologist/src/index.css"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "again erorr",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_fetch_functionality_v1",
+      "path": "prompts/dermatologist_fetch_functionality_v1.md",
+      "used_in": [
+        "routes/api.php",
+        "frontend/patient/src/store/api/dermatologistAPI.ts",
+        "frontend/patient/src/store/slices/dermatologistSlice.ts",
+        "frontend/patient/src/store/store.ts",
+        "frontend/patient/src/pages/Dermatologists.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/Sidebar.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "I have checked laravel side and there is no route for appointment/fetchDermatologists. I want whole functionality for that. Do the need full for laravel api and react patient",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_sidebar_removal_v1",
+      "path": "prompts/patient_sidebar_removal_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/Layout.tsx",
+        "frontend/patient/src/components/Header.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "I don't want sidebar in patient module. I only want book appointment popup dropdown list to be populated. Remove the unneccery code and sidebar menu.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_booking_fix_v1",
+      "path": "prompts/appointment_booking_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "frontend/patient/src/store/slices/appointmentSlice.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "Review the Appointments page, there is one button called book new appointment, In that opened new popup to store the appointment but it's not working as there are some changes in api. Fix the issue and make it working, Also i need proper listing of the stored appointments. If required to change anything in api do that the root dir has the laravel code. check that as well.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_relationship_fix_v1",
+      "path": "prompts/appointment_relationship_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "frontend/patient/src/store/slices/appointmentSlice.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "\"message\": \"Call to undefined relationship [user] on model [App\\\\Models\\\\User].\", receiving this error in the given line number",
+      "prompt_type": "user_request"
+    }
   ]
 }
