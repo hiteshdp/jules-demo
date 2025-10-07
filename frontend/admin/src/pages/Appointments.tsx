@@ -3,8 +3,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
-import { Card, Table, Tag, Avatar, Typography, Space, Empty, Spin } from 'antd';
-import { CalendarOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons';
+import { Card, Table, Tag, Avatar, Typography, Space, Empty } from 'antd';
+import { CalendarOutlined, TeamOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 
 const { Title, Text } = Typography;

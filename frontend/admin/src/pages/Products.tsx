@@ -18,7 +18,6 @@ import {
   Select, 
   InputNumber, 
   Switch,
-  message
 } from 'antd';
 import { 
   ShoppingOutlined, 
@@ -279,7 +278,10 @@ const Products: React.FC = () => {
               min={0}
               step={0.01}
               formatter={value => `₹ ${value}`}
-              parser={value => value!.replace('₹ ', '')}
+              parser={(value: string | undefined) => {
+                const numValue = value ? value.replace('₹ ', '') : '';
+                return numValue === '' ? 0 : parseFloat(numValue);
+              }}
             />
           </Form.Item>
           

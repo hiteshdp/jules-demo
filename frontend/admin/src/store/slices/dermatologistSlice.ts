@@ -1,5 +1,5 @@
 // Generated via prompt: prompts/admin_dermatologists_crud_v1.md
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { dermatologistAPI } from '../api/dermatologistAPI';
 
 interface Dermatologist {
@@ -42,7 +42,7 @@ const initialState: DermatologistState = {
 
 export const fetchDermatologists = createAsyncThunk(
   'dermatologist/fetchDermatologists',
-  async (params: { page?: number; search?: string } = {}, { rejectWithValue }) => {
+  async (params: { page?: number; search?: string } = {}, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await dermatologistAPI.getDermatologists(params);
       return response.data;
@@ -54,7 +54,7 @@ export const fetchDermatologists = createAsyncThunk(
 
 export const createDermatologist = createAsyncThunk(
   'dermatologist/createDermatologist',
-  async (data: { name: string; email: string; phone_no: string; password: string; dob?: string; gender?: 'male' | 'female' | 'other' }, { rejectWithValue }) => {
+  async (data: { name: string; email: string; phone_no: string; password: string; dob?: string; gender?: 'male' | 'female' | 'other' }, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await dermatologistAPI.createDermatologist(data);
       return response.data;
@@ -66,7 +66,7 @@ export const createDermatologist = createAsyncThunk(
 
 export const updateDermatologist = createAsyncThunk(
   'dermatologist/updateDermatologist',
-  async ({ dermatologistId, data }: { dermatologistId: number; data: Partial<{ name: string; email: string; phone_no: string; password: string; dob: string; gender: 'male' | 'female' | 'other' }> }, { rejectWithValue }) => {
+  async ({ dermatologistId, data }: { dermatologistId: number; data: Partial<{ name: string; email: string; phone_no: string; password: string; dob: string; gender: 'male' | 'female' | 'other' }> }, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await dermatologistAPI.updateDermatologist(dermatologistId, data);
       return response.data;
@@ -78,7 +78,7 @@ export const updateDermatologist = createAsyncThunk(
 
 export const deleteDermatologist = createAsyncThunk(
   'dermatologist/deleteDermatologist',
-  async (dermatologistId: number, { rejectWithValue }) => {
+  async (dermatologistId: number, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       await dermatologistAPI.deleteDermatologist(dermatologistId);
       return dermatologistId;
@@ -92,18 +92,18 @@ const dermatologistSlice = createSlice({
   name: 'dermatologist',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: (state: DermatologistState) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: (builder: any) => {
     builder
       // Fetch dermatologists
-      .addCase(fetchDermatologists.pending, (state) => {
+      .addCase(fetchDermatologists.pending, (state: DermatologistState) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchDermatologists.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchDermatologists.fulfilled, (state: DermatologistState, action: any) => {
         state.loading = false;
         state.dermatologists = action.payload.data;
         state.pagination = {
@@ -113,49 +113,49 @@ const dermatologistSlice = createSlice({
           total: action.payload.total,
         };
       })
-      .addCase(fetchDermatologists.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchDermatologists.rejected, (state: DermatologistState, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Create dermatologist
-      .addCase(createDermatologist.pending, (state) => {
+      .addCase(createDermatologist.pending, (state: DermatologistState) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createDermatologist.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(createDermatologist.fulfilled, (state: DermatologistState, action: any) => {
         state.loading = false;
         state.dermatologists.unshift(action.payload.data);
       })
-      .addCase(createDermatologist.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(createDermatologist.rejected, (state: DermatologistState, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Update dermatologist
-      .addCase(updateDermatologist.pending, (state) => {
+      .addCase(updateDermatologist.pending, (state: DermatologistState) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateDermatologist.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(updateDermatologist.fulfilled, (state: DermatologistState, action: any) => {
         state.loading = false;
-        const index = state.dermatologists.findIndex(d => d.id === action.payload.data.id);
+        const index = state.dermatologists.findIndex((d: Dermatologist) => d.id === action.payload.data.id);
         if (index !== -1) {
           state.dermatologists[index] = action.payload.data;
         }
       })
-      .addCase(updateDermatologist.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(updateDermatologist.rejected, (state: DermatologistState, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Delete dermatologist
-      .addCase(deleteDermatologist.pending, (state) => {
+      .addCase(deleteDermatologist.pending, (state: DermatologistState) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteDermatologist.fulfilled, (state, action: PayloadAction<number>) => {
+      .addCase(deleteDermatologist.fulfilled, (state: DermatologistState, action: any) => {
         state.loading = false;
-        state.dermatologists = state.dermatologists.filter(d => d.id !== action.payload);
+        state.dermatologists = state.dermatologists.filter((d: Dermatologist) => d.id !== action.payload);
       })
-      .addCase(deleteDermatologist.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(deleteDermatologist.rejected, (state: DermatologistState, action: any) => {
         state.loading = false;
         state.error = action.payload;
       });

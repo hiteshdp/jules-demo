@@ -1,5 +1,5 @@
 // Generated via prompt: prompts/admin_patients_crud_v1.md
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { patientAPI } from '../api/patientAPI';
 
 interface Patient {
@@ -37,7 +37,7 @@ const initialState: PatientState = {
 
 export const fetchPatients = createAsyncThunk(
   'patient/fetchPatients',
-  async (params: { page?: number; search?: string } = {}, { rejectWithValue }) => {
+  async (params: { page?: number; search?: string } = {}, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await patientAPI.getPatients(params);
       return response.data;
@@ -49,7 +49,7 @@ export const fetchPatients = createAsyncThunk(
 
 export const createPatient = createAsyncThunk(
   'patient/create',
-  async (data: { name: string; email: string; phone_no: string; dob?: string; gender?: 'male' | 'female' | 'other' }, { rejectWithValue }) => {
+  async (data: { name: string; email: string; phone_no: string; password: string; dob?: string; gender?: 'male' | 'female' | 'other' }, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await patientAPI.createPatient(data);
       return response.data;
@@ -61,7 +61,7 @@ export const createPatient = createAsyncThunk(
 
 export const updatePatient = createAsyncThunk(
   'patient/update',
-  async ({ patientId, data }: { patientId: number; data: Partial<{ name: string; email: string; phone_no: string; dob: string; gender: 'male' | 'female' | 'other' }> }, { rejectWithValue }) => {
+  async ({ patientId, data }: { patientId: number; data: Partial<{ name: string; email: string; phone_no: string; dob: string; gender: 'male' | 'female' | 'other' }> }, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await patientAPI.updatePatient(patientId, data);
       return response.data;
@@ -73,7 +73,7 @@ export const updatePatient = createAsyncThunk(
 
 export const deletePatient = createAsyncThunk(
   'patient/delete',
-  async (patientId: number, { rejectWithValue }) => {
+  async (patientId: number, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await patientAPI.deletePatient(patientId);
       return { id: patientId, ...response.data };
@@ -87,18 +87,18 @@ const patientSlice = createSlice({
   name: 'patient',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: (state: PatientState) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: (builder: any) => {
     builder
       // Fetch Patients
-      .addCase(fetchPatients.pending, (state) => {
+      .addCase(fetchPatients.pending, (state: PatientState) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchPatients.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchPatients.fulfilled, (state: PatientState, action: any) => {
         state.loading = false;
         state.patients = action.payload.data;
         state.pagination = {
@@ -108,12 +108,12 @@ const patientSlice = createSlice({
           total: action.payload.total,
         };
       })
-      .addCase(fetchPatients.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchPatients.rejected, (state: PatientState, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Create patient
-      .addCase(createPatient.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(createPatient.fulfilled, (state: PatientState, action: any) => {
         const created = action.payload.data || action.payload;
         state.patients.unshift(created);
         if (state.pagination) {
@@ -121,17 +121,17 @@ const patientSlice = createSlice({
         }
       })
       // Update patient
-      .addCase(updatePatient.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(updatePatient.fulfilled, (state: PatientState, action: any) => {
         const updated = action.payload.data || action.payload;
-        const index = state.patients.findIndex(p => p.id === updated.id);
+        const index = state.patients.findIndex((p: Patient) => p.id === updated.id);
         if (index !== -1) {
           state.patients[index] = { ...state.patients[index], ...updated } as Patient;
         }
       })
       // Delete patient
-      .addCase(deletePatient.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(deletePatient.fulfilled, (state: PatientState, action: any) => {
         const id = action.payload.id;
-        state.patients = state.patients.filter(p => p.id !== id);
+        state.patients = state.patients.filter((p: Patient) => p.id !== id);
         if (state.pagination) {
           state.pagination.total = Math.max(0, state.pagination.total - 1);
         }

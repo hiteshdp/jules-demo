@@ -1,6 +1,4 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from './store/store';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -13,7 +11,6 @@ import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   return (
     <div className="min-h-screen bg-gray-50">

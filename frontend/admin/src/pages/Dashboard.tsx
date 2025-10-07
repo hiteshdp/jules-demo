@@ -1,7 +1,5 @@
 // Generated via prompt: prompts/antd_admin_full_conversion_v1.md
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
 import { 
   Card, 
   Row, 
