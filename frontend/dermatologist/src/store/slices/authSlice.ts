@@ -10,6 +10,9 @@ interface User {
   date_of_birth?: string;
   gender?: string;
   profile_image?: string;
+  specialization?: string;
+  experience?: string;
+  bio?: string;
   dermatologistProfile?: any;
 }
 
