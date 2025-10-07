@@ -1,198 +1,167 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { UserCircleIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { Form, Card, Row, Col, Avatar, Button, Space } from 'antd';
+import { UserOutlined, EditOutlined } from '@ant-design/icons';
+import { PageHeader, FormField } from '../components/common';
+import toast from 'react-hot-toast';
 
 const Profile: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    specialization: 'Dermatology',
-    experience: '5+ years',
-    qualifications: 'MD Dermatology',
-    phone: '+91 98765 43210',
-    address: '123 Medical Center, Mumbai, India',
-  });
+  const [form] = Form.useForm();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  useEffect(() => {
+    if (user) {
+      form.setFieldsValue({
+        name: user.name || '',
+        email: user.email || '',
+        specialization: user.specialization || 'Dermatology',
+        experience: user.experience || '5+ years',
+        qualifications: user.qualifications || 'MD Dermatology',
+        phone: user.phone || '+91 98765 43210',
+        address: user.address || '123 Medical Center, Mumbai, India',
+      });
+    }
+  }, [user, form]);
+
+  const handleSubmit = () => {
+    // In a real app, this would dispatch an update action
+    toast.success('Profile updated successfully!');
+    setIsEditing(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement profile update API call
+  const handleCancel = () => {
+    if (user) {
+      form.setFieldsValue({
+        name: user.name || '',
+        email: user.email || '',
+        specialization: user.specialization || 'Dermatology',
+        experience: user.experience || '5+ years',
+        qualifications: user.qualifications || 'MD Dermatology',
+        phone: user.phone || '+91 98765 43210',
+        address: user.address || '123 Medical Center, Mumbai, India',
+      });
+    }
     setIsEditing(false);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage your professional information and credentials.
-          </p>
-        </div>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          <PencilIcon className="h-4 w-4 mr-2" />
-          {isEditing ? 'Cancel' : 'Edit Profile'}
-        </button>
-      </div>
+      <PageHeader
+        title="Profile"
+        description="Manage your professional information and credentials."
+        extra={
+          <Button
+            type={isEditing ? "default" : "primary"}
+            icon={<EditOutlined />}
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            {isEditing ? 'Cancel' : 'Edit Profile'}
+          </Button>
+        }
+      />
 
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="flex-shrink-0">
-              <UserCircleIcon className="h-16 w-16 text-gray-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">
-                Dr. {user?.name}
-              </h3>
-              <p className="text-sm text-gray-500">Dermatologist</p>
-            </div>
+      <Card>
+        <div className="flex items-center space-x-4 mb-6">
+          <Avatar size={64} icon={<UserOutlined />} className="bg-blue-100 text-blue-600" />
+          <div>
+            <h3 className="text-lg font-medium text-gray-900">
+              Dr. {user?.name}
+            </h3>
+            <p className="text-sm text-gray-500">Dermatologist</p>
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="specialization" className="block text-sm font-medium text-gray-700">
-                  Specialization
-                </label>
-                <input
-                  type="text"
-                  name="specialization"
-                  id="specialization"
-                  value={formData.specialization}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="experience" className="block text-sm font-medium text-gray-700">
-                  Experience
-                </label>
-                <input
-                  type="text"
-                  name="experience"
-                  id="experience"
-                  value={formData.experience}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="qualifications" className="block text-sm font-medium text-gray-700">
-                  Qualifications
-                </label>
-                <input
-                  type="text"
-                  name="qualifications"
-                  id="qualifications"
-                  value={formData.qualifications}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  id="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                Address
-              </label>
-              <textarea
-                name="address"
-                id="address"
-                rows={3}
-                value={formData.address}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-              />
-            </div>
-
-            {isEditing && (
-              <div className="flex justify-end space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Save Changes
-                </button>
-              </div>
-            )}
-          </form>
         </div>
-      </div>
+
+        <Form
+          form={form}
+          onFinish={handleSubmit}
+          layout="vertical"
+          disabled={!isEditing}
+        >
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <FormField
+                name="name"
+                label="Full Name"
+                type="input"
+                placeholder="Enter your full name"
+                required
+              />
+            </Col>
+            <Col xs={24} sm={12}>
+              <FormField
+                name="email"
+                label="Email Address"
+                type="email"
+                placeholder="Enter your email"
+                required
+              />
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <FormField
+                name="specialization"
+                label="Specialization"
+                type="input"
+                placeholder="Enter your specialization"
+              />
+            </Col>
+            <Col xs={24} sm={12}>
+              <FormField
+                name="experience"
+                label="Experience"
+                type="input"
+                placeholder="Enter your experience"
+              />
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <FormField
+                name="qualifications"
+                label="Qualifications"
+                type="input"
+                placeholder="Enter your qualifications"
+              />
+            </Col>
+            <Col xs={24} sm={12}>
+              <FormField
+                name="phone"
+                label="Phone Number"
+                type="input"
+                placeholder="Enter your phone number"
+              />
+            </Col>
+          </Row>
+
+          <FormField
+            name="address"
+            label="Address"
+            type="textarea"
+            rows={3}
+            placeholder="Enter your address"
+          />
+
+          {isEditing && (
+            <div className="flex justify-end mt-6">
+              <Space>
+                <Button onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Save Changes
+                </Button>
+              </Space>
+            </div>
+          )}
+        </Form>
+      </Card>
     </div>
   );
 };
 
 export default Profile;
-
-

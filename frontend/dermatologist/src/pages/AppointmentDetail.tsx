@@ -3,14 +3,19 @@ import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { 
-  CalendarDaysIcon, 
-  UserIcon, 
-  CurrencyDollarIcon, 
-  ClockIcon,
-  ChatBubbleLeftRightIcon,
-  DocumentTextIcon,
-  PencilIcon
-} from '@heroicons/react/24/outline';
+  CalendarOutlined, 
+  UserOutlined, 
+  DollarOutlined, 
+  ClockCircleOutlined,
+  MessageOutlined,
+  FileTextOutlined,
+  EditOutlined
+} from '@ant-design/icons';
+import { Card, Row, Col, Typography, Space, Button, Input, Descriptions } from 'antd';
+import { PageHeader, StatusTag } from '../components/common';
+
+const { Title, Text } = Typography;
+const { TextArea } = Input;
 
 const AppointmentDetail: React.FC = () => {
   const { id } = useParams();
@@ -19,15 +24,15 @@ const AppointmentDetail: React.FC = () => {
   const [notes, setNotes] = useState('Patient shows signs of early pattern hair loss. Recommended minoxidil treatment and follow-up in 3 months.');
 
   // Find the appointment by ID
-  const appointment = appointments.find(apt => apt.id === parseInt(id || '0'));
+  const appointment = (Array.isArray(appointments) ? appointments : []).find(apt => apt.id === parseInt(id || '0'));
 
   if (!appointment) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Appointment Not Found</h1>
-          <p className="mt-1 text-sm text-gray-500">The requested appointment could not be found.</p>
-        </div>
+        <PageHeader
+          title="Appointment Not Found"
+          description="The requested appointment could not be found."
+        />
         <div>
           <Link to="/appointments" className="text-blue-600 hover:text-blue-700 text-sm">← Back to Appointments</Link>
         </div>
@@ -35,191 +40,142 @@ const AppointmentDetail: React.FC = () => {
     );
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'scheduled':
-        return 'bg-blue-100 text-blue-800';
-      case 'in_progress':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const formatDateTime = (dateTime: string) => {
     return new Date(dateTime).toLocaleString();
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Appointment Details</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {formatDateTime(appointment.scheduled_at)}
-          </p>
-        </div>
-        <Link 
-          to="/appointments" 
-          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-        >
-          ← Back to Appointments
-        </Link>
-      </div>
+      <PageHeader
+        title="Appointment Details"
+        description={formatDateTime(appointment.scheduled_at)}
+        extra={
+          <Link to="/appointments">
+            <Button>← Back to Appointments</Button>
+          </Link>
+        }
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <Row gutter={[24, 24]}>
         {/* Patient Information */}
-        <div className="lg:col-span-2">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Patient Information
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <UserIcon className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {appointment.patient?.name || 'Unknown Patient'}
-                    </p>
-                    <p className="text-sm text-gray-500">Patient Name</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CalendarDaysIcon className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      {formatDateTime(appointment.scheduled_at)}
-                    </p>
-                    <p className="text-sm text-gray-500">Scheduled Time</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CurrencyDollarIcon className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      ₹{appointment.consultation_fee}
-                    </p>
-                    <p className="text-sm text-gray-500">Consultation Fee</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <ClockIcon className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
-                      {appointment.status}
-                    </span>
-                    <p className="text-sm text-gray-500">Status</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <Col xs={24} lg={16}>
+          <Card title="Patient Information" className="mb-6">
+            <Descriptions column={1}>
+              <Descriptions.Item label="Patient Name">
+                <Space>
+                  <UserOutlined />
+                  <Text strong>{appointment.patient?.name || 'Unknown Patient'}</Text>
+                </Space>
+              </Descriptions.Item>
+              <Descriptions.Item label="Scheduled Time">
+                <Space>
+                  <CalendarOutlined />
+                  <Text>{formatDateTime(appointment.scheduled_at)}</Text>
+                </Space>
+              </Descriptions.Item>
+              <Descriptions.Item label="Consultation Fee">
+                <Space>
+                  <DollarOutlined />
+                  <Text strong>₹{appointment.consultation_fee}</Text>
+                </Space>
+              </Descriptions.Item>
+              <Descriptions.Item label="Status">
+                <Space>
+                  <ClockCircleOutlined />
+                  <StatusTag status={appointment.status} />
+                </Space>
+              </Descriptions.Item>
+            </Descriptions>
+          </Card>
 
           {/* Notes Section */}
-          <div className="mt-6 bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Consultation Notes
-                </h3>
-                <button
-                  onClick={() => setIsEditingNotes(!isEditingNotes)}
-                  className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  <PencilIcon className="h-4 w-4 mr-1" />
-                  {isEditingNotes ? 'Cancel' : 'Edit'}
-                </button>
-              </div>
-              {isEditingNotes ? (
-                <div>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    rows={6}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Enter consultation notes..."
-                  />
-                  <div className="mt-4 flex justify-end space-x-3">
-                    <button
-                      onClick={() => setIsEditingNotes(false)}
-                      className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={() => setIsEditingNotes(false)}
-                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                      Save Notes
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600 whitespace-pre-wrap">
-                  {notes || 'No notes available for this appointment.'}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+          <Card 
+            title="Consultation Notes"
+            extra={
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => setIsEditingNotes(!isEditingNotes)}
+              >
+                {isEditingNotes ? 'Cancel' : 'Edit'}
+              </Button>
+            }
+          >
+            {isEditingNotes ? (
+              <Space direction="vertical" className="w-full">
+                <TextArea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={6}
+                  placeholder="Enter consultation notes..."
+                />
+                <Space>
+                  <Button onClick={() => setIsEditingNotes(false)}>
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="primary" 
+                    onClick={() => setIsEditingNotes(false)}
+                  >
+                    Save Notes
+                  </Button>
+                </Space>
+              </Space>
+            ) : (
+              <Text className="whitespace-pre-wrap">
+                {notes || 'No notes available for this appointment.'}
+              </Text>
+            )}
+          </Card>
+        </Col>
 
         {/* Actions Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Quick Actions
-              </h3>
-              <div className="space-y-3">
-                <button className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
+        <Col xs={24} lg={8}>
+          <Space direction="vertical" className="w-full" size="large">
+            <Card title="Quick Actions">
+              <Space direction="vertical" className="w-full">
+                <Button 
+                  type="primary" 
+                  icon={<MessageOutlined />}
+                  className="w-full"
+                >
                   Start Chat
-                </button>
-                <button className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <DocumentTextIcon className="h-4 w-4 mr-2" />
+                </Button>
+                <Button 
+                  icon={<FileTextOutlined />}
+                  className="w-full"
+                >
                   View Patient History
-                </button>
-                <button className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <CalendarDaysIcon className="h-4 w-4 mr-2" />
+                </Button>
+                <Button 
+                  icon={<CalendarOutlined />}
+                  className="w-full"
+                >
                   Reschedule
-                </button>
-              </div>
-            </div>
-          </div>
+                </Button>
+              </Space>
+            </Card>
 
-          {/* Status Update */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Update Status
-              </h3>
-              <div className="space-y-2">
+            <Card title="Update Status">
+              <Space direction="vertical" className="w-full">
                 {['scheduled', 'in_progress', 'completed', 'cancelled'].map((status) => (
-                  <button
+                  <Button
                     key={status}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
+                    className={`w-full text-left ${
                       appointment.status === status
                         ? 'bg-blue-100 text-blue-800'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
-                  </button>
+                  </Button>
                 ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Space>
+            </Card>
+          </Space>
+        </Col>
+      </Row>
     </div>
   );
 };
 
 export default AppointmentDetail;
-
-

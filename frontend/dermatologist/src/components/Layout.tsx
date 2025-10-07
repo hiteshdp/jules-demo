@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { getMe } from '../store/slices/authSlice';
@@ -8,23 +8,15 @@ import Header from './Header';
 
 const Layout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const { user, loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     // Check if we have a token and need to verify authentication
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('dermatologist_token');
     if (token && !loading && !user) {
       dispatch(getMe());
     }
-  }, [dispatch, loading, user]); // Remove isAuthenticated from dependencies to avoid loops
-
-  useEffect(() => {
-    // Align with patient app: redirect to login when not authenticated
-    if (!user && !loading) {
-      navigate('/login');
-    }
-  }, [user, loading, navigate]);
+  }, [dispatch, loading, user]);
 
   if (loading) {
     return (

@@ -8,18 +8,10 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, loading, user } = useSelector((state: RootState) => state.auth);
-  const token = localStorage.getItem('token');
+  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
+  const token = localStorage.getItem('dermatologist_token');
 
-  // Show loading if we have a token but haven't verified authentication yet
-  if (token && !user && !loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
+  // Show loading while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -28,6 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
+  // Redirect to login if not authenticated
   if (!isAuthenticated || !token) {
     return <Navigate to="/login" replace />;
   }

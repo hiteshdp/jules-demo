@@ -756,6 +756,95 @@
       "date": "2025-01-27T14:00:00Z",
       "user_prompt": "for the backend , due to merge conflict i have discarded some code for swagger generation in api.docs can u add all the swagger for all apis",
       "prompt_type": "ai_response"
+    },
+    {
+      "id": "patient_antd_common_components_v1",
+      "path": "prompts/patient_antd_common_components_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/PageHeader.tsx",
+        "frontend/patient/src/components/common/LoadingSpinner.tsx",
+        "frontend/patient/src/components/common/EmptyState.tsx",
+        "frontend/patient/src/components/common/StatusTag.tsx",
+        "frontend/patient/src/components/common/FormField.tsx",
+        "frontend/patient/src/components/common/Modal.tsx",
+        "frontend/patient/src/components/common/Card.tsx",
+        "frontend/patient/src/components/common/Button.tsx",
+        "frontend/patient/src/components/common/ProgressBar.tsx",
+        "frontend/patient/src/components/common/index.ts",
+        "frontend/patient/src/pages/Login.tsx",
+        "frontend/patient/src/pages/Register.tsx",
+        "frontend/patient/src/pages/Dashboard.tsx",
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/Quiz.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T15:00:00Z",
+      "user_prompt": "in patient module , make sure all the pages use ant design component and common components , use component folder also",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "patient_date_picker_fix_v1",
+      "path": "prompts/patient_date_picker_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/FormField.tsx",
+        "frontend/patient/src/pages/Profile.tsx",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T16:00:00Z",
+      "user_prompt": "i am getting this error",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_antd_conversion_v1",
+      "path": "prompts/dermatologist_antd_conversion_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/common/PageHeader.tsx",
+        "frontend/dermatologist/src/components/common/LoadingSpinner.tsx",
+        "frontend/dermatologist/src/components/common/EmptyState.tsx",
+        "frontend/dermatologist/src/components/common/StatusTag.tsx",
+        "frontend/dermatologist/src/components/common/FormField.tsx",
+        "frontend/dermatologist/src/components/common/Modal.tsx",
+        "frontend/dermatologist/src/components/common/Card.tsx",
+        "frontend/dermatologist/src/components/common/Button.tsx",
+        "frontend/dermatologist/src/components/common/index.ts",
+        "frontend/dermatologist/src/pages/Login.tsx",
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/Profile.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T17:00:00Z",
+      "user_prompt": "in dermitologist module , i want same thing , all the pages should be using ant conponent , refer components folder also here",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_navigation_loop_fix_v1",
+      "path": "prompts/dermatologist_navigation_loop_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/Layout.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/ProtectedRoute.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T17:30:00Z",
+      "user_prompt": "Console errors showing infinite loops and navigation issues",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_chat_route_fix_v1",
+      "path": "prompts/dermatologist_chat_route_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Chat.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/common/LoadingSpinner.tsx",
+        "frontend/dermatologist/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T18:00:00Z",
+      "user_prompt": "getting this on chat",
+      "prompt_type": "ai_response"
     }
   ]
 }
