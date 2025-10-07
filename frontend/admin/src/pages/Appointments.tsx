@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
-import { CalendarDaysIcon, UserGroupIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
+import { CalendarDaysIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

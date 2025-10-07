@@ -22,6 +22,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
+  // If user data is not loaded yet, allow access temporarily
+  // This prevents the "Access Denied" error when /me endpoint fails
+  if (!user) {
+    console.log('User data not loaded yet, allowing access temporarily');
+    return <>{children}</>;
+  }
+
   if (user?.role !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center">

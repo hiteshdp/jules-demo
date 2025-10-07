@@ -35,9 +35,15 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(login(formData));
+    try {
+      await dispatch(login(formData)).unwrap();
+      // Don't call getMe() to avoid loops - user data comes from login response
+      toast.success('Login successful');
+    } catch (error) {
+      // Error handling is done in the authSlice
+    }
   };
 
   return (

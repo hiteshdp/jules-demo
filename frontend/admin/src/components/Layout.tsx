@@ -1,21 +1,11 @@
-import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store/store';
-import { getMe } from '../store/slices/authSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 const Layout = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  // const navigate = useNavigate(); // TODO: Will be used for navigation logic
-  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(getMe());
-    }
-  }, [dispatch, isAuthenticated]);
+  const { loading } = useSelector((state: RootState) => state.auth);
 
   if (loading) {
     return (

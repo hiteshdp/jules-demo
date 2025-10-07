@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\QuizController;
-
+use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\DermatologistController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -37,10 +38,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index']);
         Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
         Route::post('/appointments', [AppointmentController::class, 'store']);
-        
+
         // Quiz
         Route::get('/quiz/questions', [QuizController::class, 'questions']);
         Route::post('/quiz/submit', [QuizController::class, 'submit']);
         Route::get('/quiz/responses', [QuizController::class, 'responses']);
+    });
+
+    // Admin routes (protected by auth:sanctum above)
+    Route::prefix('admin')->group(function () {
+        // Patient management CRUD
+        Route::apiResource('patients', PatientController::class);
+
+        // Dermatologist management CRUD
+        Route::apiResource('dermatologists', DermatologistController::class);
     });
 });

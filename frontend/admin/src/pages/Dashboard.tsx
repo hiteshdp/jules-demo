@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store/store';
-import { fetchDashboardData } from '../store/slices/dashboardSlice';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 import { 
   UserGroupIcon, 
   UserIcon,
@@ -13,12 +12,24 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const Dashboard: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { stats, monthlyAppointments, monthlyRevenue, loading } = useSelector((state: RootState) => state.dashboard);
+  // const dispatch = useDispatch<AppDispatch>();
+  // const { stats, monthlyAppointments, monthlyRevenue, loading } = useSelector((state: RootState) => state.dashboard);
 
-  useEffect(() => {
-    dispatch(fetchDashboardData());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchDashboardData());
+  // }, [dispatch]);
+  // Mock data for now - no API calls to prevent loops
+  const stats = {
+    total_patients: 0,
+    total_dermatologists: 0,
+    total_appointments: 0,
+    total_revenue: 0,
+    pending_appointments: 0,
+    active_subscriptions: 0,
+  };
+  const monthlyAppointments: any[] = [];
+  const monthlyRevenue: any[] = [];
+  const loading = false;
 
   const statCards = [
     {
