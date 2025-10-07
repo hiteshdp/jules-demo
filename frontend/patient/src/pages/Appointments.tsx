@@ -91,7 +91,7 @@ const Appointments: React.FC = () => {
                   >
                     <option value="">Choose a dermatologist</option>
                     {(Array.isArray(dermatologists) ? dermatologists : []).map((derm) => (
-                      <option key={derm.id} value={derm.id}>
+                      <option key={derm.id} value={derm.user_id}>
                         {derm.user.name} - {derm.specialization} (₹{derm.consultation_fee})
                       </option>
                     ))}

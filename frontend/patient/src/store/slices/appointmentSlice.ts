@@ -3,6 +3,7 @@ import { appointmentAPI } from '../api/appointmentAPI';
 
 interface Dermatologist {
   id: number;
+  user_id: number;
   user: {
     id: number;
     name: string;
@@ -11,6 +12,7 @@ interface Dermatologist {
   specialization: string;
   consultation_fee: number;
   years_of_experience: number;
+  is_available: boolean;
 }
 
 interface Appointment {
@@ -76,7 +78,7 @@ export const fetchDermatologists = createAsyncThunk(
     try {
       const response = await appointmentAPI.getDermatologists();
       // Extract dermatologists array from the API response
-      return response.data.data.dermatologists || [];
+      return response.data.data || [];
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch dermatologists');
     }
