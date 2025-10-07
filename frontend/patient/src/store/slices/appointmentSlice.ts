@@ -3,16 +3,9 @@ import { appointmentAPI } from '../api/appointmentAPI';
 
 interface Dermatologist {
   id: number;
-  user_id: number;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  specialization: string;
-  consultation_fee: number;
-  years_of_experience: number;
-  is_available: boolean;
+  name: string;
+  email: string;
+  phone?: string;
 }
 
 interface Appointment {
@@ -26,7 +19,7 @@ interface Appointment {
   zoom_link?: string;
   consultation_fee: number;
   is_paid: boolean;
-  dermatologist?: Dermatologist;
+  dermatologist?: Dermatologist; // This is now a User object directly
 }
 
 interface AppointmentState {

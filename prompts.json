@@ -399,6 +399,32 @@
       "date": "2025-10-06T00:00:00Z",
       "user_prompt": "I don't want sidebar in patient module. I only want book appointment popup dropdown list to be populated. Remove the unneccery code and sidebar menu.",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_booking_fix_v1",
+      "path": "prompts/appointment_booking_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "frontend/patient/src/store/slices/appointmentSlice.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "Review the Appointments page, there is one button called book new appointment, In that opened new popup to store the appointment but it's not working as there are some changes in api. Fix the issue and make it working, Also i need proper listing of the stored appointments. If required to change anything in api do that the root dir has the laravel code. check that as well.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_relationship_fix_v1",
+      "path": "prompts/appointment_relationship_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "frontend/patient/src/store/slices/appointmentSlice.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-06T00:00:00Z",
+      "user_prompt": "\"message\": \"Call to undefined relationship [user] on model [App\\\\Models\\\\User].\", receiving this error in the given line number",
+      "prompt_type": "user_request"
     }
   ]
 }

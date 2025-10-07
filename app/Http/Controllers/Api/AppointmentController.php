@@ -50,7 +50,7 @@ class AppointmentController extends Controller
         
         // Get appointments for the authenticated patient
         $appointments = Appointment::where('patient_id', $user->id)
-            ->with(['dermatologist', 'dermatologist.user'])
+            ->with(['dermatologist'])
             ->orderBy('scheduled_at', 'desc')
             ->get();
 
@@ -100,7 +100,7 @@ class AppointmentController extends Controller
         
         $appointment = Appointment::where('id', $id)
             ->where('patient_id', $user->id)
-            ->with(['dermatologist', 'dermatologist.user'])
+            ->with(['dermatologist'])
             ->first();
 
         if (!$appointment) {
@@ -161,19 +161,28 @@ class AppointmentController extends Controller
             'dermatologist_id' => 'required|exists:users,id',
             'scheduled_at' => 'required|date|after:now',
             'notes' => 'nullable|string|max:1000',
-            'consultation_fee' => 'required|numeric|min:0',
         ]);
+
+        // Get the dermatologist to fetch consultation fee
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $validated['dermatologist_id'])->first();
+        
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dermatologist not found'
+            ], 404);
+        }
 
         $appointment = Appointment::create([
             'patient_id' => $user->id,
             'dermatologist_id' => $validated['dermatologist_id'],
             'scheduled_at' => $validated['scheduled_at'],
             'notes' => $validated['notes'] ?? null,
-            'consultation_fee' => $validated['consultation_fee'],
+            'consultation_fee' => $dermatologist->consultation_fee,
             'status' => 'scheduled',
         ]);
 
-        $appointment->load(['dermatologist', 'dermatologist.user']);
+        $appointment->load(['dermatologist']);
 
         return response()->json([
             'success' => true,
