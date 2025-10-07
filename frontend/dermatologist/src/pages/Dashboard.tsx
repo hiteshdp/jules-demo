@@ -98,13 +98,13 @@ const Dashboard: React.FC = () => {
                   <div className="inline-flex p-3 bg-blue-50 text-blue-700 rounded-lg">
                     <CalendarOutlined className="text-2xl" />
                   </div>
-                </div>
+              </div>
                 <div className="text-center">
                   <Title level={4} className="!mb-2">View Appointments</Title>
                   <Text type="secondary">
-                    Manage your patient appointments and consultations.
+                  Manage your patient appointments and consultations.
                   </Text>
-                </div>
+              </div>
               </Space>
             </Card>
           </Col>
@@ -120,13 +120,13 @@ const Dashboard: React.FC = () => {
                   <div className="inline-flex p-3 bg-green-50 text-green-700 rounded-lg">
                     <MessageOutlined className="text-2xl" />
                   </div>
-                </div>
+              </div>
                 <div className="text-center">
                   <Title level={4} className="!mb-2">Patient Chat</Title>
                   <Text type="secondary">
-                    Communicate with your patients in real-time.
+                  Communicate with your patients in real-time.
                   </Text>
-                </div>
+              </div>
               </Space>
             </Card>
           </Col>
@@ -141,14 +141,14 @@ const Dashboard: React.FC = () => {
                 <div className="text-center">
                   <div className="inline-flex p-3 bg-purple-50 text-purple-700 rounded-lg">
                     <UserOutlined className="text-2xl" />
-                  </div>
-                </div>
+          </div>
+        </div>
                 <div className="text-center">
                   <Title level={4} className="!mb-2">Manage Profile</Title>
                   <Text type="secondary">
                     Update your professional information and credentials.
                   </Text>
-                </div>
+      </div>
               </Space>
             </Card>
           </Col>
@@ -170,7 +170,7 @@ const Dashboard: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <Text strong>{appointment.patient?.name || 'Unknown Patient'}</Text>
                       <StatusTag status={appointment.status} />
-                    </div>
+                        </div>
                   }
                   description={
                     <Space direction="vertical" size="small">
@@ -203,10 +203,10 @@ const Dashboard: React.FC = () => {
                     <Avatar icon={<CalendarOutlined />} className="bg-green-100 text-green-600" />
                   }
                   title={
-                    <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                       <Text strong>{appointment.patient?.name || 'Unknown Patient'}</Text>
                       <StatusTag status={appointment.status} />
-                    </div>
+                        </div>
                   }
                   description={
                     <Space direction="vertical" size="small">
@@ -228,13 +228,13 @@ const Dashboard: React.FC = () => {
 
       {(!Array.isArray(appointments) || appointments.length === 0) && !loading && (
         <Card>
-          <div className="text-center py-12">
+        <div className="text-center py-12">
             <CalendarOutlined className="mx-auto text-4xl text-gray-400 mb-4" />
             <Title level={3} className="text-gray-900">No appointments</Title>
             <Text type="secondary">
-              You don't have any appointments scheduled yet.
+            You don't have any appointments scheduled yet.
             </Text>
-          </div>
+        </div>
         </Card>
       )}
     </div>

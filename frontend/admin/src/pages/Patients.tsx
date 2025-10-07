@@ -1,4 +1,4 @@
-// Generated via prompt: prompts/antd_patients_dermatologists_conversion_v1.md
+// Generated via prompt: prompts/admin_patients_view_modal_v1.md
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
@@ -13,21 +13,23 @@ import {
   Empty, 
   Button, 
   Input, 
-  Row, 
-  Col,
   Spin,
-  Popconfirm
+  Popconfirm,
+  Modal,
+  Descriptions
 } from 'antd';
 import { 
   TeamOutlined, 
   PlusOutlined, 
   EditOutlined, 
   DeleteOutlined,
-  SearchOutlined
+  SearchOutlined,
+  EyeOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import toast from 'react-hot-toast';
 import PatientModal from '../components/PatientModal';
+import { patientAPI } from '../store/api/patientAPI';
 
 const { Title, Text } = Typography;
 
@@ -49,6 +51,10 @@ const Patients: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Removed viewingId as it was unused
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewLoading, setViewLoading] = useState(false);
+  const [viewData, setViewData] = useState<any | null>(null);
 
   useEffect(() => {
     dispatch(fetchPatients({ page: currentPage, search: searchTerm }));
@@ -77,6 +83,24 @@ const Patients: React.FC = () => {
       toast.success('Patient deleted successfully');
     } catch (e: any) {
       toast.error(e?.message || 'Failed to delete patient');
+    }
+  };
+
+  const handleView = async (id: number) => {
+    setViewOpen(true);
+    setViewLoading(true);
+    setViewData(null);
+    try {
+      const { data } = await patientAPI.getPatient(id);
+      if (data?.success) {
+        setViewData(data.data);
+      } else {
+        toast.error('Failed to load patient details');
+      }
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message || 'Failed to load patient details');
+    } finally {
+      setViewLoading(false);
     }
   };
 
@@ -153,6 +177,12 @@ const Patients: React.FC = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
+          <Button 
+            type="text" 
+            icon={<EyeOutlined />} 
+            onClick={() => handleView(record.id)}
+            title="View"
+          />
           <Button 
             type="text" 
             icon={<EditOutlined />} 
@@ -249,6 +279,62 @@ const Patients: React.FC = () => {
         title={editingId ? 'Edit Patient' : 'Create Patient'}
         submitting={submitting}
       />
+
+      {/* View Modal */}
+      <Modal
+        title="Patient Details"
+        open={viewOpen}
+        onCancel={() => setViewOpen(false)}
+        footer={null}
+        width={600}
+      >
+        {viewLoading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
+            <Spin />
+          </div>
+        ) : viewData ? (
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Card>
+              <Space>
+                <Avatar icon={<TeamOutlined />} size={48} />
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 16 }}>{viewData.name}</div>
+                  <Text type="secondary">{viewData.email}</Text>
+                </div>
+              </Space>
+            </Card>
+
+            <Card title="Profile">
+              <Descriptions column={1} bordered size="middle">
+                <Descriptions.Item label="Phone">{viewData.phone_no || 'N/A'}</Descriptions.Item>
+                <Descriptions.Item label="Date of Birth">{viewData.dob || '–'}</Descriptions.Item>
+                <Descriptions.Item label="Gender">{viewData.gender || '–'}</Descriptions.Item>
+                <Descriptions.Item label="Active">{viewData.is_active ? 'Yes' : 'No'}</Descriptions.Item>
+              </Descriptions>
+            </Card>
+
+            {viewData.profile && (
+              <Card title="Medical Details">
+                <Descriptions column={1} bordered size="middle">
+                  <Descriptions.Item label="Medical History">{viewData.profile.medical_history || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Allergies">{viewData.profile.allergies || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Current Medications">{viewData.profile.current_medications || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Lifestyle">{viewData.profile.lifestyle || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Smoking">{viewData.profile.smoking ? 'Yes' : 'No'}</Descriptions.Item>
+                  <Descriptions.Item label="Alcohol Consumption">{viewData.profile.alcohol_consumption ? 'Yes' : 'No'}</Descriptions.Item>
+                  <Descriptions.Item label="Dietary Habits">{viewData.profile.dietary_habits || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Stress Level">{viewData.profile.stress_level || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Sleep Pattern">{viewData.profile.sleep_pattern || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Hair Care Routine">{viewData.profile.hair_care_routine || '–'}</Descriptions.Item>
+                  <Descriptions.Item label="Family History">{viewData.profile.family_history || '–'}</Descriptions.Item>
+                </Descriptions>
+              </Card>
+            )}
+          </Space>
+        ) : (
+          <Empty description="No details found" />
+        )}
+      </Modal>
     </Space>
   );
 };
