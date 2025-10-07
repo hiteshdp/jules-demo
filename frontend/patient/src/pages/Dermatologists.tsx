@@ -3,8 +3,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchDermatologists } from '../store/slices/dermatologistSlice';
-import { Card, Row, Col, Typography, Button, Space, Avatar, Divider } from 'antd';
-import { UserOutlined, DollarOutlined, ClockCircleOutlined, BookOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Typography, Button, Space, Avatar } from 'antd';
+import { UserOutlined, DollarOutlined, BookOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag } from '../components/common';
 
 const { Title, Text } = Typography;
@@ -17,22 +17,7 @@ const Dermatologists: React.FC = () => {
     dispatch(fetchDermatologists());
   }, [dispatch]);
 
-  const formatTime = (time: string) => {
-    return new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
-  const getAvailabilityStatus = (dermatologist: any) => {
-    if (!dermatologist.is_available) return 'Not Available';
-    
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    const isAvailableToday = dermatologist.available_days?.includes(today);
-    
-    return isAvailableToday ? 'Available Today' : 'Available';
-  };
+  // Availability fields removed from API; keep simple status via consultation_fee presence
 
   if (loading) {
     return <LoadingSpinner />;
@@ -109,21 +94,7 @@ const Dermatologists: React.FC = () => {
                     </Text>
                   </div>
 
-                  <div className="flex items-center">
-                    <ClockCircleOutlined className="mr-2 text-gray-400" />
-                    <Text type="secondary">
-                      {formatTime(dermatologist.start_time || '09:00')} - {formatTime(dermatologist.end_time || '17:00')}
-                    </Text>
-                  </div>
-
-                  <Divider className="my-2" />
-
-                  <div className="flex items-center justify-between">
-                    <StatusTag status={getAvailabilityStatus(dermatologist)} />
-                    <Text type="secondary" className="text-xs">
-                      Max {dermatologist.max_patients_per_day || 0} patients/day
-                    </Text>
-                  </div>
+                  {/* Availability schedule removed */}
 
                   {dermatologist.bio && (
                     <Text type="secondary" className="block mt-2">

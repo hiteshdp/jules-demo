@@ -45,12 +45,6 @@ class UserSeeder extends Seeder
             'qualifications' => 'MD Dermatology, Board Certified',
             'bio' => 'Dr. Sarah Johnson is a board-certified dermatologist with over 15 years of experience in treating hair loss and scalp disorders.',
             'consultation_fee' => 1500.00,
-            'available_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-            'start_time' => '09:00',
-            'end_time' => '17:00',
-            'timezone' => 'UTC',
-            'is_available' => true,
-            'max_patients_per_day' => 10,
         ]);
 
         // Create sample patient

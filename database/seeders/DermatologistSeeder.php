@@ -34,12 +34,6 @@ class DermatologistSeeder extends Seeder
             'qualifications' => 'MD Dermatology, Fellowship in Trichology',
             'consultation_fee' => 1500,
             'bio' => 'Specialized in hair loss treatment and scalp disorders with 8+ years of experience.',
-            'available_days' => json_encode(['monday', 'tuesday', 'wednesday', 'thursday', 'friday']),
-            'start_time' => '09:00:00',
-            'end_time' => '17:00:00',
-            'timezone' => 'Asia/Kolkata',
-            'is_available' => true,
-            'max_patients_per_day' => 15,
         ]);
 
         // Create additional test dermatologist
@@ -60,12 +54,6 @@ class DermatologistSeeder extends Seeder
             'qualifications' => 'MD Dermatology, DNB',
             'consultation_fee' => 1200,
             'bio' => 'Experienced dermatologist specializing in general skin conditions and hair disorders.',
-            'available_days' => json_encode(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']),
-            'start_time' => '10:00:00',
-            'end_time' => '18:00:00',
-            'timezone' => 'Asia/Kolkata',
-            'is_available' => true,
-            'max_patients_per_day' => 12,
         ]);
     }
 }
