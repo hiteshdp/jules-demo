@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchQuestions, submitQuiz, updateResponse } from '../store/slices/quizSlice';
-import { Card, Typography, Space, Button, Radio, Checkbox, Input, Form } from 'antd';
-import { PageHeader, LoadingSpinner, ProgressBar } from '../components/common';
+import { Card, Typography, Space, Button, Radio, Checkbox, Input } from 'antd';
+import { LoadingSpinner, ProgressBar } from '../components/common';
 import toast from 'react-hot-toast';
 
 const { Title, Text } = Typography;
@@ -15,7 +15,7 @@ const Quiz = () => {
   const navigate = useNavigate();
   const { questions, responses, loading, isSubmitted } = useSelector((state: RootState) => state.quiz);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [form] = Form.useForm();
+  // const [form] = Form.useForm(); // Not currently used
 
   useEffect(() => {
     dispatch(fetchQuestions());
