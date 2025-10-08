@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\DermatologistController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
+use App\Http\Controllers\ZoomController;
 // use App\Http\Controllers\Api\PatientController;
 
 /*
@@ -71,6 +72,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
     });
+
+    // Zoom video call routes (available to both patients and dermatologists)
+    Route::post('/zoom/create-meeting', [ZoomController::class, 'create']);
 
     // Admin routes (protected by auth:sanctum above)
     Route::prefix('admin')->group(function () {

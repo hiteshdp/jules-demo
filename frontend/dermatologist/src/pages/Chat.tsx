@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { useLocation } from 'react-router-dom';
+import ZoomMeetingButton from '../components/ZoomMeetingButton';
 
 const Chat: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -122,6 +123,15 @@ const Chat: React.FC = () => {
         </p>
       </div>
 
+      {/* Zoom Meeting Button - Always visible at top */}
+      <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-4">
+        <ZoomMeetingButton 
+          appointmentId={selectedAppointmentId || 0}
+          patientName={selectedAppointmentId ? appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.name : 'Patient'}
+          isPatient={false}
+        />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointments List */}
         <div className="lg:col-span-1">
@@ -193,6 +203,15 @@ const Chat: React.FC = () => {
                       <span className="text-xs text-gray-600">Online</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Zoom Meeting Button */}
+                <div className="px-4 py-3 border-b border-gray-200">
+                  <ZoomMeetingButton 
+                    appointmentId={selectedAppointmentId}
+                    patientName={appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.name}
+                    isPatient={false}
+                  />
                 </div>
 
                 {/* Messages Area */}

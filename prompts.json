@@ -1044,6 +1044,24 @@
       "date": "2025-01-27T20:00:00Z",
       "user_prompt": "In register page of patient module, I have not all the fields there, which also present in patient_profile page, so please add that field in signup page from frontend and backend api both.",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "zoom_video_call_integration_v1",
+      "path": "prompts/zoom_video_call_integration_v1.md",
+      "used_in": [
+        "app/Services/ZoomService.php",
+        "app/Http/Controllers/ZoomController.php",
+        "routes/api.php",
+        "env.example",
+        "frontend/patient/src/components/ZoomMeetingButton.tsx",
+        "frontend/dermatologist/src/components/ZoomMeetingButton.tsx",
+        "frontend/patient/src/pages/Chat.tsx",
+        "frontend/dermatologist/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-08T12:00:00Z",
+      "user_prompt": "Pick your path - Path A (easiest, no SDK): Open Zoom's join URL in a new tab/app. Above steps implementation for patient and dermotologist video call feature button should be show in chat top box both side",
+      "prompt_type": "ai_response"
     }
   ]
 }
