@@ -73,7 +73,7 @@ class AppointmentController extends Controller
 
         // Get appointments for the authenticated patient
         $appointments = Appointment::where('patient_id', $user->id)
-            ->with(['dermatologist'])
+            ->with(['dermatologist.user'])
             ->orderBy('scheduled_at', 'desc')
             ->get();
 
@@ -123,7 +123,7 @@ class AppointmentController extends Controller
 
         $appointment = Appointment::where('id', $id)
             ->where('patient_id', $user->id)
-            ->with(['dermatologist'])
+            ->with(['dermatologist.user'])
             ->first();
 
         if (!$appointment) {
@@ -205,7 +205,7 @@ class AppointmentController extends Controller
             'status' => 'scheduled',
         ]);
 
-        $appointment->load(['dermatologist']);
+        $appointment->load(['dermatologist.user']);
 
         return response()->json([
             'success' => true,
