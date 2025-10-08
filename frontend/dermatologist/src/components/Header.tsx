@@ -4,6 +4,7 @@ import { AppDispatch, RootState } from '../store/store';
 import { logout } from '../store/slices/authSlice';
 import { Menu, Transition } from '@headlessui/react';
 import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import NotificationDropdown from './NotificationDropdown';
 
 const Header: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,7 +24,8 @@ const Header: React.FC = () => {
             </h2>
           </div>
           
-          <div className="flex items-center">
+          <div className="flex items-center space-x-4">
+            <NotificationDropdown />
             <Menu as="div" className="relative ml-3">
               <div>
                 <Menu.Button className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

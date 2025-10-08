@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal as AntdModal, ModalProps as AntdModalProps, Button, Space } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
 
 interface ModalProps extends AntdModalProps {
   loading?: boolean;

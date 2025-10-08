@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { register, clearError } from '../store/slices/authSlice';
-import { Form, Card, Typography, Row, Col } from 'antd';
+import { Form, Card, Typography, Row, Col, Switch } from 'antd';
 import { Button, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 
@@ -143,6 +143,47 @@ const Register = () => {
                 />
               </Col>
             </Row>
+
+            {/* Medical Information Section */}
+            <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
+              <Title level={4} style={{ marginBottom: 16, color: '#1890ff' }}>
+                Medical Information (Optional)
+              </Title>
+              
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <FormField
+                    name="allergies"
+                    label="Allergies"
+                    type="textarea"
+                    placeholder="List any allergies..."
+                    rows={2}
+                  />
+                </Col>
+                <Col xs={24} sm={12}>
+                  <FormField
+                    name="current_medications"
+                    label="Current Medications"
+                    type="textarea"
+                    placeholder="List current medications..."
+                    rows={2}
+                  />
+                </Col>
+              </Row>
+
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <Form.Item name="smoking" label="Smoking" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item name="alcohol_consumption" label="Alcohol Consumption" valuePropName="checked">
+                    <Switch />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </div>
 
             <Form.Item className="mb-0">
               <Button

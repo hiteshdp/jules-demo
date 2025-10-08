@@ -92,7 +92,7 @@ class DermatologistAppointmentController extends Controller
             ], 401);
         }
 
-        $query = Appointment::with(['patient.user', 'dermatologist.user'])
+        $query = Appointment::with(['patient', 'dermatologist'])
             ->where('dermatologist_id', $user->id);
 
         // Filter by status

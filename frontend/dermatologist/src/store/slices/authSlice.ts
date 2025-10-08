@@ -14,6 +14,8 @@ interface User {
   experience?: string;
   bio?: string;
   dermatologistProfile?: any;
+  qualifications?: string;
+  address?: string;
 }
 
 interface AuthState {

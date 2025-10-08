@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { getMe } from '../store/slices/authSlice';
@@ -8,6 +8,7 @@ import Header from './Header';
 
 const Layout: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { user, loading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -16,9 +17,19 @@ const Layout: React.FC = () => {
     if (token && !loading && !user) {
       dispatch(getMe());
     }
-  }, [dispatch, loading, user]);
+  }, [dispatch, loading, user]); // Remove isAuthenticated from dependencies to avoid loops
 
-  if (loading) {
+  useEffect(() => {
+    // Only redirect to login if we're sure there's no token and no user
+    const token = localStorage.getItem('dermatologist_token');
+    if (!user && !loading && !token) {
+      navigate('/login', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  // Show loading if we're checking authentication or if we have a token but no user yet
+  const token = localStorage.getItem('dermatologist_token');
+  if (loading || (token && !user)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>

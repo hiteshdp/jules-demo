@@ -14,7 +14,7 @@ import {
 import { Card, Row, Col, Typography, Space, Button, Input, Descriptions } from 'antd';
 import { PageHeader, StatusTag } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { TextArea } = Input;
 
 const AppointmentDetail: React.FC = () => {
@@ -137,6 +137,7 @@ const AppointmentDetail: React.FC = () => {
                   type="primary" 
                   icon={<MessageOutlined />}
                   className="w-full"
+                  onClick={() => window.location.href = `/chat?appointmentId=${appointment.id}`}
                 >
                   Start Chat
                 </Button>

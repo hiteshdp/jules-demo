@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
-import { Card, List, Avatar, Typography, Space, Button, Tabs } from 'antd';
+import { Card, List, Avatar, Typography, Space, Tabs } from 'antd';
 import { CalendarOutlined, UserOutlined, DollarOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag } from '../components/common';
 
