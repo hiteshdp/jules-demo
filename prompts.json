@@ -1062,6 +1062,31 @@
       "date": "2025-01-08T12:00:00Z",
       "user_prompt": "Pick your path - Path A (easiest, no SDK): Open Zoom's join URL in a new tab/app. Above steps implementation for patient and dermotologist video call feature button should be show in chat top box both side",
       "prompt_type": "ai_response"
+    },
+    {
+      "id": "patient_typescript_errors_fix_v1",
+      "path": "prompts/patient_typescript_errors_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T20:30:00Z",
+      "user_prompt": "Fix this issue in patient side",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_fixes_v1",
+      "path": "prompts/patient_appointments_fixes_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "app/Models/Appointment.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:00:00Z",
+      "user_prompt": "@Appointments.tsx in this page there is some issue with book new appointments button, Right now it's opening 2 model for booking. And some how in appointmets lisitng screen dr name is not displayed. Also chat icon is also missing in the listing screen items. Also check the backned for dataSource to understand the data which is comming in api. Root dirctory is the api backned",
+      "prompt_type": "user_request"
     }
   ]
 }

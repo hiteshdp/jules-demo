@@ -157,7 +157,7 @@ const Chat: React.FC = () => {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-gray-900">
-                          {appointment.dermatologist?.name || 'Unknown Doctor'}
+                          {appointment.dermatologist?.user?.name || 'Unknown Doctor'}
                         </p>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
                           {appointment.status}
@@ -196,7 +196,7 @@ const Chat: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-medium text-gray-900">
-                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.name || 'Dermatologist'}
+                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.user?.name || 'Dermatologist'}
                       </h3>
                       <p className="text-sm text-gray-600">
                         {appointments.find(a => a.id === selectedAppointmentId)?.status || 'Appointment'}

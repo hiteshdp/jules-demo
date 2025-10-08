@@ -22,11 +22,80 @@ use Illuminate\Support\Facades\DB;
  *     name="Admin",
  *     description="Admin panel endpoints"
  * )
+ * 
+ * @OA\Schema(
+ *     schema="DashboardStats",
+ *     type="object",
+ *     @OA\Property(property="total_patients", type="integer", example=150, description="Total number of patients"),
+ *     @OA\Property(property="total_dermatologists", type="integer", example=25, description="Total number of dermatologists"),
+ *     @OA\Property(property="total_appointments", type="integer", example=500, description="Total number of appointments"),
+ *     @OA\Property(property="total_revenue", type="number", format="float", example=25000.50, description="Total revenue from completed payments"),
+ *     @OA\Property(property="pending_appointments", type="integer", example=15, description="Number of scheduled appointments"),
+ *     @OA\Property(property="active_subscriptions", type="integer", example=120, description="Number of active subscriptions")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="MonthlyTrend",
+ *     type="object",
+ *     @OA\Property(property="month", type="string", example="2024-01", description="Month in YYYY-MM format"),
+ *     @OA\Property(property="count", type="integer", example=45, description="Number of appointments for the month"),
+ *     @OA\Property(property="total", type="number", format="float", example=5000.00, description="Total revenue for the month")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="DashboardResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(
+ *         property="data",
+ *         type="object",
+ *         @OA\Property(property="stats", ref="#/components/schemas/DashboardStats"),
+ *         @OA\Property(
+ *             property="monthly_appointments",
+ *             type="array",
+ *             @OA\Items(ref="#/components/schemas/MonthlyTrend"),
+ *             description="Monthly appointment trends for the last 12 months"
+ *         ),
+ *         @OA\Property(
+ *             property="monthly_revenue",
+ *             type="array",
+ *             @OA\Items(ref="#/components/schemas/MonthlyTrend"),
+ *             description="Monthly revenue trends for the last 12 months"
+ *         )
+ *     )
+ * )
  */
 class AdminController extends Controller
 {
     /**
-     * Get dashboard statistics
+     * @OA\Get(
+     *     path="/admin/dashboard",
+     *     summary="Get dashboard statistics",
+     *     description="Retrieve comprehensive dashboard statistics including patient counts, revenue, appointments, and monthly trends for the last 12 months",
+     *     tags={"Admin"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dashboard statistics retrieved successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/DashboardResponse")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - Bearer token required",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthenticated")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Internal server error")
+     *         )
+     *     )
+     * )
      */
     public function getDashboard(Request $request)
     {
