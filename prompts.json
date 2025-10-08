@@ -1248,6 +1248,17 @@
       "date": "2025-01-28T00:25:00Z",
       "user_prompt": "Looks Good. Do the same changes for dermatologist chat as well.",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_appointments_ui_redesign_v1",
+      "path": "prompts/dermatologist_appointments_ui_redesign_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T01:05:00Z",
+      "user_prompt": "@Appointments.tsx in this page i have listing of appointments and i need exect same design and ui/ux in dermatologist appointment lisitng. @Appointments.tsx",
+      "prompt_type": "user_request"
     }
   ]
 }
