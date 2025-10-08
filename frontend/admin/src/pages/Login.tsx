@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
+// Generated via prompt: prompts/antd_admin_full_conversion_v1.md
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
+import { Card, Form, Input, Button, Typography, Space } from 'antd';
+import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 
-const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+const { Title, Text } = Typography;
 
+const Login = () => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { isAuthenticated, loading, error } = useSelector((state: RootState) => state.auth);
@@ -28,76 +29,86 @@ const Login = () => {
     }
   }, [error, dispatch]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(login(formData));
+  const handleSubmit = async (values: { email: string; password: string }) => {
+    try {
+      await dispatch(login(values)).unwrap();
+      toast.success('Login successful');
+    } catch (error) {
+      // Error handling is done in the authSlice
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Admin Login
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to access the admin panel
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      background: '#f5f5f5',
+      padding: '24px'
+    }}>
+      <Card 
+        style={{ 
+          width: '100%', 
+          maxWidth: 400,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+        }}
+      >
+        <Space direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
           <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
+            <Title level={2} style={{ margin: 0, color: '#1890ff' }}>
+              Admin Login
+            </Title>
+            <Text type="secondary">
+              Sign in to access the admin panel
+            </Text>
           </div>
-        </form>
-      </div>
+          
+          <Form
+            form={form}
+            name="login"
+            onFinish={handleSubmit}
+            layout="vertical"
+            size="large"
+            requiredMark={false}
+          >
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: 'Please enter your email' },
+                { type: 'email', message: 'Please enter a valid email' }
+              ]}
+            >
+              <Input 
+                prefix={<UserOutlined />} 
+                placeholder="Email address"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="password"
+              rules={[{ required: true, message: 'Please enter your password' }]}
+            >
+              <Input.Password 
+                prefix={<LockOutlined />} 
+                placeholder="Password"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={loading}
+                icon={<LoginOutlined />}
+                style={{ width: '100%' }}
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Space>
+      </Card>
     </div>
   );
 };

@@ -89,7 +89,7 @@ const Chat: React.FC = () => {
         setNewMessage('');
         //toast.success('Message sent successfully!');
       })
-      .catch((err) => {
+      .catch((err: any) => {
         toast.error(err || 'Failed to send message');
       });
   };
@@ -182,10 +182,10 @@ const Chat: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-medium text-gray-900">
-                        {appointments.find(a => a.id === selectedAppointmentId)?.patient?.name || 'Patient'}
+                        {appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.name || 'Patient'}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        {appointments.find(a => a.id === selectedAppointmentId)?.status || 'Appointment'}
+                        {appointments.find((a: any) => a.id === selectedAppointmentId)?.status || 'Appointment'}
                       </p>
                     </div>
                     <div className="flex items-center space-x-3">
@@ -226,7 +226,7 @@ const Chat: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    messages.map((message, index) => {
+                    messages.map((message: any, index: number) => {
                       const isOwnMessage = message.sender_id === user?.id;
                       const prevMessage = index > 0 ? messages[index - 1] : null;
                       const isConsecutive = prevMessage && prevMessage.sender_id === message.sender_id;

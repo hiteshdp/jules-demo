@@ -1,286 +1,562 @@
 <?php
-// Generated via prompt: prompts/laravel_swagger_documentation_v1.md
+// Generated via prompt: prompts/admin_patients_crud_v1.md
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\HairLossQuizQuestion;
-use App\Models\HairLossQuizResponse;
-use App\Models\PatientProfile;
-use App\Models\Product;
-use App\Models\Subscription;
-use App\Models\Appointment;
-use App\Models\Dermatologist;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 /**
+ * @OA\Info(
+ *     title="Hair Loss Diagnosis & Treatment Platform API",
+ *     version="1.0.0",
+ *     description="Complete API documentation for the Hair Loss Diagnosis & Treatment Platform"
+ * )
+ * 
+ * @OA\Server(
+ *     url="http://localhost:8000/api",
+ *     description="Development server"
+ * )
+ * 
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="Patient",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="subscription_status", type="string", example="-"),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="PatientCreateRequest",
+ *     type="object",
+ *     required={"name","email","phone_no","password"},
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
+ *     @OA\Property(property="allergies", type="string", example="None known"),
+ *     @OA\Property(property="current_medications", type="string", example="None"),
+ *     @OA\Property(property="smoking", type="boolean", example=false),
+ *     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="PatientUpdateRequest",
+ *     type="object",
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+ *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
+ *     @OA\Property(property="password", type="string", format="password", example="password123"),
+ *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="allergies", type="string", example="None known"),
+ *     @OA\Property(property="current_medications", type="string", example="None"),
+ *     @OA\Property(property="smoking", type="boolean", example=false),
+ *     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ApiError",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=false),
+ *     @OA\Property(property="message", type="string", example="Error message"),
+ *     @OA\Property(property="error", type="string", example="Detailed error information")
+ * )
+ * 
+ * @OA\Schema(
+ *     schema="ValidationError",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=false),
+ *     @OA\Property(property="message", type="string", example="Validation errors"),
+ *     @OA\Property(property="errors", type="object", example={"field": "The field is required."})
+ * )
+ * 
  * @OA\Tag(
  *     name="Patients",
- *     description="Patient-specific endpoints"
+ *     description="Patient management endpoints (Admin)"
  * )
  */
 class PatientController extends Controller
 {
     /**
-     * Get patient profile
+     * @OA\Get(
+     *     path="/admin/patients",
+     *     summary="List patients",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", example=1)),
+     *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", example=15)),
+     *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string", example="john")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Patients retrieved",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Patients retrieved successfully"),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Patient")),
+     *             @OA\Property(property="current_page", type="integer", example=1),
+     *             @OA\Property(property="last_page", type="integer", example=5),
+     *             @OA\Property(property="per_page", type="integer", example=15),
+     *             @OA\Property(property="total", type="integer", example=75)
+     *         )
+     *     ),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function getProfile(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $user->load('patientProfile');
+        try {
+            $perPage = (int)($request->query('per_page', 15));
+            $query = User::where('role', 'patient')
+                ->select([
+                    'id',
+                    'name',
+                    'email',
+                    'phone as phone_no',
+                    'date_of_birth as dob',
+                    'gender',
+                    'is_active',
+                    'created_at'
+                ])
+                ->orderBy('created_at', 'desc');
 
-        return response()->json([
-            'success' => true,
-            'data' => $user
-        ]);
-    }
+            if ($search = trim((string)$request->query('search', ''))) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
 
-    /**
-     * Update patient profile
-     */
-    public function updateProfile(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'medical_history' => 'nullable|string',
-            'allergies' => 'nullable|string',
-            'current_medications' => 'nullable|string',
-            'lifestyle' => 'nullable|in:sedentary,moderate,active,very_active',
-            'smoking' => 'nullable|boolean',
-            'alcohol_consumption' => 'nullable|boolean',
-            'dietary_habits' => 'nullable|string',
-            'stress_level' => 'nullable|string',
-            'sleep_pattern' => 'nullable|string',
-            'hair_care_routine' => 'nullable|string',
-            'family_history' => 'nullable|string',
-        ]);
+            $patients = $query->paginate($perPage);
 
-        if ($validator->fails()) {
+            $patients->getCollection()->transform(function ($patient) {
+                $patient->subscription_status = '-';
+
+                // Load profile data
+                $profile = \App\Models\PatientProfile::where('user_id', $patient->id)
+                    ->select([
+                        'allergies',
+                        'current_medications',
+                        'smoking',
+                        'alcohol_consumption'
+                    ])->first();
+
+                $patient->profile = $profile;
+                return $patient;
+            });
+
             return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $user = $request->user();
-        
-        // Update user data
-        $user->update($request->only(['name', 'phone', 'date_of_birth', 'gender']));
-        
-        // Update patient profile
-        $profileData = $request->only([
-            'medical_history', 'allergies', 'current_medications', 'lifestyle',
-            'smoking', 'alcohol_consumption', 'dietary_habits', 'stress_level',
-            'sleep_pattern', 'hair_care_routine', 'family_history'
-        ]);
-        
-        $user->patientProfile()->updateOrCreate(
-            ['user_id' => $user->id],
-            $profileData
-        );
-
-        $user->load('patientProfile');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Profile updated successfully',
-            'data' => $user
-        ]);
-    }
-
-    /**
-     * Get hair loss quiz questions
-     */
-    public function getQuizQuestions()
-    {
-        $questions = HairLossQuizQuestion::orderBy('order')->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $questions
-        ]);
-    }
-
-    /**
-     * Submit hair loss quiz responses
-     */
-    public function submitQuiz(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'responses' => 'required|array',
-            'responses.*.question_id' => 'required|exists:hair_loss_quiz_questions,id',
-            'responses.*.answer' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $user = $request->user();
-
-        // Delete existing responses
-        $user->quizResponses()->delete();
-
-        // Create new responses
-        foreach ($request->responses as $response) {
-            HairLossQuizResponse::create([
-                'user_id' => $user->id,
-                'question_id' => $response['question_id'],
-                'answer' => $response['answer'],
+                'success' => true,
+                'message' => 'Patients retrieved successfully',
+                'data' => $patients->items(),
+                'current_page' => $patients->currentPage(),
+                'last_page' => $patients->lastPage(),
+                'per_page' => $patients->perPage(),
+                'total' => $patients->total(),
             ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Quiz submitted successfully'
-        ]);
-    }
-
-    /**
-     * Get personalized recommendations (stub for ChatGPT integration)
-     */
-    public function getRecommendations(Request $request)
-    {
-        $user = $request->user();
-        $user->load(['quizResponses.question', 'patientProfile']);
-
-        // This is a stub - in real implementation, you would call ChatGPT API
-        $recommendations = [
-            [
-                'type' => 'product',
-                'title' => 'Gentle Shampoo for Hair Loss',
-                'description' => 'Based on your quiz responses, we recommend a gentle, sulfate-free shampoo.',
-                'product_id' => 1,
-                'priority' => 'high'
-            ],
-            [
-                'type' => 'lifestyle',
-                'title' => 'Improve Sleep Pattern',
-                'description' => 'Getting 7-8 hours of quality sleep can help reduce hair loss.',
-                'priority' => 'medium'
-            ],
-            [
-                'type' => 'consultation',
-                'title' => 'Book Consultation',
-                'description' => 'Consider booking a consultation with our dermatologist for personalized treatment.',
-                'priority' => 'high'
-            ]
-        ];
-
-        return response()->json([
-            'success' => true,
-            'data' => $recommendations
-        ]);
-    }
-
-    /**
-     * Get available dermatologists
-     */
-    public function getDermatologists()
-    {
-        $dermatologists = Dermatologist::with('user')
-            ->where('is_available', true)
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $dermatologists
-        ]);
-    }
-
-    /**
-     * Book appointment
-     */
-    public function bookAppointment(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'dermatologist_id' => 'required|exists:users,id',
-            'scheduled_at' => 'required|date|after:now',
-        ]);
-
-        if ($validator->fails()) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Failed to retrieve patients',
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
 
-        $dermatologist = Dermatologist::where('user_id', $request->dermatologist_id)->first();
-        
-        if (!$dermatologist) {
+    /**
+     * @OA\Post(
+     *     path="/admin/patients",
+     *     summary="Create patient",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/PatientCreateRequest")),
+     *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/Patient")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $patientData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email'),
+                ],
+                'phone_no' => 'required|string|max:20',
+                'password' => 'required|string|min:6',
+                'dob' => 'nullable|date|before:today',
+                'gender' => 'nullable|in:male,female,other',
+                // Patient profile fields
+                'allergies' => 'nullable|string',
+                'current_medications' => 'nullable|string',
+                'smoking' => 'nullable|boolean',
+                'alcohol_consumption' => 'nullable|boolean',
+            ]);
+
+            $userData = [
+                'name' => $patientData['name'],
+                'email' => $patientData['email'],
+                'phone' => $patientData['phone_no'],
+                'password' => Hash::make($patientData['password']),
+                'date_of_birth' => $patientData['dob'] ?? null,
+                'gender' => $patientData['gender'],
+                'role' => 'patient',
+                'is_active' => true,
+            ];
+
+            $patient = User::create($userData);
+
+            // Create patient profile
+            $profileData = [
+                'user_id' => $patient->id,
+                'allergies' => $patientData['allergies'] ?? null,
+                'current_medications' => $patientData['current_medications'] ?? null,
+                'smoking' => $patientData['smoking'] ?? false,
+                'alcohol_consumption' => $patientData['alcohol_consumption'] ?? false,
+            ];
+
+            \App\Models\PatientProfile::create($profileData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient created successfully',
+                'data' => [
+                    'id' => $patient->id,
+                    'name' => $patient->name,
+                    'email' => $patient->email,
+                    'phone_no' => $patient->phone,
+                    'dob' => $patient->date_of_birth,
+                    'gender' => $patient->gender,
+                    'is_active' => $patient->is_active,
+                    'subscription_status' => '-',
+                    'created_at' => $patient->created_at,
+                ]
+            ], 201);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Dermatologist not found'
-            ], 404);
+                'message' => 'Failed to create patient',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $appointment = Appointment::create([
-            'patient_id' => $request->user()->id,
-            'dermatologist_id' => $request->dermatologist_id,
-            'scheduled_at' => $request->scheduled_at,
-            'consultation_fee' => $dermatologist->consultation_fee,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Appointment booked successfully',
-            'data' => $appointment
-        ]);
     }
 
     /**
-     * Get patient appointments
+     * @OA\Get(
+     *     path="/admin/patients/{id}",
+     *     summary="Get patient",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Patient")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function getAppointments(Request $request)
+    public function show(string $id): JsonResponse
     {
-        $appointments = Appointment::with(['dermatologist.user'])
-            ->where('patient_id', $request->user()->id)
-            ->orderBy('scheduled_at', 'desc')
-            ->get();
+        try {
+            $user = User::where('role', 'patient')
+                ->where('id', $id)
+                ->with('patientProfile')
+                ->first();
 
-        return response()->json([
-            'success' => true,
-            'data' => $appointments
-        ]);
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Patient not found'
+                ], 404);
+            }
+
+            $profile = $user->patientProfile; // joined via user_id
+
+            $data = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_no' => $user->phone,
+                'dob' => $user->date_of_birth,
+                'gender' => $user->gender,
+                'is_active' => $user->is_active,
+                'subscription_status' => '-',
+                'created_at' => $user->created_at,
+                'profile' => $profile ? [
+                    'id' => $profile->id,
+                    'user_id' => $profile->user_id,
+                    'allergies' => $profile->allergies,
+                    'current_medications' => $profile->current_medications,
+                    'smoking' => $profile->smoking,
+                    'alcohol_consumption' => $profile->alcohol_consumption,
+                    'created_at' => $profile->created_at,
+                    'updated_at' => $profile->updated_at,
+                ] : null,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient retrieved successfully',
+                'data' => $data,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve patient',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Get patient subscriptions
+     * @OA\Put(
+     *     path="/admin/patients/{id}",
+     *     summary="Update patient",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/PatientUpdateRequest")),
+     *     @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/Patient")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function getSubscriptions(Request $request)
+    public function update(Request $request, string $id): JsonResponse
     {
-        $subscriptions = Subscription::where('user_id', $request->user()->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $patient = User::where('role', 'patient')->where('id', $id)->first();
+            if (!$patient) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Patient not found'
+                ], 404);
+            }
 
-        return response()->json([
-            'success' => true,
-            'data' => $subscriptions
-        ]);
+            $updateData = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'email' => [
+                    'sometimes',
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($patient->id),
+                ],
+                'phone_no' => 'sometimes|required|string|max:20',
+                'password' => 'sometimes|nullable|string|min:6',
+                'dob' => 'nullable|date|before:today',
+                'gender' => 'nullable|in:male,female,other',
+                'is_active' => 'sometimes|boolean',
+                // Patient profile fields
+                'allergies' => 'nullable|string',
+                'current_medications' => 'nullable|string',
+                'smoking' => 'nullable|boolean',
+                'alcohol_consumption' => 'nullable|boolean',
+            ]);
+
+            // Separate user and profile data
+            $userData = [];
+            $profileData = [];
+
+            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
+            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
+            if (isset($updateData['phone_no'])) {
+                $userData['phone'] = $updateData['phone_no'];
+                unset($updateData['phone_no']);
+            }
+            if (isset($updateData['dob'])) {
+                $userData['date_of_birth'] = $updateData['dob'];
+                unset($updateData['dob']);
+            }
+            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
+            if (isset($updateData['is_active'])) $userData['is_active'] = $updateData['is_active'];
+            if (array_key_exists('password', $updateData)) {
+                if ($updateData['password']) {
+                    $userData['password'] = Hash::make($updateData['password']);
+                }
+                unset($updateData['password']);
+            }
+
+            // Profile fields
+            if (isset($updateData['allergies'])) $profileData['allergies'] = $updateData['allergies'];
+            if (isset($updateData['current_medications'])) $profileData['current_medications'] = $updateData['current_medications'];
+            if (isset($updateData['smoking'])) $profileData['smoking'] = $updateData['smoking'];
+            if (isset($updateData['alcohol_consumption'])) $profileData['alcohol_consumption'] = $updateData['alcohol_consumption'];
+
+            // Update user data
+            if (!empty($userData)) {
+                $patient->update($userData);
+            }
+
+            // Update or create profile data
+            if (!empty($profileData)) {
+                $profile = \App\Models\PatientProfile::where('user_id', $patient->id)->first();
+                if ($profile) {
+                    $profile->update($profileData);
+                } else {
+                    $profileData['user_id'] = $patient->id;
+                    \App\Models\PatientProfile::create($profileData);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient updated successfully',
+                'data' => [
+                    'id' => $patient->id,
+                    'name' => $patient->name,
+                    'email' => $patient->email,
+                    'phone_no' => $patient->phone,
+                    'dob' => $patient->date_of_birth,
+                    'gender' => $patient->gender,
+                    'is_active' => $patient->is_active,
+                    'subscription_status' => '-',
+                    'created_at' => $patient->created_at,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update patient',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Get products catalog
+     * @OA\Delete(
+     *     path="/admin/patients/{id}",
+     *     summary="Delete patient",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *     @OA\Response(response=200, description="Deleted", @OA\JsonContent(@OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Patient deleted successfully"))),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
-    public function getProducts(Request $request)
+    public function destroy(string $id): JsonResponse
     {
-        $products = Product::where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        try {
+            $patient = User::where('role', 'patient')->where('id', $id)->first();
+            if (!$patient) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Patient not found'
+                ], 404);
+            }
 
-        return response()->json([
-            'success' => true,
-            'data' => $products
-        ]);
+            $patient->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Patient deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete patient',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/patient/dermatologists",
+     *     summary="Get available dermatologists",
+     *     description="Get list of available dermatologists for appointment booking",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dermatologists retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Dermatologists retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="dermatologists",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+     *                         @OA\Property(property="email", type="string", example="dermatologist@example.com"),
+     *                         @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+     *                         @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *                         @OA\Property(property="years_of_experience", type="integer", example=5),
+     *                         @OA\Property(property="qualifications", type="string", example="MD, Dermatology")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated")
+     *         )
+     *     )
+     * )
+     */
+    public function getDermatologists(Request $request): JsonResponse
+    {
+        try {
+            $dermatologists = User::where('role', 'dermatologist')
+                ->where('is_active', true)
+                ->with('dermatologistProfile')
+                ->get()
+                ->map(function ($user) {
+                    $profile = $user->dermatologistProfile;
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'specialization' => $profile ? $profile->specialization : 'General Dermatology',
+                        'consultation_fee' => $profile ? $profile->consultation_fee : 0,
+                        'years_of_experience' => $profile ? $profile->years_of_experience : 0,
+                        'qualifications' => $profile ? $profile->qualifications : 'MD'
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Dermatologists retrieved successfully',
+                'data' => [
+                    'dermatologists' => $dermatologists
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve dermatologists',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

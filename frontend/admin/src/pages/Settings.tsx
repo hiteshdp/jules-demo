@@ -1,14 +1,27 @@
-import React, { useEffect, useState } from 'react';
+// Generated via prompt: prompts/antd_admin_remaining_pages_v1.md
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchSettings, updateSettings } from '../store/slices/settingsSlice';
-import { CogIcon } from '@heroicons/react/24/outline';
+import { 
+  Card, 
+  Typography, 
+  Space, 
+  Form, 
+  Input, 
+  InputNumber, 
+  Button, 
+  Row, 
+  Col, 
+} from 'antd';
 import toast from 'react-hot-toast';
+
+const { Title, Text } = Typography;
 
 const Settings: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { settings, loading } = useSelector((state: RootState) => state.settings);
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [form] = Form.useForm();
 
   useEffect(() => {
     dispatch(fetchSettings());
@@ -16,21 +29,13 @@ const Settings: React.FC = () => {
 
   useEffect(() => {
     if (settings) {
-      setFormData(settings);
+      form.setFieldsValue(settings);
     }
-  }, [settings]);
+  }, [settings, form]);
 
-  const handleChange = (key: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (values: any) => {
     try {
-      await dispatch(updateSettings(formData)).unwrap();
+      await dispatch(updateSettings(values)).unwrap();
       toast.success('Settings updated successfully');
     } catch (error) {
       toast.error('Failed to update settings');
@@ -77,76 +82,75 @@ const Settings: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '400px' 
+      }}>
+        <div>Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <Title level={2} style={{ margin: 0 }}>
+          Settings
+        </Title>
+        <Text type="secondary">
           Configure platform settings and integrations.
-        </p>
+        </Text>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={settings}
+      >
         {settingGroups.map((group) => (
-          <div key={group.title} className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">
-                {group.title}
-              </h3>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {group.settings.map((setting) => (
-                  <div key={setting.key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {setting.label}
-                    </label>
+          <Card key={group.title} title={group.title} style={{ marginBottom: 24 }}>
+            <Row gutter={[16, 16]}>
+              {group.settings.map((setting) => (
+                <Col xs={24} sm={12} key={setting.key}>
+                  <Form.Item
+                    name={setting.key}
+                    label={setting.label}
+                    rules={[
+                      { required: setting.type !== 'password', message: `Please enter ${setting.label.toLowerCase()}` }
+                    ]}
+                  >
                     {setting.type === 'password' ? (
-                      <input
-                        type="password"
-                        value={formData[setting.key] || ''}
-                        onChange={(e) => handleChange(setting.key, e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      <Input.Password 
                         placeholder={`Enter ${setting.label.toLowerCase()}`}
                       />
                     ) : setting.type === 'number' ? (
-                      <input
-                        type="number"
-                        value={formData[setting.key] || ''}
-                        onChange={(e) => handleChange(setting.key, parseFloat(e.target.value) || 0)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      <InputNumber
+                        style={{ width: '100%' }}
                         placeholder={`Enter ${setting.label.toLowerCase()}`}
                       />
                     ) : (
-                      <input
+                      <Input
                         type={setting.type}
-                        value={formData[setting.key] || ''}
-                        onChange={(e) => handleChange(setting.key, e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder={`Enter ${setting.label.toLowerCase()}`}
                       />
                     )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                  </Form.Item>
+                </Col>
+              ))}
+            </Row>
+          </Card>
         ))}
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
+        <div style={{ textAlign: 'right' }}>
+          <Button type="primary" htmlType="submit" size="large">
             Save Settings
-          </button>
+          </Button>
         </div>
-      </form>
-    </div>
+      </Form>
+    </Space>
   );
 };
 

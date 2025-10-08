@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { authAPI } from '../api/authAPI';
 
 interface User {
@@ -30,11 +30,14 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async (credentials: { email: string; password: string }, { rejectWithValue }) => {
+  async (credentials: { email: string; password: string }, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await authAPI.login(credentials);
-      localStorage.setItem('token', response.data.token);
-      return response.data;
+      localStorage.setItem('token', response.data.data.token);
+      return {
+        user: response.data.data.user,
+        token: response.data.data.token
+      };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
@@ -43,10 +46,10 @@ export const login = createAsyncThunk(
 
 export const getMe = createAsyncThunk(
   'auth/getMe',
-  async (_, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await authAPI.getMe();
-      return response.data;
+      return response.data.data.user;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get user data');
     }
@@ -55,7 +58,7 @@ export const getMe = createAsyncThunk(
 
 export const logout = createAsyncThunk(
   'auth/logout',
-  async (_, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       await authAPI.logout();
       localStorage.removeItem('token');
@@ -70,46 +73,45 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: (state: AuthState) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: (builder: any) => {
     builder
       // Login
-      .addCase(login.pending, (state) => {
+      .addCase(login.pending, (state: AuthState) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(login.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(login.fulfilled, (state: AuthState, action: any) => {
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
         state.error = null;
       })
-      .addCase(login.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(login.rejected, (state: AuthState, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Get Me
-      .addCase(getMe.pending, (state) => {
+      .addCase(getMe.pending, (state: AuthState) => {
         state.loading = true;
       })
-      .addCase(getMe.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(getMe.fulfilled, (state: AuthState, action: any) => {
         state.loading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
       })
-      .addCase(getMe.rejected, (state) => {
+      .addCase(getMe.rejected, (state: AuthState) => {
         state.loading = false;
-        state.isAuthenticated = false;
+        // Don't clear authentication if getMe fails - just keep the user as null
+        // This allows the user to stay logged in even if /me fails
         state.user = null;
-        state.token = null;
-        localStorage.removeItem('token');
       })
       // Logout
-      .addCase(logout.fulfilled, (state) => {
+      .addCase(logout.fulfilled, (state: AuthState) => {
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;

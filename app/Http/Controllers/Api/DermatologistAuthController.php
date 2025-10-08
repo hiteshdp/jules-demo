@@ -11,6 +11,20 @@ use Illuminate\Validation\ValidationException;
 use App\Models\User;
 
 /**
+ * @OA\Schema(
+ *     schema="DermatologistProfile",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="user_id", type="integer", example=1),
+ *     @OA\Property(property="license_number", type="string", example="DR123456"),
+ *     @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+ *     @OA\Property(property="years_of_experience", type="integer", example=5),
+ *     @OA\Property(property="qualifications", type="string", example="MD, Dermatology"),
+ *     @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+ *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+ * )
+ * 
  * @OA\Tag(
  *     name="Dermatologist Authentication",
  *     description="Dermatologist authentication endpoints"
@@ -20,10 +34,10 @@ class DermatologistAuthController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/dermatologist/me",
+     *     path="/dermatologist/me",
      *     summary="Get authenticated dermatologist details",
      *     tags={"Dermatologist Authentication"},
-     *     security={{"sanctum":{}}},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
      *         description="Dermatologist details retrieved successfully",
@@ -33,8 +47,27 @@ class DermatologistAuthController extends Controller
      *             @OA\Property(
      *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="user", ref="#/components/schemas/User"),
-     *                 @OA\Property(property="dermatologist_profile", ref="#/components/schemas/DermatologistProfile")
+     *                 @OA\Property(property="user", type="object",
+                     @OA\Property(property="id", type="integer", example=1),
+                     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+                     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+                     @OA\Property(property="phone", type="string", example="+1234567890"),
+                     @OA\Property(property="date_of_birth", type="string", format="date", example="1985-01-01"),
+                     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
+                     @OA\Property(property="role", type="string", example="dermatologist"),
+                     @OA\Property(property="is_active", type="boolean", example=true),
+                     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+                     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")),
+     *                 @OA\Property(property="dermatologist_profile", type="object",
+                     @OA\Property(property="id", type="integer", example=1),
+                     @OA\Property(property="user_id", type="integer", example=1),
+                     @OA\Property(property="license_number", type="string", example="DR123456"),
+                     @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+                     @OA\Property(property="years_of_experience", type="integer", example=5),
+                     @OA\Property(property="qualifications", type="string", example="MD, Dermatology"),
+                     @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+                     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+                     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
      *             )
      *         )
      *     ),
@@ -51,7 +84,7 @@ class DermatologistAuthController extends Controller
     public function me(Request $request)
     {
         $user = $request->user();
-        
+
         if (!$user || $user->role !== 'dermatologist') {
             return response()->json([
                 'success' => false,

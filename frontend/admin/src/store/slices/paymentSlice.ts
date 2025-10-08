@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { paymentAPI } from '../api/paymentAPI';
 
 interface User {
@@ -38,7 +38,7 @@ const initialState: PaymentState = {
 
 export const fetchPayments = createAsyncThunk(
   'payment/fetchPayments',
-  async (_, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await paymentAPI.getPayments();
       return response.data;
@@ -52,21 +52,21 @@ const paymentSlice = createSlice({
   name: 'payment',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: (state: any) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: (builder: any) => {
     builder
-      .addCase(fetchPayments.pending, (state) => {
+      .addCase(fetchPayments.pending, (state: any) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchPayments.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchPayments.fulfilled, (state: any, action: any) => {
         state.loading = false;
         state.payments = action.payload.data;
       })
-      .addCase(fetchPayments.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchPayments.rejected, (state: any, action: any) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -70,11 +70,6 @@ mkdir -p bootstrap/cache \
          storage/logs
 print_success "Laravel directories created"
 
-# --- Composer install
-print_status "Installing PHP dependencies with Composer..."
-composer install --no-interaction --prefer-dist --optimize-autoloader
-print_success "PHP dependencies installed successfully"
-print_debug "Composer install completed"
 
 # --- .env file
 if [ ! -f ".env" ]; then
@@ -84,6 +79,13 @@ if [ ! -f ".env" ]; then
 else
     print_status ".env file already exists, skipping"
 fi
+
+# --- Composer install
+print_status "Installing PHP dependencies with Composer..."
+composer install --no-interaction --prefer-dist --optimize-autoloader
+print_success "PHP dependencies installed successfully"
+print_debug "Composer install completed"
+
 
 # --- App key
 print_status "Generating application key..."

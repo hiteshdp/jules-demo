@@ -41,9 +41,9 @@ class AdminController extends Controller
 
         // Monthly appointments trend
         $monthlyAppointments = Appointment::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('COUNT(*) as count')
-            )
+            DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+            DB::raw('COUNT(*) as count')
+        )
             ->where('created_at', '>=', now()->subMonths(12))
             ->groupBy('month')
             ->orderBy('month')
@@ -51,9 +51,9 @@ class AdminController extends Controller
 
         // Monthly revenue trend
         $monthlyRevenue = Payment::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('SUM(amount) as total')
-            )
+            DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
+            DB::raw('SUM(amount) as total')
+        )
             ->where('status', 'completed')
             ->where('created_at', '>=', now()->subMonths(12))
             ->groupBy('month')
@@ -183,9 +183,7 @@ class AdminController extends Controller
             'years_of_experience' => $request->years_of_experience,
             'qualifications' => $request->qualifications,
             'consultation_fee' => $request->consultation_fee,
-            'available_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-            'start_time' => '09:00',
-            'end_time' => '17:00',
+            // availability fields removed from dermatologists schema
         ]);
 
         $user->load('dermatologistProfile');

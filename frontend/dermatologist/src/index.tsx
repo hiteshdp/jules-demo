@@ -5,8 +5,9 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { store } from './store/store';
-import App from './App';
+import 'antd/dist/reset.css';
 import './index.css';
+import App from './App';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -42,6 +43,4 @@ root.render(
       </BrowserRouter>
     </Provider>
   </React.StrictMode>
-)
-
-
+);
