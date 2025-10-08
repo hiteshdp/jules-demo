@@ -205,14 +205,6 @@ const Chat: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Zoom Meeting Button */}
-                <div className="px-4 py-3 border-b border-gray-200">
-                  <ZoomMeetingButton 
-                    appointmentId={selectedAppointmentId}
-                    patientName={appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.name}
-                    isPatient={false}
-                  />
-                </div>
 
                 {/* Messages Area */}
                 <div
