@@ -10,12 +10,6 @@ export interface Dermatologist {
   qualifications: string;
   bio?: string;
   consultation_fee: number;
-  available_days: string[];
-  start_time: string;
-  end_time: string;
-  timezone: string;
-  is_available: boolean;
-  max_patients_per_day: number;
   user: {
     id: number;
     name: string;
@@ -32,7 +26,7 @@ export const dermatologistAPI = {
     console.log('API Response received:', response);
     return response;
   },
-  
+
   // Get dermatologist by ID
   getDermatologist: (id: number) =>
     apiClient.get<{ success: boolean; data: Dermatologist }>(`/patient/dermatologists/${id}`),

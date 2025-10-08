@@ -183,9 +183,7 @@ class AdminController extends Controller
             'years_of_experience' => $request->years_of_experience,
             'qualifications' => $request->qualifications,
             'consultation_fee' => $request->consultation_fee,
-            'available_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-            'start_time' => '09:00',
-            'end_time' => '17:00',
+            // availability fields removed from dermatologists schema
         ]);
 
         $user->load('dermatologistProfile');

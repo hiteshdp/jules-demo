@@ -206,7 +206,7 @@ class DermatologistController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $dermatologist = User::where('role', 'dermatologist')
+            $user = User::where('role', 'dermatologist')
                 ->where('id', $id)
                 ->select([
                     'id',
@@ -220,14 +220,28 @@ class DermatologistController extends Controller
                 ])
                 ->first();
 
-            if (!$dermatologist) {
+            if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Dermatologist not found'
                 ], 404);
             }
 
+            // Load related dermatologist profile by user_id
+            $profile = \App\Models\Dermatologist::where('user_id', $user->id)
+                ->select([
+                    'user_id',
+                    'license_number',
+                    'specialization',
+                    'years_of_experience',
+                    'qualifications',
+                    'bio',
+                    'consultation_fee'
+                ])->first();
+
+            $dermatologist = $user;
             $dermatologist->subscription_status = '-';
+            $dermatologist->profile = $profile;
 
             return response()->json([
                 'success' => true,

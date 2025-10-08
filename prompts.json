@@ -1,6 +1,40 @@
 {
   "prompts": [
     {
+      "id": "admin_patients_view_icon_v1",
+      "path": "prompts/admin_patients_view_icon_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "in admin module , patient section , i need icon instead of view text",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_dermatologists_view_modal_v1",
+      "path": "prompts/admin_dermatologists_view_modal_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistController.php",
+        "frontend/admin/src/pages/Dermatologists.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:20:00Z",
+      "user_prompt": "Update the existing API /admin/dermatologists/{id} to fetch full details from both the users and dermatologist tables, and add a View button in the admin UI to display these details in a styled card modal — similar to the Patient View modal feature.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_patients_view_modal_v1",
+      "path": "prompts/admin_patients_view_modal_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:05:00Z",
+      "user_prompt": "so pelase replace the drawer with model",
+      "prompt_type": "user_request"
+    },
+    {
       "id": "hair_skin_health_setup_v1",
       "path": "prompts/hair_skin_health_setup_v1.md",
       "used_in": [
@@ -848,3 +882,4 @@
     }
   ]
 }
+

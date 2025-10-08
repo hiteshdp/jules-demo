@@ -240,33 +240,53 @@ class PatientController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $patient = User::where('role', 'patient')
+            $user = User::where('role', 'patient')
                 ->where('id', $id)
-                ->select([
-                    'id',
-                    'name',
-                    'email',
-                    'phone as phone_no',
-                    'date_of_birth as dob',
-                    'gender',
-                    'is_active',
-                    'created_at'
-                ])
+                ->with('patientProfile')
                 ->first();
 
-            if (!$patient) {
+            if (!$user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Patient not found'
                 ], 404);
             }
 
-            $patient->subscription_status = '-';
+            $profile = $user->patientProfile; // joined via user_id
+
+            $data = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_no' => $user->phone,
+                'dob' => $user->date_of_birth,
+                'gender' => $user->gender,
+                'is_active' => $user->is_active,
+                'subscription_status' => '-',
+                'created_at' => $user->created_at,
+                'profile' => $profile ? [
+                    'id' => $profile->id,
+                    'user_id' => $profile->user_id,
+                    'medical_history' => $profile->medical_history,
+                    'allergies' => $profile->allergies,
+                    'current_medications' => $profile->current_medications,
+                    'lifestyle' => $profile->lifestyle,
+                    'smoking' => $profile->smoking,
+                    'alcohol_consumption' => $profile->alcohol_consumption,
+                    'dietary_habits' => $profile->dietary_habits,
+                    'stress_level' => $profile->stress_level,
+                    'sleep_pattern' => $profile->sleep_pattern,
+                    'hair_care_routine' => $profile->hair_care_routine,
+                    'family_history' => $profile->family_history,
+                    'created_at' => $profile->created_at,
+                    'updated_at' => $profile->updated_at,
+                ] : null,
+            ];
 
             return response()->json([
                 'success' => true,
                 'message' => 'Patient retrieved successfully',
-                'data' => $patient
+                'data' => $data,
             ]);
         } catch (\Exception $e) {
             return response()->json([
