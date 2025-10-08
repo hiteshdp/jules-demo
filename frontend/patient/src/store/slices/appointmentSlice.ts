@@ -6,6 +6,14 @@ interface Dermatologist {
   name: string;
   email: string;
   phone?: string;
+  user_id?: number;
+  user?: {
+	name: string;
+  };
+  specialization: string;
+  years_of_experience: number;
+  consultation_fee: number;
+  is_available: boolean;
 }
 
 interface Appointment {

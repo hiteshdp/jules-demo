@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments, fetchDermatologists, bookAppointment } from '../store/slices/appointmentSlice';
-import { CalendarDaysIcon, ClockIcon, UserIcon } from '@heroicons/react/24/outline';
+import { CalendarDaysIcon, ClockIcon, UserIcon, ChatBubbleLeftRightIcon, XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { sendChatMessage } from '../store/slices/chatSlice';
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { appointments, dermatologists, loading, error } = useSelector((state: RootState) => state.appointment);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [chatOpenForId, setChatOpenForId] = useState<number | null>(null);
+  const [chatMessage, setChatMessage] = useState<string>('');
   const [bookingData, setBookingData] = useState({
     dermatologist_id: '',
     scheduled_at: '',
@@ -47,6 +52,24 @@ const Appointments: React.FC = () => {
     return new Date(dateTime).toLocaleString();
   };
 
+  const openChat = (appointmentId: number) => {
+    navigate(`/chat?appointmentId=${appointmentId}`);
+  };
+
+  const closeChat = () => {
+    setChatOpenForId(null);
+    setChatMessage('');
+  };
+
+  const onSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatOpenForId || !chatMessage.trim()) return;
+    dispatch(sendChatMessage({ appointmentId: chatOpenForId, message: chatMessage.trim() }))
+      .unwrap()
+      .then(() => setChatMessage(''))
+      .catch((err) => toast.error(err || 'Failed to send'));
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'scheduled':
@@ -63,6 +86,7 @@ const Appointments: React.FC = () => {
   };
 
   return (
+    <>
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
@@ -102,7 +126,7 @@ const Appointments: React.FC = () => {
                     <option value="">Choose a dermatologist</option>
                     {(Array.isArray(dermatologists) ? dermatologists : []).map((derm) => (
                       <option key={derm.id} value={derm.user_id}>
-                        {derm.user.name} - {derm.specialization} (₹{derm.consultation_fee})
+                        {derm.user?.name} - {derm.specialization} (₹{derm.consultation_fee})
                       </option>
                     ))}
                   </select>
@@ -210,6 +234,14 @@ const Appointments: React.FC = () => {
                             {appointment.notes}
                           </p>
                         )}
+                        <div className="mt-2 flex items-center gap-2">
+                          <button
+                            onClick={() => openChat(appointment.id)}
+                            className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+                          >
+                            <ChatBubbleLeftRightIcon className="h-4 w-4 mr-1" /> Chat
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -220,6 +252,34 @@ const Appointments: React.FC = () => {
         </div>
       </div>
     </div>
+      {chatOpenForId !== null && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-10 mx-auto w-full max-w-xl shadow-lg rounded-md bg-white">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h3 className="text-lg font-medium text-gray-900">Chat with Dermatologist</h3>
+              <button onClick={closeChat} className="p-1 rounded hover:bg-gray-100">
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="max-h-[60vh] overflow-y-auto p-4 space-y-3">
+              {/* Messages rendering can be connected to store if needed */}
+            </div>
+            <form onSubmit={onSendMessage} className="p-4 border-t flex gap-2">
+              <input
+                type="text"
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+                className="flex-1 input-field"
+                placeholder="Type your message..."
+              />
+              <button type="submit" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <PaperAirplaneIcon className="h-4 w-4 mr-2" /> Send
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

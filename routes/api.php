@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AppointmentController;
 use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\AppointmentChatController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
 use App\Http\Controllers\Api\PatientController;
@@ -40,6 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index']);
         Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
         Route::post('/appointments', [AppointmentController::class, 'store']);
+
+        // Appointment Chat
+        Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
+        Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
         
         // Quiz
         Route::get('/quiz/questions', [QuizController::class, 'questions']);
@@ -59,5 +64,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments', [DermatologistAppointmentController::class, 'index']);
         Route::get('/appointments/{id}', [DermatologistAppointmentController::class, 'show']);
         Route::put('/appointments/{id}/status', [DermatologistAppointmentController::class, 'updateStatus']);
+
+        // Appointment Chat (Dermatologist)
+        Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
+        Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
     });
 });
