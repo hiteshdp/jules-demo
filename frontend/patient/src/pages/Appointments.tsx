@@ -44,11 +44,6 @@ const Appointments: React.FC = () => {
       });
   };
 
-  const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString();
-  };
-
-
   return (
     <>
     <div className="space-y-6">

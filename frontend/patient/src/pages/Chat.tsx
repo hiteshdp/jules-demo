@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from '../store/store';
 import { fetchChatMessages, sendChatMessage, clearMessages } from '../store/slices/chatSlice';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
 import { useLocation } from 'react-router-dom';
-import { Card, Typography, Avatar, Button, Input, Space, Row, Col, Spin, Alert, Tag } from 'antd';
+import { Card, Typography, Avatar, Button, Input, Space, Row, Col, Alert, Tag } from 'antd';
 import { MessageOutlined, UserOutlined, CalendarOutlined, SendOutlined } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 
