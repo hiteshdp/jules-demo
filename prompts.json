@@ -1137,6 +1137,45 @@
       "date": "2025-01-27T22:45:00Z",
       "user_prompt": "Looks good, Can you do some UI/UX changes for the chat icon and view detail icon as well",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_error_boundary_v1",
+      "path": "prompts/patient_error_boundary_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/ErrorBoundary.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:00:00Z",
+      "user_prompt": "read this file and i want to create this type of error Boundary in patient settup",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_error_boundary_v1",
+      "path": "prompts/admin_error_boundary_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/common/ErrorBoundary.tsx",
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_error_boundary_v1",
+      "path": "prompts/dermatologist_error_boundary_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/common/ErrorBoundary.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
+      "prompt_type": "user_request"
     }
   ]
 }
