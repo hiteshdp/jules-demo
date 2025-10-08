@@ -178,7 +178,7 @@ class DermatologistController extends Controller
                     'max:255',
                     Rule::unique('users', 'email'),
                 ],
-                'phone_no' => 'required|string|max:20',
+                'phone_no' => 'nullable|string|max:20',
                 'password' => 'required|string|min:6',
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
@@ -194,7 +194,7 @@ class DermatologistController extends Controller
             $userData = [
                 'name' => $dermatologistData['name'],
                 'email' => $dermatologistData['email'],
-                'phone' => $dermatologistData['phone_no'],
+                'phone' => $dermatologistData['phone_no'] ?? null,
                 'password' => Hash::make($dermatologistData['password']),
                 'date_of_birth' => $dermatologistData['dob'] ?? null,
                 'gender' => $dermatologistData['gender'],
@@ -332,6 +332,10 @@ class DermatologistController extends Controller
                 ], 404);
             }
 
+            // Get the dermatologist profile to get the correct ID for unique validation
+            $dermatologistProfile = \App\Models\Dermatologist::where('user_id', $dermatologist->id)->first();
+            $dermatologistProfileId = $dermatologistProfile ? $dermatologistProfile->id : null;
+
             $updateData = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
                 'email' => [
@@ -341,17 +345,17 @@ class DermatologistController extends Controller
                     'max:255',
                     Rule::unique('users', 'email')->ignore($dermatologist->id),
                 ],
-                'phone_no' => 'sometimes|required|string|max:20',
+                'phone_no' => 'sometimes|nullable|string|max:20',
                 'password' => 'sometimes|nullable|string|min:6',
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
                 'is_active' => 'sometimes|boolean',
                 // Professional fields
-                'license_number' => 'sometimes|required|string|max:255|unique:dermatologists,license_number,' . $dermatologist->id,
-                'specialization' => 'sometimes|required|string|max:255',
-                'years_of_experience' => 'sometimes|required|integer|min:0|max:50',
-                'qualifications' => 'sometimes|required|string',
-                'consultation_fee' => 'sometimes|required|numeric|min:0',
+                'license_number' => 'sometimes|nullable|string|max:255|unique:dermatologists,license_number,' . $dermatologistProfileId,
+                'specialization' => 'sometimes|nullable|string|max:255',
+                'years_of_experience' => 'sometimes|nullable|integer|min:0|max:50',
+                'qualifications' => 'sometimes|nullable|string',
+                'consultation_fee' => 'sometimes|nullable|numeric|min:0',
                 'bio' => 'nullable|string',
             ]);
 
@@ -362,7 +366,7 @@ class DermatologistController extends Controller
             if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
             if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
             if (isset($updateData['phone_no'])) {
-                $userData['phone'] = $updateData['phone_no'];
+                $userData['phone'] = $updateData['phone_no'] ?: null;
                 unset($updateData['phone_no']);
             }
             if (isset($updateData['dob'])) {
@@ -378,13 +382,25 @@ class DermatologistController extends Controller
                 unset($updateData['password']);
             }
 
-            // Profile fields
-            if (isset($updateData['license_number'])) $profileData['license_number'] = $updateData['license_number'];
-            if (isset($updateData['specialization'])) $profileData['specialization'] = $updateData['specialization'];
-            if (isset($updateData['years_of_experience'])) $profileData['years_of_experience'] = $updateData['years_of_experience'];
-            if (isset($updateData['qualifications'])) $profileData['qualifications'] = $updateData['qualifications'];
-            if (isset($updateData['consultation_fee'])) $profileData['consultation_fee'] = $updateData['consultation_fee'];
-            if (isset($updateData['bio'])) $profileData['bio'] = $updateData['bio'];
+            // Profile fields - only update if values are provided and not empty
+            if (isset($updateData['license_number']) && !empty(trim($updateData['license_number']))) {
+                $profileData['license_number'] = $updateData['license_number'];
+            }
+            if (isset($updateData['specialization']) && !empty(trim($updateData['specialization']))) {
+                $profileData['specialization'] = $updateData['specialization'];
+            }
+            if (isset($updateData['years_of_experience']) && $updateData['years_of_experience'] !== null) {
+                $profileData['years_of_experience'] = $updateData['years_of_experience'];
+            }
+            if (isset($updateData['qualifications']) && !empty(trim($updateData['qualifications']))) {
+                $profileData['qualifications'] = $updateData['qualifications'];
+            }
+            if (isset($updateData['consultation_fee']) && $updateData['consultation_fee'] !== null) {
+                $profileData['consultation_fee'] = $updateData['consultation_fee'];
+            }
+            if (isset($updateData['bio'])) {
+                $profileData['bio'] = $updateData['bio'];
+            }
 
             // Update user data
             if (!empty($userData)) {
