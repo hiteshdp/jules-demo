@@ -5,6 +5,7 @@ import {
   ClipboardDocumentListIcon,
   LightBulbIcon,
   CalendarDaysIcon,
+  ChatBubbleLeftRightIcon,
   ShoppingBagIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
@@ -14,6 +15,7 @@ const navigation = [
   { name: 'Hair Loss Quiz', href: '/quiz', icon: ClipboardDocumentListIcon },
   { name: 'Recommendations', href: '/recommendations', icon: LightBulbIcon },
   { name: 'Appointments', href: '/appointments', icon: CalendarDaysIcon },
+  { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
   { name: 'Products', href: '/products', icon: ShoppingBagIcon },
   { name: 'Profile', href: '/profile', icon: UserIcon },
 ];

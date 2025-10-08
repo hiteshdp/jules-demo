@@ -1,21 +1,6 @@
+// Generated via prompt: prompts/appointment_chat_feature_v1.md
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { chatAPI } from '../api/chatAPI';
-
-interface ChatMessage {
-  id: number;
-  appointment_id: number;
-  sender_id: number;
-  message: string;
-  attachment?: string;
-  type: string;
-  is_read: boolean;
-  created_at: string;
-  sender?: {
-    id: number;
-    name: string;
-    role: string;
-  };
-}
+import { chatAPI, ChatMessage } from '../api/chatAPI';
 
 interface ChatState {
   messages: ChatMessage[];
@@ -46,31 +31,17 @@ export const fetchChatMessages = createAsyncThunk(
   }
 );
 
-export const sendMessage = createAsyncThunk(
+export const sendChatMessage = createAsyncThunk(
   'chat/sendMessage',
-  async ({ appointmentId, message, type, attachment }: {
-    appointmentId: number;
-    message: string;
-    type?: string;
-    attachment?: File;
-  }, { rejectWithValue }) => {
+  async (
+    { appointmentId, message }: { appointmentId: number; message: string },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await chatAPI.sendMessage(appointmentId, message, type, attachment);
+      const response = await chatAPI.sendMessage(appointmentId, { message });
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to send message');
-    }
-  }
-);
-
-export const markMessagesAsRead = createAsyncThunk(
-  'chat/markAsRead',
-  async (appointmentId: number, { rejectWithValue }) => {
-    try {
-      const response = await chatAPI.markAsRead(appointmentId);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to mark messages as read');
     }
   }
 );
@@ -114,28 +85,24 @@ const chatSlice = createSlice({
         state.error = action.payload;
       })
       // Send Message
-      .addCase(sendMessage.pending, (state) => {
+      .addCase(sendChatMessage.pending, (state) => {
         state.sending = true;
         state.error = null;
       })
-      .addCase(sendMessage.fulfilled, (state, action: PayloadAction<ChatMessage>) => {
+      .addCase(sendChatMessage.fulfilled, (state, action: PayloadAction<ChatMessage>) => {
         state.sending = false;
         if (!state.messages.find(m => m.id === action.payload.id)) {
           state.messages.push(action.payload);
         }
       })
-      .addCase(sendMessage.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(sendChatMessage.rejected, (state, action: PayloadAction<any>) => {
         state.sending = false;
         state.error = action.payload;
-      })
-      // Mark as Read
-      .addCase(markMessagesAsRead.fulfilled, (state) => {
-        state.messages.forEach(message => {
-          message.is_read = true;
-        });
       });
   },
 });
 
 export const { clearError, addMessage, clearMessages } = chatSlice.actions;
 export default chatSlice.reducer;
+
+

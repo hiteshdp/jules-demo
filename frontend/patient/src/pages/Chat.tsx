@@ -1,24 +1,24 @@
-// Generated via prompt: prompts/dermatologist_chat_feature_v1.md
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+// Generated via prompt: prompts/chat_page_implementation_v1.md
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchChatMessages, sendMessage } from '../store/slices/chatSlice';
+import { fetchChatMessages, sendChatMessage, clearMessages } from '../store/slices/chatSlice';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
+import { useLocation } from 'react-router-dom';
 import { 
   ChatBubbleLeftRightIcon, 
   PaperAirplaneIcon, 
   UserIcon,
-  CalendarDaysIcon
+  CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-import { useLocation } from 'react-router-dom';
 
 const Chat: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   const { user } = useSelector((state: RootState) => state.auth);
   const { appointments } = useSelector((state: RootState) => state.appointment);
-  const { messages, loading, error, sending } = useSelector((state: RootState) => state.chat);
+  const { messages, loading, error } = useSelector((state: RootState) => state.chat);
   
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -45,6 +45,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     if (selectedAppointmentId) {
+      dispatch(clearMessages()); // Clear previous messages
       dispatch(fetchChatMessages(selectedAppointmentId));
     }
   }, [selectedAppointmentId, dispatch]);
@@ -63,8 +64,12 @@ const Chat: React.FC = () => {
     const el = messagesContainerRef.current;
     if (!el) return;
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    setIsNearBottom(distanceFromBottom < 120);
+    const nearBottom = distanceFromBottom < 120;
+    setIsNearBottom(nearBottom);
   };
+
+  // Filter messages for the selected appointment
+  const currentMessages = selectedAppointmentId ? messages.filter(m => m.appointment_id === selectedAppointmentId) : [];
 
   // Auto-scroll only if near bottom
   useEffect(() => {
@@ -73,23 +78,22 @@ const Chat: React.FC = () => {
     if (isNearBottom) {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
-  }, [messages, selectedAppointmentId, isNearBottom]);
+  }, [currentMessages, selectedAppointmentId, isNearBottom]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedAppointmentId || !newMessage.trim()) return;
 
-    dispatch(sendMessage({ 
+    dispatch(sendChatMessage({ 
       appointmentId: selectedAppointmentId, 
-      message: newMessage.trim(),
-      type: 'text'
+      message: newMessage.trim() 
     }))
       .unwrap()
       .then(() => {
         setNewMessage('');
         //toast.success('Message sent successfully!');
       })
-      .catch((err: any) => {
+      .catch((err) => {
         toast.error(err || 'Failed to send message');
       });
   };
@@ -116,9 +120,9 @@ const Chat: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Patient Chat</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Chat with Dermatologists</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Communicate with your patients about their appointments.
+          Communicate with your dermatologists about your appointments.
         </p>
       </div>
 
@@ -127,7 +131,7 @@ const Chat: React.FC = () => {
         <div className="lg:col-span-1">
           <div className="bg-white shadow-lg rounded-lg border border-gray-200">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Patient Appointments</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Your Appointments</h3>
               
               {Array.isArray(appointments) && appointments.length > 0 ? (
                 <div className="space-y-3">
@@ -143,7 +147,7 @@ const Chat: React.FC = () => {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-gray-900">
-                          {appointment.patient?.name || 'Unknown Patient'}
+                          {appointment.dermatologist?.name || 'Unknown Doctor'}
                         </p>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
                           {appointment.status}
@@ -161,7 +165,7 @@ const Chat: React.FC = () => {
                   <ChatBubbleLeftRightIcon className="mx-auto h-12 w-12 text-gray-400" />
                   <h3 className="mt-2 text-sm font-medium text-gray-900">No appointments found</h3>
                   <p className="mt-1 text-sm text-gray-500">
-                    You don't have any patient appointments yet.
+                    Book an appointment to start chatting with dermatologists.
                   </p>
                 </div>
               )}
@@ -182,10 +186,10 @@ const Chat: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-medium text-gray-900">
-                        {appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.name || 'Patient'}
+                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.name || 'Dermatologist'}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        {appointments.find((a: any) => a.id === selectedAppointmentId)?.status || 'Appointment'}
+                        {appointments.find(a => a.id === selectedAppointmentId)?.status || 'Appointment'}
                       </p>
                     </div>
                     <div className="flex items-center space-x-3">
@@ -218,7 +222,7 @@ const Chat: React.FC = () => {
                         Try Again
                       </button>
                     </div>
-                  ) : messages.length === 0 ? (
+                  ) : currentMessages.length === 0 ? (
                     <div className="text-center text-gray-500 h-full flex items-center justify-center">
                       <div>
                         <ChatBubbleLeftRightIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -226,11 +230,11 @@ const Chat: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    messages.map((message: any, index: number) => {
+                    currentMessages.map((message, index) => {
                       const isOwnMessage = message.sender_id === user?.id;
-                      const prevMessage = index > 0 ? messages[index - 1] : null;
+                      const prevMessage = index > 0 ? currentMessages[index - 1] : null;
                       const isConsecutive = prevMessage && prevMessage.sender_id === message.sender_id;
-                      const showTime = !isConsecutive || index === messages.length - 1;
+                      const showTime = !isConsecutive || index === currentMessages.length - 1;
                       
                       return (
                         <div
@@ -268,12 +272,12 @@ const Chat: React.FC = () => {
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type a message"
                         className="w-full px-4 py-3 bg-gray-100 text-gray-900 placeholder-gray-500 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-                        disabled={sending}
+                        disabled={loading}
                       />
                     </div>
                     <button
                       type="submit"
-                      disabled={!newMessage.trim() || sending}
+                      disabled={!newMessage.trim() || loading}
                       className="inline-flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <PaperAirplaneIcon className="h-5 w-5" />
@@ -285,9 +289,9 @@ const Chat: React.FC = () => {
               <div className="flex-1 flex items-center justify-center bg-gray-50">
                 <div className="text-center">
                   <ChatBubbleLeftRightIcon className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Patient</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Appointment</h3>
                   <p className="text-gray-500">
-                    Choose a patient appointment from the list to start chatting.
+                    Choose an appointment from the list to start chatting with your dermatologist.
                   </p>
                 </div>
               </div>

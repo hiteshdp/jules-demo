@@ -24,6 +24,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const appointmentAPI = {
   getAppointments: () =>
     api.get('/dermatologist/appointments'),

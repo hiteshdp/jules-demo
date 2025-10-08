@@ -773,6 +773,115 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "dermatologist_login_security_fix_v1",
+      "path": "prompts/dermatologist_login_security_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/Layout.tsx",
+        "frontend/dermatologist/src/components/ProtectedRoute.tsx",
+        "frontend/dermatologist/src/pages/Login.tsx",
+        "frontend/dermatologist/src/index.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T10:30:00Z",
+      "user_prompt": "Uncaught DOMException: The operation is insecure. receiving this error when try to login",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_dashboard_loading_fix_v1",
+      "path": "prompts/dermatologist_dashboard_loading_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T10:45:00Z",
+      "user_prompt": "Dashboard is not showing only loading",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_refresh_auth_fix_v1",
+      "path": "prompts/dermatologist_refresh_auth_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/components/Layout.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T11:00:00Z",
+      "user_prompt": "First time when i logged in that time all things working fine after that it's not. There is no api call when i refresh the page",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "appointment_chat_feature_v1",
+      "path": "prompts/appointment_chat_feature_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentChatController.php",
+        "routes/api.php",
+        "frontend/patient/src/store/api/chatAPI.ts",
+        "frontend/patient/src/store/slices/chatSlice.ts",
+        "frontend/patient/src/store/store.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "In appointments listing screen give chat option where patient can chat with the dermatologist. Do the needful for frontend and backend api as well",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "chat_page_implementation",
+      "path": "prompts/chat_page_implementation_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/Sidebar.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T11:00:00Z",
+      "user_prompt": "I want new chat page where we display all the past chat messge and can send new chat messge. Don't want any model for that..",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "chat_page_deeplink_v1",
+      "path": "prompts/chat_page_deeplink_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "When patient click on the chat button appoitments listing. That time it will redirect to chat with the dermatologist selected",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_chat_feature_v1",
+      "path": "prompts/dermatologist_chat_feature_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Chat.tsx",
+        "frontend/dermatologist/src/store/api/chatAPI.ts",
+        "frontend/dermatologist/src/store/slices/chatSlice.ts",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/Header.tsx",
+        "frontend/dermatologist/src/components/NotificationDropdown.tsx",
+        "frontend/dermatologist/src/hooks/useNotifications.ts",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T12:00:00Z",
+      "user_prompt": "Now the I want same chat feature in dermatologist. When patient send messge there messge will be displayed in dermatologist side as well. And after that i need notification feature for the chat.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_chat_api_v1",
+      "path": "prompts/dermatologist_chat_api_v1.md",
+      "used_in": [
+        "routes/api.php",
+        "frontend/dermatologist/src/store/api/chatAPI.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "I think you need to create new api endpoint and all the requried things for dermatologist",
+      "prompt_type": "user_request"
+    },
+    {
       "id": "swagger_comprehensive_documentation_v1",
       "path": "prompts/swagger_comprehensive_documentation_v1.md",
       "used_in": [

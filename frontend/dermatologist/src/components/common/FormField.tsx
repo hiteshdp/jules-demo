@@ -1,7 +1,6 @@
 import React from 'react';
 import { Form, Input, Select, DatePicker, InputNumber, Switch, Radio, Checkbox } from 'antd';
 import type { FormItemProps } from 'antd/es/form';
-import dayjs from 'dayjs';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -49,7 +48,6 @@ const FormField: React.FC<FormFieldProps> = ({
             disabled={disabled}
             className="w-full"
             format="YYYY-MM-DD"
-            valueFormat="YYYY-MM-DD"
           />
         );
       case 'datetime':
@@ -60,7 +58,6 @@ const FormField: React.FC<FormFieldProps> = ({
             className="w-full"
             showTime
             format="YYYY-MM-DD HH:mm"
-            valueFormat="YYYY-MM-DD HH:mm"
           />
         );
       case 'number':

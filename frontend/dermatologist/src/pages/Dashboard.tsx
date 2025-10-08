@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
-import { Card, Row, Col, Statistic, Typography, Space, Button, List, Avatar } from 'antd';
+import { Card, Row, Col, Statistic, Typography, Space, List, Avatar } from 'antd';
 import { 
   CalendarOutlined, 
   UserOutlined,
@@ -18,11 +18,14 @@ const { Title, Text } = Typography;
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { appointments, loading } = useSelector((state: RootState) => state.appointment);
+  const { appointments, loading, error } = useSelector((state: RootState) => state.appointment);
 
   useEffect(() => {
-    dispatch(fetchAppointments());
-  }, [dispatch]);
+    // Only fetch appointments if user is authenticated
+    if (user && user.id) {
+      dispatch(fetchAppointments());
+    }
+  }, [dispatch, user]);
 
   const todayAppointments = (Array.isArray(appointments) ? appointments : []).filter(
     appointment => new Date(appointment.scheduled_at).toDateString() === new Date().toDateString()
@@ -59,6 +62,32 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return <LoadingSpinner />;
+  }
+
+  // Show loading if user is not authenticated yet or if appointments are loading
+  if (!user || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Dashboard</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => dispatch(fetchAppointments())}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
