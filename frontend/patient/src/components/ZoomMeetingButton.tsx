@@ -106,7 +106,7 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
     
     switch (status) {
       case 'not_created':
-        return 'Waiting for dermatologist to create the meeting...';
+        return 'Waiting for dermatologist to start the meeting...';
       case 'created':
         return 'Meeting created - waiting for dermatologist to start the call...';
       case 'started':
