@@ -3,20 +3,12 @@ import { appointmentAPI } from '../api/appointmentAPI';
 
 interface Dermatologist {
   id: number;
-  user_id?: number;
-  license_number: string;
+  name: string;
+  email: string;
   specialization?: string;
   years_of_experience: number;
   qualifications: string;
-  bio?: string;
   consultation_fee?: number;
-  is_available?: boolean;
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-    phone?: string;
-  };
 }
 
 interface Appointment {
@@ -30,7 +22,22 @@ interface Appointment {
   zoom_link?: string;
   consultation_fee: number;
   is_paid: boolean;
-  dermatologist?: Dermatologist; // This is now a User object directly
+  dermatologist?: {
+    id: number;
+    user_id: number;
+    license_number: string;
+    specialization?: string;
+    years_of_experience: number;
+    qualifications: string;
+    bio?: string;
+    consultation_fee?: number;
+    user?: {
+      id: number;
+      name: string;
+      email: string;
+      phone?: string;
+    };
+  };
 }
 
 interface AppointmentState {
@@ -81,9 +88,11 @@ export const fetchDermatologists = createAsyncThunk(
     
     try {
       const response = await appointmentAPI.getDermatologists();
+      console.log('Dermatologists API response:', response.data);
       // Extract dermatologists array from the API response
-      return response.data.data || [];
+      return response.data.data.dermatologists || [];
     } catch (error: any) {
+      console.error('Dermatologists API error:', error);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch dermatologists');
     }
   }

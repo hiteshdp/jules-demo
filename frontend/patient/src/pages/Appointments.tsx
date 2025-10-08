@@ -1,28 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments, fetchDermatologists, bookAppointment } from '../store/slices/appointmentSlice';
-import { XMarkIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { Card, List, Avatar, Typography, Space, Button, Form } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined } from '@ant-design/icons';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, PhoneOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
-import { sendChatMessage } from '../store/slices/chatSlice';
 
 const { Text } = Typography;
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { appointments, dermatologists, loading, error } = useSelector((state: RootState) => state.appointment);
   const [showBookingForm, setShowBookingForm] = useState(false);
-  const [chatOpenForId, setChatOpenForId] = useState<number | null>(null);
-  const [chatMessage, setChatMessage] = useState<string>('');
   const [form] = Form.useForm();
 
   useEffect(() => {
     dispatch(fetchAppointments());
     dispatch(fetchDermatologists());
   }, [dispatch]);
+
+  // Debug: Log dermatologists data
+  useEffect(() => {
+    console.log('Dermatologists data:', dermatologists);
+  }, [dermatologists]);
 
   const handleBookingSubmit = (values: any) => {
     dispatch(bookAppointment({
@@ -45,19 +48,6 @@ const Appointments: React.FC = () => {
     return new Date(dateTime).toLocaleString();
   };
 
-  const closeChat = () => {
-    setChatOpenForId(null);
-    setChatMessage('');
-  };
-
-  const onSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatOpenForId || !chatMessage.trim()) return;
-    dispatch(sendChatMessage({ appointmentId: chatOpenForId, message: chatMessage.trim() }))
-      .unwrap()
-      .then(() => setChatMessage(''))
-      .catch((err) => toast.error(err || 'Failed to send'));
-  };
 
   return (
     <>
@@ -97,8 +87,8 @@ const Appointments: React.FC = () => {
             placeholder="Choose a dermatologist"
             required
             options={(Array.isArray(dermatologists) ? dermatologists : []).map((derm) => ({
-              label: `${derm.user?.name || 'Unknown'} - ${derm.specialization || 'General'} (₹${derm.consultation_fee || 0})`,
-              value: derm.user_id || derm.id
+              label: `${derm.name || 'Unknown'} - ${derm.specialization || 'General'} (₹${derm.consultation_fee || 0})`,
+              value: derm.id
             }))}
           />
           
@@ -112,28 +102,48 @@ const Appointments: React.FC = () => {
       </Modal>
 
       {/* Appointments List */}
-      <Card 
-        title="Your Appointments"
-        extra={
-          <Text type="secondary">
-            {Array.isArray(appointments) ? appointments.length : 0} appointment(s)
-          </Text>
-        }
-      >
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-            <Text type="danger">Error: {error}</Text>
-            <Button
-              type="link"
-              onClick={() => {
-                dispatch(fetchAppointments());
-                dispatch(fetchDermatologists());
-              }}
-            >
-              Try Again
-            </Button>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">Your Appointments</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Manage your consultations with dermatologists
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-blue-600">
+                {Array.isArray(appointments) ? appointments.length : 0}
+              </div>
+              <div className="text-sm text-gray-500">appointment(s)</div>
+            </div>
           </div>
-        )}
+        </div>
+        <div className="p-6">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs">!</span>
+                  </div>
+                </div>
+                <div className="ml-3 flex-1">
+                  <Text type="danger" className="font-medium">Error: {error}</Text>
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      dispatch(fetchAppointments());
+                      dispatch(fetchDermatologists());
+                    }}
+                    className="p-0 h-auto text-red-600 hover:text-red-800"
+                  >
+                    Try Again
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
         {loading ? (
           <LoadingSpinner />
@@ -146,80 +156,108 @@ const Appointments: React.FC = () => {
             onAction={() => setShowBookingForm(true)}
           />
         ) : (
-          <List
-            dataSource={appointments}
-            renderItem={(appointment) => (
-              <List.Item
-                actions={[
-                  <Button
-                    key="chat"
-                    type="link"
-                    icon={<MessageOutlined />}
-                    onClick={() => setChatOpenForId(appointment.id)}
-                  >
-                    Chat
-                  </Button>
-                ]}
+          <div className="space-y-4">
+            {appointments.map((appointment) => (
+              <Card
+                key={appointment.id}
+                className="hover:shadow-lg transition-all duration-300 border-0 shadow-sm hover:shadow-md"
+                bodyStyle={{ padding: '20px' }}
               >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar icon={<UserOutlined />} className="bg-blue-100 text-blue-600" />
-                  }
-                  title={
-                    <div className="flex items-center justify-between">
-                      <Text strong>{appointment.dermatologist?.user?.name || 'Unknown Doctor'}</Text>
-                      <StatusTag status={appointment.status} />
-                    </div>
-                  }
-                  description={
-                    <Space direction="vertical" size="small">
-                      <div className="flex items-center">
-                        <CalendarOutlined className="mr-2 text-gray-400" />
-                        <Text type="secondary">{formatDateTime(appointment.scheduled_at)}</Text>
+                <div className="flex items-center justify-between">
+                  {/* Left Side - Doctor Info */}
+                  <div className="flex items-start space-x-4 flex-1">
+                    <Avatar 
+                      size={56} 
+                      icon={<UserOutlined />} 
+                      className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <Text strong className="text-lg text-gray-900">
+                          {appointment.dermatologist?.user?.name || 'Unknown Doctor'}
+                        </Text>
+                        <StatusTag status={appointment.status} />
                       </div>
-                      <div className="flex items-center">
-                        <ClockCircleOutlined className="mr-2 text-gray-400" />
-                        <Text type="secondary">₹{appointment.consultation_fee}</Text>
+                      <div className="text-sm text-gray-500 mb-3">
+                        Dermatologist
                       </div>
+                      
+                      {/* Appointment Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                          <CalendarOutlined className="text-blue-500 text-lg flex-shrink-0" />
+                          <div>
+                            <Text className="text-sm font-medium text-gray-900">
+                              {new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </Text>
+                            <Text className="text-sm text-gray-500">
+                              {new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </Text>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                          <ClockCircleOutlined className="text-green-500 text-lg flex-shrink-0" />
+                          <div>
+                            <Text className="text-sm font-medium text-gray-900">
+                              Consultation Fee
+                            </Text>
+                            <Text className="text-lg font-bold text-green-600">
+                              ₹{appointment.consultation_fee}
+                            </Text>
+                          </div>
+                        </div>
+                      </div>
+
                       {appointment.notes && (
-                        <Text type="secondary">{appointment.notes}</Text>
+                        <div className="mt-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                          <Text className="text-sm text-gray-700">
+                            <strong>Notes:</strong> {appointment.notes}
+                          </Text>
+                        </div>
                       )}
-                    </Space>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        )}
-      </Card>
-    </div>
-      {chatOpenForId !== null && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto w-full max-w-xl shadow-lg rounded-md bg-white">
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <h3 className="text-lg font-medium text-gray-900">Chat with Dermatologist</h3>
-              <button onClick={closeChat} className="p-1 rounded hover:bg-gray-100">
-                <XMarkIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="max-h-[60vh] overflow-y-auto p-4 space-y-3">
-              {/* Messages rendering can be connected to store if needed */}
-            </div>
-            <form onSubmit={onSendMessage} className="p-4 border-t flex gap-2">
-              <input
-                type="text"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                className="flex-1 input-field"
-                placeholder="Type your message..."
-              />
-              <button type="submit" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                <PaperAirplaneIcon className="h-4 w-4 mr-2" /> Send
-              </button>
-            </form>
+                    </div>
+                  </div>
+
+                  {/* Right Side - Actions */}
+                  <div className="flex flex-col space-y-3 ml-4 min-w-[140px]">
+                    {/* Chat Button */}
+                    <Button
+                      type="primary"
+                      icon={<MessageOutlined />}
+                      onClick={() => navigate(`/chat?appointmentId=${appointment.id}`)}
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                      size="middle"
+                    >
+                      <span className="font-medium">Start Chat</span>
+                    </Button>
+                    
+                    {/* View Details Button */}
+                    <Button
+                      type="default"
+                      icon={<EyeOutlined />}
+                      className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 text-gray-700 hover:text-gray-900"
+                      size="middle"
+                    >
+                      <span className="font-medium">View Details</span>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
+        )}
         </div>
-      )}
+      </div>
+    </div>
     </>
   );
 };
