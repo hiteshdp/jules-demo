@@ -1273,6 +1273,23 @@
       "date": "2025-10-08T13:45:00Z",
       "user_prompt": "Store start and end date too in subscription",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_dynamic_payment_pages_v1",
+      "path": "prompts/razorpay_dynamic_payment_pages_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/PaymentSuccess.tsx",
+        "frontend/patient/src/components/PaymentFailed.tsx",
+        "frontend/patient/src/components/SubscribeButton.tsx",
+        "frontend/patient/src/pages/PaymentSuccess.tsx",
+        "frontend/patient/src/pages/PaymentFailed.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/SubscriptionStatus.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T14:00:00Z",
+      "user_prompt": "After payment done then show success or failed pages base on response currently show sample success and faild message but i want to add in dynamic",
+      "prompt_type": "user_request"
     }
   ]
 }

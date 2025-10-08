@@ -23,7 +23,6 @@ const SubscribeButton: React.FC = () => {
       description: 'Monthly Plan Rs. 500',
       handler: async (response: any) => {
         await apiClient.post('/patient/subscription/verify', response);
-        alert('Subscription activated successfully!');
       },
       theme: { color: '#3399cc' },
     };
