@@ -1223,6 +1223,56 @@
       "date": "2025-01-27T23:15:00Z",
       "user_prompt": "now this add same error boundary in admin and demostartor setup too",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_cancel_subscription_v1",
+      "path": "prompts/razorpay_cancel_subscription_v1.md",
+      "used_in": [
+        "app/Services/RazorpayService.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:20:00Z",
+      "user_prompt": "currentlu when call cancel subscription then only status update in database but i want to cancel in razorpay dashboard also so can not recusrring next time",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_payment_id_storage_v1",
+      "path": "prompts/razorpay_payment_id_storage_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_08_132341_add_payment_id_to_subscriptions_table.php",
+        "app/Models/Subscription.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:25:00Z",
+      "user_prompt": "now i want to store payment id also in subscription table",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_next_billing_date_v1",
+      "path": "prompts/razorpay_next_billing_date_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_08_134022_add_next_billing_date_to_subscriptions_table.php",
+        "app/Models/Subscription.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:40:00Z",
+      "user_prompt": "one more fiels need to add in subscription table like add next billing date",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_start_end_dates_v1",
+      "path": "prompts/razorpay_start_end_dates_v1.md",
+      "used_in": [
+        "app/Models/Subscription.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:45:00Z",
+      "user_prompt": "Store start and end date too in subscription",
+      "prompt_type": "user_request"
     }
   ]
 }

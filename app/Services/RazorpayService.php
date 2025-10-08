@@ -56,6 +56,40 @@ class RazorpayService
             return false;
         }
     }
+
+    public function cancelSubscription(string $subscriptionId)
+    {
+        try {
+            // Cancel the subscription in Razorpay
+            $subscription = $this->api->subscription->fetch($subscriptionId);
+            $subscription->cancel();
+            
+            Log::info('Razorpay subscription cancelled', [
+                'subscription_id' => $subscriptionId,
+            ]);
+            
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('Failed to cancel Razorpay subscription', [
+                'subscription_id' => $subscriptionId,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    public function getSubscription(string $subscriptionId)
+    {
+        try {
+            return $this->api->subscription->fetch($subscriptionId);
+        } catch (\Throwable $e) {
+            Log::error('Failed to fetch Razorpay subscription', [
+                'subscription_id' => $subscriptionId,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
 }
 
 
