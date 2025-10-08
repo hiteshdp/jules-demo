@@ -274,7 +274,12 @@ const Patients: React.FC = () => {
           email: currentEditingData.email, 
           phone_no: currentEditingData.phone_no, 
           dob: currentEditingData.dob, 
-          gender: currentEditingData.gender 
+          gender: currentEditingData.gender,
+          // Patient profile fields - these will be loaded from the profile data
+          allergies: currentEditingData.profile?.allergies || '',
+          current_medications: currentEditingData.profile?.current_medications || '',
+          smoking: currentEditingData.profile?.smoking || false,
+          alcohol_consumption: currentEditingData.profile?.alcohol_consumption || false
         } : null}
         title={editingId ? 'Edit Patient' : 'Create Patient'}
         submitting={submitting}
@@ -316,17 +321,10 @@ const Patients: React.FC = () => {
             {viewData.profile && (
               <Card title="Medical Details">
                 <Descriptions column={1} bordered size="middle">
-                  <Descriptions.Item label="Medical History">{viewData.profile.medical_history || '–'}</Descriptions.Item>
                   <Descriptions.Item label="Allergies">{viewData.profile.allergies || '–'}</Descriptions.Item>
                   <Descriptions.Item label="Current Medications">{viewData.profile.current_medications || '–'}</Descriptions.Item>
-                  <Descriptions.Item label="Lifestyle">{viewData.profile.lifestyle || '–'}</Descriptions.Item>
                   <Descriptions.Item label="Smoking">{viewData.profile.smoking ? 'Yes' : 'No'}</Descriptions.Item>
                   <Descriptions.Item label="Alcohol Consumption">{viewData.profile.alcohol_consumption ? 'Yes' : 'No'}</Descriptions.Item>
-                  <Descriptions.Item label="Dietary Habits">{viewData.profile.dietary_habits || '–'}</Descriptions.Item>
-                  <Descriptions.Item label="Stress Level">{viewData.profile.stress_level || '–'}</Descriptions.Item>
-                  <Descriptions.Item label="Sleep Pattern">{viewData.profile.sleep_pattern || '–'}</Descriptions.Item>
-                  <Descriptions.Item label="Hair Care Routine">{viewData.profile.hair_care_routine || '–'}</Descriptions.Item>
-                  <Descriptions.Item label="Family History">{viewData.profile.family_history || '–'}</Descriptions.Item>
                 </Descriptions>
               </Card>
             )}

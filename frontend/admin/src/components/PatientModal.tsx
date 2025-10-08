@@ -1,9 +1,10 @@
 // Generated via prompt: prompts/antd_admin_complete_audit_v1.md
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Button, DatePicker, Select, Space } from 'antd';
+import { Modal, Form, Input, Button, DatePicker, Select, Space, Switch } from 'antd';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 interface PatientForm {
   name: string;
@@ -12,6 +13,11 @@ interface PatientForm {
   password?: string;
   dob?: string;
   gender?: string;
+  // Patient profile fields
+  allergies?: string;
+  current_medications?: string;
+  smoking?: boolean;
+  alcohol_consumption?: boolean;
 }
 
 interface Props {
@@ -97,6 +103,41 @@ const PatientModal: React.FC<Props> = ({ open, onClose, onSubmit, initialData, t
             <Option value="other">Other</Option>
           </Select>
         </Form.Item>
+
+        {/* Medical Information Section */}
+        <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
+          <h4 style={{ marginBottom: 16, color: '#1890ff' }}>Medical Information</h4>
+          
+          <Form.Item
+            name="allergies"
+            label="Allergies"
+          >
+            <TextArea 
+              rows={2} 
+              placeholder="List any allergies..."
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="current_medications"
+            label="Current Medications"
+          >
+            <TextArea 
+              rows={2} 
+              placeholder="List current medications..."
+            />
+          </Form.Item>
+
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <Form.Item name="smoking" label="Smoking" valuePropName="checked" style={{ flex: 1 }}>
+              <Switch />
+            </Form.Item>
+            <Form.Item name="alcohol_consumption" label="Alcohol Consumption" valuePropName="checked" style={{ flex: 1 }}>
+              <Switch />
+            </Form.Item>
+          </div>
+        </div>
+
         <Form.Item>
           <Space>
             <Button onClick={onClose}>Cancel</Button>

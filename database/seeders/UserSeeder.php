@@ -67,17 +67,10 @@ class UserSeeder extends Seeder
             ]);
 
             $patient->patientProfile()->create([
-                'medical_history' => 'No significant medical history',
                 'allergies' => 'None known',
                 'current_medications' => 'None',
-                'lifestyle' => 'moderate',
                 'smoking' => false,
                 'alcohol_consumption' => false,
-                'dietary_habits' => 'Balanced diet with occasional fast food',
-                'stress_level' => 'Moderate work stress',
-                'sleep_pattern' => '6-7 hours per night',
-                'hair_care_routine' => 'Daily shampoo, occasional conditioner',
-                'family_history' => 'Father experienced hair loss in his 40s',
             ]);
             echo "Patient user created successfully.\n";
         } else {

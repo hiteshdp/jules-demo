@@ -32,7 +32,11 @@ use Illuminate\Validation\ValidationException;
  *     @OA\Property(property="phone", type="string", example="+1234567890"),
  *     @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
  *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
- *     @OA\Property(property="role", type="string", enum={"patient","dermatologist","admin"}, example="patient")
+ *     @OA\Property(property="role", type="string", enum={"patient","dermatologist","admin"}, example="patient"),
+ *     @OA\Property(property="allergies", type="string", example="None known"),
+ *     @OA\Property(property="current_medications", type="string", example="None"),
+ *     @OA\Property(property="smoking", type="boolean", example=false),
+ *     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
  * )
  * 
  * @OA\Schema(
@@ -197,6 +201,11 @@ class AuthController extends Controller
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|string|in:male,female,other',
             'role' => 'required|string|in:patient,dermatologist,admin',
+            // Patient profile fields
+            'allergies' => 'nullable|string',
+            'current_medications' => 'nullable|string',
+            'smoking' => 'nullable|boolean',
+            'alcohol_consumption' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -219,7 +228,12 @@ class AuthController extends Controller
 
         // Create profile based on role
         if ($user->role === 'patient') {
-            $user->patientProfile()->create([]);
+            $user->patientProfile()->create([
+                'allergies' => $request->allergies,
+                'current_medications' => $request->current_medications,
+                'smoking' => $request->smoking ?? false,
+                'alcohol_consumption' => $request->alcohol_consumption ?? false,
+            ]);
         } elseif ($user->role === 'dermatologist') {
             $user->dermatologistProfile()->create([
                 'license_number' => 'DR' . uniqid(),

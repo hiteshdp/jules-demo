@@ -20,17 +20,10 @@ const Profile = () => {
         phone: user.phone || '',
         date_of_birth: user.date_of_birth ? dayjs(user.date_of_birth) : null,
         gender: user.gender || '',
-        medical_history: user.patientProfile?.medical_history || '',
         allergies: user.patientProfile?.allergies || '',
         current_medications: user.patientProfile?.current_medications || '',
-        lifestyle: user.patientProfile?.lifestyle || '',
         smoking: user.patientProfile?.smoking || false,
         alcohol_consumption: user.patientProfile?.alcohol_consumption || false,
-        dietary_habits: user.patientProfile?.dietary_habits || '',
-        stress_level: user.patientProfile?.stress_level || '',
-        sleep_pattern: user.patientProfile?.sleep_pattern || '',
-        hair_care_routine: user.patientProfile?.hair_care_routine || '',
-        family_history: user.patientProfile?.family_history || '',
       });
     }
   }, [user, form]);
@@ -49,17 +42,10 @@ const Profile = () => {
         phone: user.phone || '',
         date_of_birth: user.date_of_birth ? dayjs(user.date_of_birth) : null,
         gender: user.gender || '',
-        medical_history: user.patientProfile?.medical_history || '',
         allergies: user.patientProfile?.allergies || '',
         current_medications: user.patientProfile?.current_medications || '',
-        lifestyle: user.patientProfile?.lifestyle || '',
         smoking: user.patientProfile?.smoking || false,
         alcohol_consumption: user.patientProfile?.alcohol_consumption || false,
-        dietary_habits: user.patientProfile?.dietary_habits || '',
-        stress_level: user.patientProfile?.stress_level || '',
-        sleep_pattern: user.patientProfile?.sleep_pattern || '',
-        hair_care_routine: user.patientProfile?.hair_care_routine || '',
-        family_history: user.patientProfile?.family_history || '',
       });
     }
     setIsEditing(false);
@@ -144,16 +130,8 @@ const Profile = () => {
             </Row>
           </Card>
 
-          {/* Medical History */}
-          <Card title="Medical History" className="mb-6">
-            <FormField
-              name="medical_history"
-              label="Medical History"
-              type="textarea"
-              rows={3}
-              placeholder="Describe any relevant medical history..."
-            />
-            
+          {/* Medical Information */}
+          <Card title="Medical Information" className="mb-6">
             <FormField
               name="allergies"
               label="Allergies"
@@ -169,30 +147,6 @@ const Profile = () => {
               rows={2}
               placeholder="List current medications..."
             />
-            
-            <FormField
-              name="family_history"
-              label="Family History"
-              type="textarea"
-              rows={2}
-              placeholder="Describe family history of hair loss or related conditions..."
-            />
-          </Card>
-
-          {/* Lifestyle Information */}
-          <Card title="Lifestyle Information">
-            <FormField
-              name="lifestyle"
-              label="Lifestyle"
-              type="select"
-              placeholder="Select lifestyle"
-              options={[
-                { label: 'Sedentary', value: 'sedentary' },
-                { label: 'Moderate', value: 'moderate' },
-                { label: 'Active', value: 'active' },
-                { label: 'Very Active', value: 'very_active' }
-              ]}
-            />
 
             <Row gutter={16}>
               <Col xs={24} sm={12}>
@@ -206,38 +160,6 @@ const Profile = () => {
                 </Form.Item>
               </Col>
             </Row>
-
-            <FormField
-              name="dietary_habits"
-              label="Dietary Habits"
-              type="textarea"
-              rows={2}
-              placeholder="Describe your dietary habits..."
-            />
-            
-            <FormField
-              name="stress_level"
-              label="Stress Level"
-              type="textarea"
-              rows={2}
-              placeholder="Describe your stress level and sources..."
-            />
-            
-            <FormField
-              name="sleep_pattern"
-              label="Sleep Pattern"
-              type="textarea"
-              rows={2}
-              placeholder="Describe your sleep pattern..."
-            />
-            
-            <FormField
-              name="hair_care_routine"
-              label="Hair Care Routine"
-              type="textarea"
-              rows={2}
-              placeholder="Describe your current hair care routine..."
-            />
           </Card>
 
           {isEditing && (

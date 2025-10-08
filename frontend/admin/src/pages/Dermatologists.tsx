@@ -163,13 +163,25 @@ const Dermatologists: React.FC = () => {
     },
     {
       title: 'Specialization',
-      dataIndex: 'specialization',
+      dataIndex: 'profile',
       key: 'specialization',
-      render: (specialization) => (
+      render: (profile) => (
         <Tag color="blue">
-          {specialization || '–'}
+          {profile?.specialization || '–'}
         </Tag>
       ),
+    },
+    {
+      title: 'Experience',
+      dataIndex: 'profile',
+      key: 'experience',
+      render: (profile) => profile?.years_of_experience ? `${profile.years_of_experience} years` : '–',
+    },
+    {
+      title: 'Consultation Fee',
+      dataIndex: 'profile',
+      key: 'consultation_fee',
+      render: (profile) => profile?.consultation_fee ? `$${profile.consultation_fee}` : '–',
     },
     {
       title: 'Actions',
@@ -273,7 +285,14 @@ const Dermatologists: React.FC = () => {
           email: currentEditingData.email, 
           phone_no: currentEditingData.phone_no, 
           dob: currentEditingData.dob, 
-          gender: currentEditingData.gender 
+          gender: currentEditingData.gender,
+          // Professional fields - these will be loaded from the profile data
+          license_number: currentEditingData.profile?.license_number || '',
+          specialization: currentEditingData.profile?.specialization || '',
+          years_of_experience: currentEditingData.profile?.years_of_experience || 0,
+          qualifications: currentEditingData.profile?.qualifications || '',
+          consultation_fee: currentEditingData.profile?.consultation_fee || 0,
+          bio: currentEditingData.profile?.bio || ''
         } : null}
         title={editingId ? 'Edit Dermatologist' : 'Create Dermatologist'}
         submitting={submitting}

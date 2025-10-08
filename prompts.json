@@ -879,6 +879,62 @@
       "date": "2025-01-27T18:00:00Z",
       "user_prompt": "getting this on chat",
       "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_extended_fields_v1",
+      "path": "prompts/dermatologist_extended_fields_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistController.php",
+        "frontend/admin/src/components/features/DermatologistModal.tsx",
+        "frontend/admin/src/pages/Dermatologists.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T18:30:00Z",
+      "user_prompt": "Extend the **Dermatologist Create and Edit** forms and APIs to include additional fields stored in the `dermatologist` table. Table: `dermatologist` fields to be added: license_number, specialization, years_of_experience, qualifications, consultation_fees, bio. Manage both frontend and backend for this requirements.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_columns_cleanup_v1",
+      "path": "prompts/patient_columns_cleanup_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_08_064223_drop_columns_from_patient_profiles_table.php",
+        "app/Models/PatientProfile.php",
+        "app/Http/Controllers/Api/PatientController.php",
+        "database/seeders/UserSeeder.php",
+        "frontend/admin/src/pages/Patients.tsx",
+        "frontend/patient/src/pages/Profile.tsx",
+        "frontend/dermatologist/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T19:00:00Z",
+      "user_prompt": "Safely remove several columns from the `patient_profiles` table and clean up all related code across the whole project - frontend backend both. Target Table: `patient_profiles`. Columns to be dropped: medical_history, lifestyle, dietary_habits, stress_level, sleep_pattern, hair_care_routine, family_history. Generate a new migration file to drop these columns. Ensure rollback support by re-adding them in the `down()` method.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_extended_fields_v1",
+      "path": "prompts/patient_extended_fields_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/PatientController.php",
+        "frontend/admin/src/components/features/PatientModal.tsx",
+        "frontend/admin/src/components/PatientModal.tsx",
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T19:30:00Z",
+      "user_prompt": "Extend the Create and Edit patient forms and backend APIs to include new fields from the `patient_profiles` table. 1️⃣ TARGET TABLE: `patient_profiles` Fields to be added: allergies, current_medications, smoking, alcohol_consumption. Manage frontend and backend APIs both.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_register_extended_v1",
+      "path": "prompts/patient_register_extended_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AuthController.php",
+        "frontend/patient/src/pages/Register.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T20:00:00Z",
+      "user_prompt": "In register page of patient module, I have not all the fields there, which also present in patient_profile page, so please add that field in signup page from frontend and backend api both.",
+      "prompt_type": "user_request"
     }
   ]
 }
