@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments, fetchDermatologists, bookAppointment } from '../store/slices/appointmentSlice';
-import { Card, List, Avatar, Typography, Space, Button, Form } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, PhoneOutlined } from '@ant-design/icons';
+import { Card, Avatar, Typography, Button, Form } from 'antd';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 
