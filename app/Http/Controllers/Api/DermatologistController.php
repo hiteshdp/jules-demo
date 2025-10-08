@@ -28,13 +28,19 @@ use Illuminate\Validation\Rule;
  * @OA\Schema(
  *     schema="DermatologistCreateRequest",
  *     type="object",
- *     required={"name","email","phone_no","password"},
+ *     required={"name","email","phone_no","password","license_number","specialization","years_of_experience","qualifications","consultation_fee"},
  *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
  *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
  *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
  *     @OA\Property(property="password", type="string", format="password", example="password123"),
  *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
- *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female")
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
+ *     @OA\Property(property="license_number", type="string", example="DMT123456"),
+ *     @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+ *     @OA\Property(property="years_of_experience", type="integer", example=5),
+ *     @OA\Property(property="qualifications", type="string", example="MD, Board Certified Dermatologist"),
+ *     @OA\Property(property="consultation_fee", type="number", format="float", example=150.00),
+ *     @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatments")
  * )
  * 
  * @OA\Schema(
@@ -46,7 +52,13 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="password", type="string", format="password", example="password123"),
  *     @OA\Property(property="dob", type="string", format="date", example="1985-01-01"),
  *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
- *     @OA\Property(property="is_active", type="boolean", example=true)
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="license_number", type="string", example="DMT123456"),
+ *     @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+ *     @OA\Property(property="years_of_experience", type="integer", example=5),
+ *     @OA\Property(property="qualifications", type="string", example="MD, Board Certified Dermatologist"),
+ *     @OA\Property(property="consultation_fee", type="number", format="float", example=150.00),
+ *     @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatments")
  * )
  * 
  * @OA\Tag(
@@ -109,6 +121,19 @@ class DermatologistController extends Controller
 
             $dermatologists->getCollection()->transform(function ($dermatologist) {
                 $dermatologist->subscription_status = '-';
+
+                // Load profile data
+                $profile = \App\Models\Dermatologist::where('user_id', $dermatologist->id)
+                    ->select([
+                        'license_number',
+                        'specialization',
+                        'years_of_experience',
+                        'qualifications',
+                        'consultation_fee',
+                        'bio'
+                    ])->first();
+
+                $dermatologist->profile = $profile;
                 return $dermatologist;
             });
 
@@ -157,29 +182,54 @@ class DermatologistController extends Controller
                 'password' => 'required|string|min:6',
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
+                // Professional fields
+                'license_number' => 'required|string|max:255|unique:dermatologists,license_number',
+                'specialization' => 'required|string|max:255',
+                'years_of_experience' => 'required|integer|min:0|max:50',
+                'qualifications' => 'required|string',
+                'consultation_fee' => 'required|numeric|min:0',
+                'bio' => 'nullable|string',
             ]);
 
-            $dermatologistData['role'] = 'dermatologist';
-            $dermatologistData['is_active'] = true;
-            $dermatologistData['phone'] = $dermatologistData['phone_no'];
-            $dermatologistData['date_of_birth'] = $dermatologistData['dob'] ?? null;
-            $dermatologistData['password'] = Hash::make($dermatologistData['password']);
+            $userData = [
+                'name' => $dermatologistData['name'],
+                'email' => $dermatologistData['email'],
+                'phone' => $dermatologistData['phone_no'],
+                'password' => Hash::make($dermatologistData['password']),
+                'date_of_birth' => $dermatologistData['dob'] ?? null,
+                'gender' => $dermatologistData['gender'],
+                'role' => 'dermatologist',
+                'is_active' => true,
+            ];
 
-            $dermatologist = User::create($dermatologistData);
+            $user = User::create($userData);
+
+            // Create dermatologist profile
+            $profileData = [
+                'user_id' => $user->id,
+                'license_number' => $dermatologistData['license_number'],
+                'specialization' => $dermatologistData['specialization'],
+                'years_of_experience' => $dermatologistData['years_of_experience'],
+                'qualifications' => $dermatologistData['qualifications'],
+                'consultation_fee' => $dermatologistData['consultation_fee'],
+                'bio' => $dermatologistData['bio'] ?? null,
+            ];
+
+            \App\Models\Dermatologist::create($profileData);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Dermatologist created successfully',
                 'data' => [
-                    'id' => $dermatologist->id,
-                    'name' => $dermatologist->name,
-                    'email' => $dermatologist->email,
-                    'phone_no' => $dermatologist->phone,
-                    'dob' => $dermatologist->date_of_birth,
-                    'gender' => $dermatologist->gender,
-                    'is_active' => $dermatologist->is_active,
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone_no' => $user->phone,
+                    'dob' => $user->date_of_birth,
+                    'gender' => $user->gender,
+                    'is_active' => $user->is_active,
                     'subscription_status' => '-',
-                    'created_at' => $dermatologist->created_at,
+                    'created_at' => $user->created_at,
                 ]
             ], 201);
         } catch (\Exception $e) {
@@ -296,25 +346,61 @@ class DermatologistController extends Controller
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
                 'is_active' => 'sometimes|boolean',
+                // Professional fields
+                'license_number' => 'sometimes|required|string|max:255|unique:dermatologists,license_number,' . $dermatologist->id,
+                'specialization' => 'sometimes|required|string|max:255',
+                'years_of_experience' => 'sometimes|required|integer|min:0|max:50',
+                'qualifications' => 'sometimes|required|string',
+                'consultation_fee' => 'sometimes|required|numeric|min:0',
+                'bio' => 'nullable|string',
             ]);
 
+            // Separate user and profile data
+            $userData = [];
+            $profileData = [];
+
+            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
+            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
             if (isset($updateData['phone_no'])) {
-                $updateData['phone'] = $updateData['phone_no'];
+                $userData['phone'] = $updateData['phone_no'];
                 unset($updateData['phone_no']);
             }
             if (isset($updateData['dob'])) {
-                $updateData['date_of_birth'] = $updateData['dob'];
+                $userData['date_of_birth'] = $updateData['dob'];
                 unset($updateData['dob']);
             }
+            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
+            if (isset($updateData['is_active'])) $userData['is_active'] = $updateData['is_active'];
             if (array_key_exists('password', $updateData)) {
                 if ($updateData['password']) {
-                    $updateData['password'] = Hash::make($updateData['password']);
-                } else {
-                    unset($updateData['password']);
+                    $userData['password'] = Hash::make($updateData['password']);
                 }
+                unset($updateData['password']);
             }
 
-            $dermatologist->update($updateData);
+            // Profile fields
+            if (isset($updateData['license_number'])) $profileData['license_number'] = $updateData['license_number'];
+            if (isset($updateData['specialization'])) $profileData['specialization'] = $updateData['specialization'];
+            if (isset($updateData['years_of_experience'])) $profileData['years_of_experience'] = $updateData['years_of_experience'];
+            if (isset($updateData['qualifications'])) $profileData['qualifications'] = $updateData['qualifications'];
+            if (isset($updateData['consultation_fee'])) $profileData['consultation_fee'] = $updateData['consultation_fee'];
+            if (isset($updateData['bio'])) $profileData['bio'] = $updateData['bio'];
+
+            // Update user data
+            if (!empty($userData)) {
+                $dermatologist->update($userData);
+            }
+
+            // Update or create profile data
+            if (!empty($profileData)) {
+                $profile = \App\Models\Dermatologist::where('user_id', $dermatologist->id)->first();
+                if ($profile) {
+                    $profile->update($profileData);
+                } else {
+                    $profileData['user_id'] = $dermatologist->id;
+                    \App\Models\Dermatologist::create($profileData);
+                }
+            }
 
             return response()->json([
                 'success' => true,

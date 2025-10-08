@@ -7,10 +7,8 @@ interface Patient {
   email: string;
   phone?: string;
   patientProfile?: {
-    medical_history?: string;
     allergies?: string;
     current_medications?: string;
-    family_history?: string;
   };
 }
 
@@ -68,11 +66,11 @@ export const fetchAppointment = createAsyncThunk(
 
 export const updateAppointmentStatus = createAsyncThunk(
   'appointment/updateStatus',
-  async ({ appointmentId, status, notes, prescription }: { 
-    appointmentId: number; 
-    status: string; 
-    notes?: string; 
-    prescription?: string; 
+  async ({ appointmentId, status, notes, prescription }: {
+    appointmentId: number;
+    status: string;
+    notes?: string;
+    prescription?: string;
   }, { rejectWithValue }) => {
     try {
       const response = await appointmentAPI.updateAppointmentStatus(appointmentId, {

@@ -52,7 +52,11 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
  *     @OA\Property(property="password", type="string", format="password", example="password123"),
  *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
- *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male")
+ *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
+ *     @OA\Property(property="allergies", type="string", example="None known"),
+ *     @OA\Property(property="current_medications", type="string", example="None"),
+ *     @OA\Property(property="smoking", type="boolean", example=false),
+ *     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
  * )
  * 
  * @OA\Schema(
@@ -64,7 +68,11 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="password", type="string", format="password", example="password123"),
  *     @OA\Property(property="dob", type="string", format="date", example="1990-01-01"),
  *     @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
- *     @OA\Property(property="is_active", type="boolean", example=true)
+ *     @OA\Property(property="is_active", type="boolean", example=true),
+ *     @OA\Property(property="allergies", type="string", example="None known"),
+ *     @OA\Property(property="current_medications", type="string", example="None"),
+ *     @OA\Property(property="smoking", type="boolean", example=false),
+ *     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
  * )
  * 
  * @OA\Schema(
@@ -143,6 +151,17 @@ class PatientController extends Controller
 
             $patients->getCollection()->transform(function ($patient) {
                 $patient->subscription_status = '-';
+
+                // Load profile data
+                $profile = \App\Models\PatientProfile::where('user_id', $patient->id)
+                    ->select([
+                        'allergies',
+                        'current_medications',
+                        'smoking',
+                        'alcohol_consumption'
+                    ])->first();
+
+                $patient->profile = $profile;
                 return $patient;
             });
 
@@ -191,15 +210,36 @@ class PatientController extends Controller
                 'password' => 'required|string|min:6',
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
+                // Patient profile fields
+                'allergies' => 'nullable|string',
+                'current_medications' => 'nullable|string',
+                'smoking' => 'nullable|boolean',
+                'alcohol_consumption' => 'nullable|boolean',
             ]);
 
-            $patientData['role'] = 'patient';
-            $patientData['is_active'] = true;
-            $patientData['phone'] = $patientData['phone_no'];
-            $patientData['date_of_birth'] = $patientData['dob'] ?? null;
-            $patientData['password'] = Hash::make($patientData['password']);
+            $userData = [
+                'name' => $patientData['name'],
+                'email' => $patientData['email'],
+                'phone' => $patientData['phone_no'],
+                'password' => Hash::make($patientData['password']),
+                'date_of_birth' => $patientData['dob'] ?? null,
+                'gender' => $patientData['gender'],
+                'role' => 'patient',
+                'is_active' => true,
+            ];
 
-            $patient = User::create($patientData);
+            $patient = User::create($userData);
+
+            // Create patient profile
+            $profileData = [
+                'user_id' => $patient->id,
+                'allergies' => $patientData['allergies'] ?? null,
+                'current_medications' => $patientData['current_medications'] ?? null,
+                'smoking' => $patientData['smoking'] ?? false,
+                'alcohol_consumption' => $patientData['alcohol_consumption'] ?? false,
+            ];
+
+            \App\Models\PatientProfile::create($profileData);
 
             return response()->json([
                 'success' => true,
@@ -267,17 +307,10 @@ class PatientController extends Controller
                 'profile' => $profile ? [
                     'id' => $profile->id,
                     'user_id' => $profile->user_id,
-                    'medical_history' => $profile->medical_history,
                     'allergies' => $profile->allergies,
                     'current_medications' => $profile->current_medications,
-                    'lifestyle' => $profile->lifestyle,
                     'smoking' => $profile->smoking,
                     'alcohol_consumption' => $profile->alcohol_consumption,
-                    'dietary_habits' => $profile->dietary_habits,
-                    'stress_level' => $profile->stress_level,
-                    'sleep_pattern' => $profile->sleep_pattern,
-                    'hair_care_routine' => $profile->hair_care_routine,
-                    'family_history' => $profile->family_history,
                     'created_at' => $profile->created_at,
                     'updated_at' => $profile->updated_at,
                 ] : null,
@@ -336,25 +369,57 @@ class PatientController extends Controller
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
                 'is_active' => 'sometimes|boolean',
+                // Patient profile fields
+                'allergies' => 'nullable|string',
+                'current_medications' => 'nullable|string',
+                'smoking' => 'nullable|boolean',
+                'alcohol_consumption' => 'nullable|boolean',
             ]);
 
+            // Separate user and profile data
+            $userData = [];
+            $profileData = [];
+
+            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
+            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
             if (isset($updateData['phone_no'])) {
-                $updateData['phone'] = $updateData['phone_no'];
+                $userData['phone'] = $updateData['phone_no'];
                 unset($updateData['phone_no']);
             }
             if (isset($updateData['dob'])) {
-                $updateData['date_of_birth'] = $updateData['dob'];
+                $userData['date_of_birth'] = $updateData['dob'];
                 unset($updateData['dob']);
             }
+            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
+            if (isset($updateData['is_active'])) $userData['is_active'] = $updateData['is_active'];
             if (array_key_exists('password', $updateData)) {
                 if ($updateData['password']) {
-                    $updateData['password'] = Hash::make($updateData['password']);
-                } else {
-                    unset($updateData['password']);
+                    $userData['password'] = Hash::make($updateData['password']);
                 }
+                unset($updateData['password']);
             }
 
-            $patient->update($updateData);
+            // Profile fields
+            if (isset($updateData['allergies'])) $profileData['allergies'] = $updateData['allergies'];
+            if (isset($updateData['current_medications'])) $profileData['current_medications'] = $updateData['current_medications'];
+            if (isset($updateData['smoking'])) $profileData['smoking'] = $updateData['smoking'];
+            if (isset($updateData['alcohol_consumption'])) $profileData['alcohol_consumption'] = $updateData['alcohol_consumption'];
+
+            // Update user data
+            if (!empty($userData)) {
+                $patient->update($userData);
+            }
+
+            // Update or create profile data
+            if (!empty($profileData)) {
+                $profile = \App\Models\PatientProfile::where('user_id', $patient->id)->first();
+                if ($profile) {
+                    $profile->update($profileData);
+                } else {
+                    $profileData['user_id'] = $patient->id;
+                    \App\Models\PatientProfile::create($profileData);
+                }
+            }
 
             return response()->json([
                 'success' => true,
