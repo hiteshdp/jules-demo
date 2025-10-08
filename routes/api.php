@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\DermatologistController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
-// use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +23,11 @@ use App\Http\Controllers\Api\DermatologistAppointmentController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// Admin routes
+Route::prefix('admin')->group(function () {
+    Route::get('dashboard', [AdminController::class, 'getDashboard']);
+});
 
 // Authentication routes (public)
 Route::post('/login', [AuthController::class, 'login']);

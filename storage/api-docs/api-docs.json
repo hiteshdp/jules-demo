@@ -12,6 +12,73 @@
         }
     ],
     "paths": {
+        "/admin/dashboard": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get dashboard statistics",
+                "description": "Retrieve comprehensive dashboard statistics including patient counts, revenue, appointments, and monthly trends for the last 12 months",
+                "operationId": "9faac78ba28d101fa4061509756f5c8c",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard statistics retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DashboardResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Bearer token required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/patient/appointments": {
             "get": {
                 "tags": [
@@ -2200,6 +2267,94 @@
     },
     "components": {
         "schemas": {
+            "DashboardStats": {
+                "properties": {
+                    "total_patients": {
+                        "description": "Total number of patients",
+                        "type": "integer",
+                        "example": 150
+                    },
+                    "total_dermatologists": {
+                        "description": "Total number of dermatologists",
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "total_appointments": {
+                        "description": "Total number of appointments",
+                        "type": "integer",
+                        "example": 500
+                    },
+                    "total_revenue": {
+                        "description": "Total revenue from completed payments",
+                        "type": "number",
+                        "format": "float",
+                        "example": 25000.5
+                    },
+                    "pending_appointments": {
+                        "description": "Number of scheduled appointments",
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "active_subscriptions": {
+                        "description": "Number of active subscriptions",
+                        "type": "integer",
+                        "example": 120
+                    }
+                },
+                "type": "object"
+            },
+            "MonthlyTrend": {
+                "properties": {
+                    "month": {
+                        "description": "Month in YYYY-MM format",
+                        "type": "string",
+                        "example": "2024-01"
+                    },
+                    "count": {
+                        "description": "Number of appointments for the month",
+                        "type": "integer",
+                        "example": 45
+                    },
+                    "total": {
+                        "description": "Total revenue for the month",
+                        "type": "number",
+                        "format": "float",
+                        "example": 5000
+                    }
+                },
+                "type": "object"
+            },
+            "DashboardResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "properties": {
+                            "stats": {
+                                "$ref": "#/components/schemas/DashboardStats"
+                            },
+                            "monthly_appointments": {
+                                "description": "Monthly appointment trends for the last 12 months",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/MonthlyTrend"
+                                }
+                            },
+                            "monthly_revenue": {
+                                "description": "Monthly revenue trends for the last 12 months",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/MonthlyTrend"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "Appointment": {
                 "properties": {
                     "id": {
@@ -2346,6 +2501,22 @@
                             "admin"
                         ],
                         "example": "patient"
+                    },
+                    "allergies": {
+                        "type": "string",
+                        "example": "None known"
+                    },
+                    "current_medications": {
+                        "type": "string",
+                        "example": "None"
+                    },
+                    "smoking": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "alcohol_consumption": {
+                        "type": "boolean",
+                        "example": false
                     }
                 },
                 "type": "object"
@@ -2529,7 +2700,12 @@
                     "name",
                     "email",
                     "phone_no",
-                    "password"
+                    "password",
+                    "license_number",
+                    "specialization",
+                    "years_of_experience",
+                    "qualifications",
+                    "consultation_fee"
                 ],
                 "properties": {
                     "name": {
@@ -2563,6 +2739,31 @@
                             "other"
                         ],
                         "example": "female"
+                    },
+                    "license_number": {
+                        "type": "string",
+                        "example": "DMT123456"
+                    },
+                    "specialization": {
+                        "type": "string",
+                        "example": "Hair Loss Treatment"
+                    },
+                    "years_of_experience": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "qualifications": {
+                        "type": "string",
+                        "example": "MD, Board Certified Dermatologist"
+                    },
+                    "consultation_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 150
+                    },
+                    "bio": {
+                        "type": "string",
+                        "example": "Experienced dermatologist specializing in hair loss treatments"
                     }
                 },
                 "type": "object"
@@ -2604,6 +2805,31 @@
                     "is_active": {
                         "type": "boolean",
                         "example": true
+                    },
+                    "license_number": {
+                        "type": "string",
+                        "example": "DMT123456"
+                    },
+                    "specialization": {
+                        "type": "string",
+                        "example": "Hair Loss Treatment"
+                    },
+                    "years_of_experience": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "qualifications": {
+                        "type": "string",
+                        "example": "MD, Board Certified Dermatologist"
+                    },
+                    "consultation_fee": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 150
+                    },
+                    "bio": {
+                        "type": "string",
+                        "example": "Experienced dermatologist specializing in hair loss treatments"
                     }
                 },
                 "type": "object"
@@ -2696,6 +2922,22 @@
                             "other"
                         ],
                         "example": "male"
+                    },
+                    "allergies": {
+                        "type": "string",
+                        "example": "None known"
+                    },
+                    "current_medications": {
+                        "type": "string",
+                        "example": "None"
+                    },
+                    "smoking": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "alcohol_consumption": {
+                        "type": "boolean",
+                        "example": false
                     }
                 },
                 "type": "object"
@@ -2737,6 +2979,22 @@
                     "is_active": {
                         "type": "boolean",
                         "example": true
+                    },
+                    "allergies": {
+                        "type": "string",
+                        "example": "None known"
+                    },
+                    "current_medications": {
+                        "type": "string",
+                        "example": "None"
+                    },
+                    "smoking": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "alcohol_consumption": {
+                        "type": "boolean",
+                        "example": false
                     }
                 },
                 "type": "object"
@@ -2885,6 +3143,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Admin",
+            "description": "Admin panel endpoints"
+        },
         {
             "name": "Appointments",
             "description": "Appointment management endpoints"
