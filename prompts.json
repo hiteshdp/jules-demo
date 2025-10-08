@@ -1069,6 +1069,74 @@
       "date": "2025-01-27T21:00:00Z",
       "user_prompt": "@Appointments.tsx in this page there is some issue with book new appointments button, Right now it's opening 2 model for booking. And some how in appointmets lisitng screen dr name is not displayed. Also chat icon is also missing in the listing screen items. Also check the backned for dataSource to understand the data which is comming in api. Root dirctory is the api backned",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_dropdown_chat_fix_v1",
+      "path": "prompts/patient_appointments_dropdown_chat_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:30:00Z",
+      "user_prompt": "@Appointments.tsx in this fine when booking model is openned at that time select Dermatologist dropdown is showing blank data. but there are Dermatologist. also chat button should redirect to chat page with the chat selected",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_dermatologist_dropdown_api_fix_v1",
+      "path": "prompts/patient_dermatologist_dropdown_api_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:45:00Z",
+      "user_prompt": "Still in the Dropdown of select dermatologist is empty. check the api call as well for that dropdown. @Appointments.tsx",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_icon_alignment_fix_v1",
+      "path": "prompts/patient_chat_icon_alignment_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:00:00Z",
+      "user_prompt": "Now working fine. Change the chat icon position it should be align with the status",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_modern_ui_v1",
+      "path": "prompts/patient_appointments_modern_ui_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:15:00Z",
+      "user_prompt": "Now everything is working fine. But can you change the appointment listing screen UI/UX mordern and good looking",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_list_view_v1",
+      "path": "prompts/patient_appointments_list_view_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:30:00Z",
+      "user_prompt": "Need the list view not grid view",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_button_enhancement_v1",
+      "path": "prompts/patient_appointments_button_enhancement_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:45:00Z",
+      "user_prompt": "Looks good, Can you do some UI/UX changes for the chat icon and view detail icon as well",
+      "prompt_type": "user_request"
     }
   ]
 }
