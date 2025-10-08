@@ -26,33 +26,6 @@ class UserSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Create sample dermatologist
-        $dermatologist = User::create([
-            'name' => 'Dr. Sarah Johnson',
-            'email' => 'dermatologist@hairskinhealth.com',
-            'password' => Hash::make('password'),
-            'role' => 'dermatologist',
-            'phone' => '+1234567891',
-            'date_of_birth' => '1980-05-15',
-            'gender' => 'female',
-            'is_active' => true,
-        ]);
-
-        $dermatologist->dermatologistProfile()->create([
-            'license_number' => 'DERM123456',
-            'specialization' => 'Hair Loss and Scalp Disorders',
-            'years_of_experience' => 15,
-            'qualifications' => 'MD Dermatology, Board Certified',
-            'bio' => 'Dr. Sarah Johnson is a board-certified dermatologist with over 15 years of experience in treating hair loss and scalp disorders.',
-            'consultation_fee' => 1500.00,
-            'available_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-            'start_time' => '09:00',
-            'end_time' => '17:00',
-            'timezone' => 'UTC',
-            'is_available' => true,
-            'max_patients_per_day' => 10,
-        ]);
-
         // Create sample patient
         $patient = User::create([
             'name' => 'John Doe',

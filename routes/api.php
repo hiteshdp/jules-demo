@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\DermatologistController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
+use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\WebhookController;
 // use App\Http\Controllers\Api\PatientController;
 
 /*
@@ -50,6 +52,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Dermatologists
         Route::get('/dermatologists', [PatientController::class, 'getDermatologists']);
+
+        // Subscriptions
+        Route::post('/subscription/create', [SubscriptionController::class, 'createSubscription']);
+        Route::post('/subscription/verify', [SubscriptionController::class, 'verifyPayment']);
+        Route::get('/subscription/status', [SubscriptionController::class, 'status']);
+        Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel']);
     });
 
     // Dermatologist routes
@@ -72,3 +80,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('dermatologists', DermatologistController::class);
     });
 });
+
+// Razorpay webhook (public)
+Route::post('/razorpay/webhook', [WebhookController::class, 'handle']);

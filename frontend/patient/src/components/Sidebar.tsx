@@ -7,6 +7,7 @@ import {
   CalendarDaysIcon,
   ShoppingBagIcon,
   UserIcon,
+  CreditCardIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -15,6 +16,7 @@ const navigation = [
   { name: 'Recommendations', href: '/recommendations', icon: LightBulbIcon },
   { name: 'Appointments', href: '/appointments', icon: CalendarDaysIcon },
   { name: 'Products', href: '/products', icon: ShoppingBagIcon },
+  { name: 'Subscription', href: '/subscription', icon: CreditCardIcon },
   { name: 'Profile', href: '/profile', icon: UserIcon },
 ];
 
