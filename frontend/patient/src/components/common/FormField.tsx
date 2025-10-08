@@ -49,7 +49,6 @@ const FormField: React.FC<FormFieldProps> = ({
             disabled={disabled}
             className="w-full"
             format="YYYY-MM-DD"
-            valueFormat="YYYY-MM-DD"
           />
         );
       case 'datetime':
@@ -60,7 +59,6 @@ const FormField: React.FC<FormFieldProps> = ({
             className="w-full"
             showTime
             format="YYYY-MM-DD HH:mm"
-            valueFormat="YYYY-MM-DD HH:mm"
           />
         );
       case 'number':

@@ -3,15 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
 import { fetchQuestions } from '../store/slices/quizSlice';
-import { Card, Row, Col, Statistic, Typography, Space, Button } from 'antd';
+import { Card, Row, Col, Statistic, Typography, Space } from 'antd';
 import { 
   CalendarOutlined, 
   FileTextOutlined, 
   BulbOutlined,
-  TeamOutlined,
-  UserOutlined
+  TeamOutlined
 } from '@ant-design/icons';
-import { PageHeader, LoadingSpinner, StatusTag } from '../components/common';
+import { PageHeader, StatusTag } from '../components/common';
 
 const { Title, Text } = Typography;
 

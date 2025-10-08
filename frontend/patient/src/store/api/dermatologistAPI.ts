@@ -3,14 +3,15 @@ import apiClient from './apiClient';
 
 export interface Dermatologist {
   id: number;
-  user_id: number;
+  user_id?: number;
   license_number: string;
-  specialization: string;
+  specialization?: string;
   years_of_experience: number;
   qualifications: string;
   bio?: string;
-  consultation_fee: number;
-  user: {
+  consultation_fee?: number;
+  is_available?: boolean;
+  user?: {
     id: number;
     name: string;
     email: string;

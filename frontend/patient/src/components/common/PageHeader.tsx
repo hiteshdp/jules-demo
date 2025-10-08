@@ -1,6 +1,6 @@
 // Generated via prompt: prompts/patient_antd_common_components_v1.md
 import React from 'react';
-import { Typography, Space } from 'antd';
+import { Typography } from 'antd';
 
 const { Title, Text } = Typography;
 

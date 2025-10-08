@@ -138,7 +138,7 @@ const Appointments: React.FC = () => {
                   }
                   title={
                     <div className="flex items-center justify-between">
-                      <Text strong>{appointment.dermatologist?.name || 'Unknown Doctor'}</Text>
+                      <Text strong>{appointment.dermatologist?.user?.name || 'Unknown Doctor'}</Text>
                       <StatusTag status={appointment.status} />
                     </div>
                   }

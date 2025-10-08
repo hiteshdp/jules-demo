@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from '../store/store';
 import { fetchDermatologists } from '../store/slices/dermatologistSlice';
 import { Card, Row, Col, Typography, Button, Space, Avatar } from 'antd';
 import { UserOutlined, DollarOutlined, BookOutlined } from '@ant-design/icons';
-import { PageHeader, LoadingSpinner, EmptyState, StatusTag } from '../components/common';
+import { PageHeader, LoadingSpinner, EmptyState } from '../components/common';
 
 const { Title, Text } = Typography;
 
