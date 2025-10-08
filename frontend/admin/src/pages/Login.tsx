@@ -1,10 +1,10 @@
 // Generated via prompt: prompts/antd_admin_full_conversion_v1.md
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
-import { Card, Form, Input, Button, Typography, Space, message } from 'antd';
+import { Card, Form, Input, Button, Typography, Space } from 'antd';
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 

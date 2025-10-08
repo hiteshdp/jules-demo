@@ -16,27 +16,33 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create admin user
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@hairskinhealth.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'phone' => '+1234567890',
-            'is_active' => true,
-        ]);
+        // Create admin user (idempotent)
+        if (!User::where('email', 'admin@hairskinhealth.com')->exists()) {
+            $admin = User::create([
+                'name' => 'Admin User',
+                'email' => 'admin@hairskinhealth.com',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'phone' => '+1234567890',
+                'is_active' => true,
+            ]);
+            echo "Admin user created successfully.\n";
+        } else {
+            echo "Admin user already exists, skipping.\n";
+        }
 
-        // Create sample dermatologist
-        $dermatologist = User::create([
-            'name' => 'Dr. Sarah Johnson',
-            'email' => 'dermatologist@hairskinhealth.com',
-            'password' => Hash::make('password'),
-            'role' => 'dermatologist',
-            'phone' => '+1234567891',
-            'date_of_birth' => '1980-05-15',
-            'gender' => 'female',
-            'is_active' => true,
-        ]);
+        // Create sample dermatologist (idempotent)
+        if (!User::where('email', 'dermatologist@hairskinhealth.com')->exists()) {
+            $dermatologist = User::create([
+                'name' => 'Dr. Sarah Johnson',
+                'email' => 'dermatologist@hairskinhealth.com',
+                'password' => Hash::make('password'),
+                'role' => 'dermatologist',
+                'phone' => '+1234567891',
+                'date_of_birth' => '1980-05-15',
+                'gender' => 'female',
+                'is_active' => true,
+            ]);
 
         $dermatologist->dermatologistProfile()->create([
             'license_number' => 'DERM123456',
@@ -47,30 +53,35 @@ class UserSeeder extends Seeder
             'consultation_fee' => 1500.00,
         ]);
 
-        // Create sample patient
-        $patient = User::create([
-            'name' => 'John Doe',
-            'email' => 'patient@hairskinhealth.com',
-            'password' => Hash::make('password'),
-            'role' => 'patient',
-            'phone' => '+1234567892',
-            'date_of_birth' => '1990-03-20',
-            'gender' => 'male',
-            'is_active' => true,
-        ]);
+        // Create sample patient (idempotent)
+        if (!User::where('email', 'patient@hairskinhealth.com')->exists()) {
+            $patient = User::create([
+                'name' => 'John Doe',
+                'email' => 'patient@hairskinhealth.com',
+                'password' => Hash::make('password'),
+                'role' => 'patient',
+                'phone' => '+1234567892',
+                'date_of_birth' => '1990-03-20',
+                'gender' => 'male',
+                'is_active' => true,
+            ]);
 
-        $patient->patientProfile()->create([
-            'medical_history' => 'No significant medical history',
-            'allergies' => 'None known',
-            'current_medications' => 'None',
-            'lifestyle' => 'moderate',
-            'smoking' => false,
-            'alcohol_consumption' => false,
-            'dietary_habits' => 'Balanced diet with occasional fast food',
-            'stress_level' => 'Moderate work stress',
-            'sleep_pattern' => '6-7 hours per night',
-            'hair_care_routine' => 'Daily shampoo, occasional conditioner',
-            'family_history' => 'Father experienced hair loss in his 40s',
-        ]);
+            $patient->patientProfile()->create([
+                'medical_history' => 'No significant medical history',
+                'allergies' => 'None known',
+                'current_medications' => 'None',
+                'lifestyle' => 'moderate',
+                'smoking' => false,
+                'alcohol_consumption' => false,
+                'dietary_habits' => 'Balanced diet with occasional fast food',
+                'stress_level' => 'Moderate work stress',
+                'sleep_pattern' => '6-7 hours per night',
+                'hair_care_routine' => 'Daily shampoo, occasional conditioner',
+                'family_history' => 'Father experienced hair loss in his 40s',
+            ]);
+            echo "Patient user created successfully.\n";
+        } else {
+            echo "Patient user already exists, skipping.\n";
+        }
     }
 }
