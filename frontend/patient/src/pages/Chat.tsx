@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import { Card, Typography, Avatar, Button, Input, Space, Row, Col, Alert, Tag } from 'antd';
 import { MessageOutlined, UserOutlined, CalendarOutlined, SendOutlined } from '@ant-design/icons';
 import toast from 'react-hot-toast';
+import ZoomMeetingButton from '../components/ZoomMeetingButton';
 
 const Chat: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -113,6 +114,15 @@ const Chat: React.FC = () => {
         </Typography.Text>
       </div>
 
+	  {/* Zoom Meeting Button - Always visible at top */}
+      <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-4">
+        <ZoomMeetingButton 
+          appointmentId={selectedAppointmentId}
+          dermatologistName={selectedAppointmentId ? appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.user?.name : 'Dermatologist'}
+          isPatient={true}
+        />
+      </div>
+
       <Row gutter={[24, 24]}>
         {/* Appointments List */}
         <Col xs={24} lg={8}>
@@ -193,6 +203,7 @@ const Chat: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
 
                 {/* Messages Area */}
                 <div

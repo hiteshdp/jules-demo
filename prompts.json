@@ -901,6 +901,53 @@
       "prompt_type": "ai_response"
     },
     {
+      "id": "razorpay_recurring_payments_v1",
+      "path": "prompts/razorpay_recurring_payments_v1.md",
+      "used_in": [
+        "config/services.php",
+        "database/migrations/2025_10_07_000001_create_subscriptions_table.php",
+        "database/migrations/2025_10_07_000002_create_razorpay_logs_table.php",
+        "app/Models/Subscription.php",
+        "app/Models/RazorpayLog.php",
+        "app/Services/RazorpayService.php",
+        "app/Http/Controllers/Api/SubscriptionController.php",
+        "app/Http/Controllers/Api/WebhookController.php",
+        "routes/api.php",
+        "frontend/patient/src/hooks/useRazorpay.ts",
+        "frontend/patient/src/components/SubscribeButton.tsx",
+        "frontend/patient/src/components/SubscriptionStatus.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "You are helping build a recurring payment system using Razorpay with Laravel 12 (backend) and React 18 (frontend).",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_subscription_nav_v1",
+      "path": "prompts/razorpay_subscription_nav_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Subscription.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/Sidebar.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:05:00Z",
+      "user_prompt": "give subscription page route in sidebar so i can click and test payment",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_subscription_swagger_v1",
+      "path": "prompts/razorpay_subscription_swagger_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/SubscriptionController.php",
+        "app/Http/Controllers/Api/WebhookController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:10:00Z",
+      "user_prompt": "Add this all subscription API in swagger"
+
+    },
+    {
       "id": "patient_antd_common_components_v1",
       "path": "prompts/patient_antd_common_components_v1.md",
       "used_in": [
@@ -1046,6 +1093,24 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "zoom_video_call_integration_v1",
+      "path": "prompts/zoom_video_call_integration_v1.md",
+      "used_in": [
+        "app/Services/ZoomService.php",
+        "app/Http/Controllers/ZoomController.php",
+        "routes/api.php",
+        "env.example",
+        "frontend/patient/src/components/ZoomMeetingButton.tsx",
+        "frontend/dermatologist/src/components/ZoomMeetingButton.tsx",
+        "frontend/patient/src/pages/Chat.tsx",
+        "frontend/dermatologist/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-08T12:00:00Z",
+      "user_prompt": "Pick your path - Path A (easiest, no SDK): Open Zoom's join URL in a new tab/app. Above steps implementation for patient and dermotologist video call feature button should be show in chat top box both side",
+      "prompt_type": "ai_response"
+    },
+    {
       "id": "patient_typescript_errors_fix_v1",
       "path": "prompts/patient_typescript_errors_fix_v1.md",
       "used_in": [
@@ -1068,6 +1133,17 @@
       "author": "AI Assistant",
       "date": "2025-01-27T21:00:00Z",
       "user_prompt": "@Appointments.tsx in this page there is some issue with book new appointments button, Right now it's opening 2 model for booking. And some how in appointmets lisitng screen dr name is not displayed. Also chat icon is also missing in the listing screen items. Also check the backned for dataSource to understand the data which is comming in api. Root dirctory is the api backned",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "zoom_test_route_v1",
+      "path": "prompts/zoom_test_route_v1.md",
+      "used_in": [
+        "routes/web.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-08T12:30:00Z",
+      "user_prompt": "please for test zoom video call feature make test route",
       "prompt_type": "user_request"
     },
     {
@@ -1258,6 +1334,45 @@
       "author": "AI Assistant",
       "date": "2025-01-28T01:05:00Z",
       "user_prompt": "@Appointments.tsx in this page i have listing of appointments and i need exect same design and ui/ux in dermatologist appointment lisitng. @Appointments.tsx",
+	  "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_error_boundary_v1",
+      "path": "prompts/patient_error_boundary_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/ErrorBoundary.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:00:00Z",
+      "user_prompt": "read this file and i want to create this type of error Boundary in patient settup",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_error_boundary_v1",
+      "path": "prompts/admin_error_boundary_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/common/ErrorBoundary.tsx",
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_error_boundary_v1",
+      "path": "prompts/dermatologist_error_boundary_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/common/ErrorBoundary.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
       "prompt_type": "user_request"
     }
   ]
