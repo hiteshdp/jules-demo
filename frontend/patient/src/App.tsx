@@ -12,6 +12,7 @@ import Appointments from './pages/Appointments';
 import Chat from './pages/Chat';
 import Profile from './pages/Profile';
 import Products from './pages/Products';
+import Subscription from './pages/Subscription';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
             <Route path="chat" element={<Chat />} />
             <Route path="products" element={<Products />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="subscription" element={<Subscription />} />
           </Route>
         </Routes>
       </div>

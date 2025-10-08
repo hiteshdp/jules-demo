@@ -10,24 +10,15 @@ class Subscription extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Merge legacy and new columns so model works with existing and new schema
     protected $fillable = [
         'user_id',
-        'plan_name',
-        'description',
-        'price',
-        'billing_cycle',
-        'status',
-        'razorpay_subscription_id',
-        'razorpay_plan_id',
-        'auto_renew',
-        'starts_at',
-        'ends_at',
-        'cancelled_at',
+        // Legacy columns
+        'plan_name', 'description', 'price', 'billing_cycle', 'auto_renew', 'starts_at', 'ends_at', 'cancelled_at',
+        // Current implementation columns
+        'amount', 'status', 'next_payment_date',
+        // Common
+        'razorpay_subscription_id', 'razorpay_plan_id',
     ];
 
     /**
@@ -43,6 +34,7 @@ class Subscription extends Model
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'next_payment_date' => 'datetime',
         ];
     }
 

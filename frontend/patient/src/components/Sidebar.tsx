@@ -8,6 +8,7 @@ import {
   ChatBubbleLeftRightIcon,
   ShoppingBagIcon,
   UserIcon,
+  CreditCardIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
@@ -17,6 +18,7 @@ const navigation = [
   { name: 'Appointments', href: '/appointments', icon: CalendarDaysIcon },
   { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
   { name: 'Products', href: '/products', icon: ShoppingBagIcon },
+  { name: 'Subscription', href: '/subscription', icon: CreditCardIcon },
   { name: 'Profile', href: '/profile', icon: UserIcon },
 ];
 

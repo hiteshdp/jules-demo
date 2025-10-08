@@ -901,6 +901,53 @@
       "prompt_type": "ai_response"
     },
     {
+      "id": "razorpay_recurring_payments_v1",
+      "path": "prompts/razorpay_recurring_payments_v1.md",
+      "used_in": [
+        "config/services.php",
+        "database/migrations/2025_10_07_000001_create_subscriptions_table.php",
+        "database/migrations/2025_10_07_000002_create_razorpay_logs_table.php",
+        "app/Models/Subscription.php",
+        "app/Models/RazorpayLog.php",
+        "app/Services/RazorpayService.php",
+        "app/Http/Controllers/Api/SubscriptionController.php",
+        "app/Http/Controllers/Api/WebhookController.php",
+        "routes/api.php",
+        "frontend/patient/src/hooks/useRazorpay.ts",
+        "frontend/patient/src/components/SubscribeButton.tsx",
+        "frontend/patient/src/components/SubscriptionStatus.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "You are helping build a recurring payment system using Razorpay with Laravel 12 (backend) and React 18 (frontend).",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_subscription_nav_v1",
+      "path": "prompts/razorpay_subscription_nav_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Subscription.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/Sidebar.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:05:00Z",
+      "user_prompt": "give subscription page route in sidebar so i can click and test payment",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_subscription_swagger_v1",
+      "path": "prompts/razorpay_subscription_swagger_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/SubscriptionController.php",
+        "app/Http/Controllers/Api/WebhookController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:10:00Z",
+      "user_prompt": "Add this all subscription API in swagger"
+
+    },
+    {
       "id": "patient_antd_common_components_v1",
       "path": "prompts/patient_antd_common_components_v1.md",
       "used_in": [

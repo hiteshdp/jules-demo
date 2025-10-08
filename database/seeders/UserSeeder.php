@@ -53,6 +53,8 @@ class UserSeeder extends Seeder
             'consultation_fee' => 1500.00,
         ]);
 
+        }
+
         // Create sample patient (idempotent)
         if (!User::where('email', 'patient@hairskinhealth.com')->exists()) {
             $patient = User::create([
