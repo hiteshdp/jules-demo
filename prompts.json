@@ -1044,6 +1044,32 @@
       "date": "2025-01-27T20:00:00Z",
       "user_prompt": "In register page of patient module, I have not all the fields there, which also present in patient_profile page, so please add that field in signup page from frontend and backend api both.",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_dashboard_swagger_v1",
+      "path": "prompts/admin_dashboard_swagger_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AdminController.php",
+        "routes/api.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T20:30:00Z",
+      "user_prompt": "Get dashboard API in admin section, add swagger for this.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_dashboard_integration_v1",
+      "path": "prompts/admin_dashboard_integration_v1.md",
+      "used_in": [
+        "frontend/admin/src/store/api/dashboardAPI.ts",
+        "frontend/admin/src/store/slices/dashboardSlice.ts",
+        "frontend/admin/src/store/store.ts",
+        "frontend/admin/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:00:00Z",
+      "user_prompt": "Please integrate the API for dashboard in admin section.",
+      "prompt_type": "user_request"
     }
   ]
 }
