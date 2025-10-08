@@ -1093,6 +1093,24 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "zoom_video_call_integration_v1",
+      "path": "prompts/zoom_video_call_integration_v1.md",
+      "used_in": [
+        "app/Services/ZoomService.php",
+        "app/Http/Controllers/ZoomController.php",
+        "routes/api.php",
+        "env.example",
+        "frontend/patient/src/components/ZoomMeetingButton.tsx",
+        "frontend/dermatologist/src/components/ZoomMeetingButton.tsx",
+        "frontend/patient/src/pages/Chat.tsx",
+        "frontend/dermatologist/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-08T12:00:00Z",
+      "user_prompt": "Pick your path - Path A (easiest, no SDK): Open Zoom's join URL in a new tab/app. Above steps implementation for patient and dermotologist video call feature button should be show in chat top box both side",
+      "prompt_type": "ai_response"
+    },
+    {
       "id": "patient_typescript_errors_fix_v1",
       "path": "prompts/patient_typescript_errors_fix_v1.md",
       "used_in": [
@@ -1115,6 +1133,17 @@
       "author": "AI Assistant",
       "date": "2025-01-27T21:00:00Z",
       "user_prompt": "@Appointments.tsx in this page there is some issue with book new appointments button, Right now it's opening 2 model for booking. And some how in appointmets lisitng screen dr name is not displayed. Also chat icon is also missing in the listing screen items. Also check the backned for dataSource to understand the data which is comming in api. Root dirctory is the api backned",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "zoom_test_route_v1",
+      "path": "prompts/zoom_test_route_v1.md",
+      "used_in": [
+        "routes/web.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-08T12:30:00Z",
+      "user_prompt": "please for test zoom video call feature make test route",
       "prompt_type": "user_request"
     },
     {

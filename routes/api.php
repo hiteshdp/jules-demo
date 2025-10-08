@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\DermatologistController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
+use App\Http\Controllers\ZoomController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\WebhookController;
 // use App\Http\Controllers\Api\PatientController;
@@ -85,6 +86,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
     });
+
+    // Zoom video call routes (available to both patients and dermatologists)
+    Route::post('/zoom/create-meeting', [ZoomController::class, 'create']);
+    
+    // New Zoom meeting management routes
+    Route::post('/zoom-meetings', [App\Http\Controllers\Api\ZoomMeetingController::class, 'create']);
+    Route::post('/zoom-meetings/{id}/start', [App\Http\Controllers\Api\ZoomMeetingController::class, 'start']);
+    Route::post('/zoom-meetings/{id}/end', [App\Http\Controllers\Api\ZoomMeetingController::class, 'end']);
+    Route::get('/zoom-meetings/status/{appointmentId}', [App\Http\Controllers\Api\ZoomMeetingController::class, 'getStatus']);
 
     // Admin routes (protected by auth:sanctum above)
     Route::prefix('admin')->group(function () {

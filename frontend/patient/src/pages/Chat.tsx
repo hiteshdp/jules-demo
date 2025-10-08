@@ -12,6 +12,7 @@ import {
   CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import ZoomMeetingButton from '../components/ZoomMeetingButton';
 
 const Chat: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -126,6 +127,15 @@ const Chat: React.FC = () => {
         </p>
       </div>
 
+      {/* Zoom Meeting Button - Always visible at top */}
+      <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-4">
+        <ZoomMeetingButton 
+          appointmentId={selectedAppointmentId}
+          dermatologistName={selectedAppointmentId ? appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.user?.name : 'Dermatologist'}
+          isPatient={true}
+        />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointments List */}
         <div className="lg:col-span-1">
@@ -198,6 +208,7 @@ const Chat: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
 
                 {/* Messages Area */}
                 <div
