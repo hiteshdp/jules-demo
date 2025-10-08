@@ -1215,6 +1215,128 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "patient_chat_antd_conversion_v1",
+      "path": "prompts/patient_chat_antd_conversion_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:00:00Z",
+      "user_prompt": "@Chat.tsx Currrenlty this file is coded as using direct html. I need to use antd design components. But stricly i don't want to change any design and functionality. Make sure on this.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_whatsapp_redesign_v1",
+      "path": "prompts/patient_chat_whatsapp_redesign_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "Chat bar design is not looking good. Please fix the UI/UX for that and try to make design like whatsapp. for chatbar to send chat messgae. No need to start server every time it's alredy running.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_bar_alignment_fix_v1",
+      "path": "prompts/patient_chat_bar_alignment_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:30:00Z",
+      "user_prompt": "Still not properly align and not up to the mark. When i hover it's not looks good. Do the needful. And also no need to npm run build.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_input_focus_fix_v1",
+      "path": "prompts/patient_chat_input_focus_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:45:00Z",
+      "user_prompt": "Please see the image it's looking bad when click on input box",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_empty_state_fix_v1",
+      "path": "prompts/patient_chat_empty_state_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx",
+        "frontend/patient/src/store/slices/chatSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:55:00Z",
+      "user_prompt": "if there is no message then it should display like the image not what we have right now. Also there are some issue when there is no messages. it's continues the loader and that showing the no messages. No need to show the loader. also when i want to start typing it's not allowing and refreshing the input box after api call.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_input_ui_enhancement_v1",
+      "path": "prompts/patient_chat_input_ui_enhancement_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T00:05:00Z",
+      "user_prompt": "Chat input box UI/UX is still not good. Make it proper and user friendly",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_whatsapp_chat_input_fix_v1",
+      "path": "prompts/patient_whatsapp_chat_input_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T00:10:00Z",
+      "user_prompt": "it's looking really bad. Not expected from you to do this kind of UI. make the chat input box like whatsapp chat input. and This do it proper",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_antd_whatsapp_chat_input_v1",
+      "path": "prompts/patient_antd_whatsapp_chat_input_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T00:15:00Z",
+      "user_prompt": "Context: I'm using React + Ant Design (antd). I currently have a chat input box styled using a <div> wrapper, but I want to move all design and styling directly into the <Input> tag instead — similar to WhatsApp's chat input UI. Goal: Replace any outer <div>-based styling with input-focused design. Ensure the input itself looks clean and integrated — no ugly border or flicker when focused. On :focus or :focus-within, the input should have a border color that matches my theme's primary color (you can assume theme color or derive from Ant Design's token). Maintain padding, background, and rounded corners like WhatsApp chat input. Input should expand horizontally to fill available space and vertically center text. Should look consistent with Ant Design components (use Ant tokens if possible). Add a smooth transition for border color and shadow on focus. Make it mobile-responsive. Example layout: input + send button (right side). Expected Output: Complete code for a WhatsApp-style chat input using Ant Design components (like Input, Button, Space). Styled so that border is subtle by default, and on focus it glows with the theme color. Include hover and focus states for the buttons to match the theme. Use Ant Design icons (SendOutlined, SmileOutlined) for emoji and send buttons.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_spacing_rounded_button_v1",
+      "path": "prompts/patient_chat_spacing_rounded_button_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T00:20:00Z",
+      "user_prompt": "Perfect! Now just small change i want rounded button and chat input and button has some space in between",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_chat_whatsapp_style_v1",
+      "path": "prompts/dermatologist_chat_whatsapp_style_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T00:25:00Z",
+      "user_prompt": "Looks Good. Do the same changes for dermatologist chat as well.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_appointments_ui_redesign_v1",
+      "path": "prompts/dermatologist_appointments_ui_redesign_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T01:05:00Z",
+      "user_prompt": "@Appointments.tsx in this page i have listing of appointments and i need exect same design and ui/ux in dermatologist appointment lisitng. @Appointments.tsx",
+	  "prompt_type": "user_request"
+    },
+    {
       "id": "patient_error_boundary_v1",
       "path": "prompts/patient_error_boundary_v1.md",
       "used_in": [

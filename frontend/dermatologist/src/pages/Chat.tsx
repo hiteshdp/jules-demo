@@ -269,27 +269,94 @@ const Chat: React.FC = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message Input */}
-                <div className="bg-white border-t border-gray-200 p-4">
-                  <form onSubmit={handleSendMessage} className="flex items-center space-x-3">
-                    <div className="flex-1 relative">
-                      <input
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type a message"
-                        className="w-full px-4 py-3 bg-gray-100 text-gray-900 placeholder-gray-500 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-                        disabled={sending}
-                      />
-                    </div>
+                {/* Message Input - WhatsApp Style with Ant Design */}
+                <div className="bg-white border-t border-gray-200 p-3">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type a message"
+                      disabled={sending}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage(e);
+                        }
+                      }}
+                      style={{
+                        borderRadius: '20px',
+                        border: '1px solid #d9d9d9',
+                        backgroundColor: '#f5f5f5',
+                        fontSize: '14px',
+                        padding: '8px 16px',
+                        height: '40px',
+                        transition: 'all 0.2s ease',
+                        boxShadow: 'none',
+                        flex: 1,
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#1890ff';
+                        e.target.style.backgroundColor = '#ffffff';
+                        e.target.style.boxShadow = '0 0 0 2px rgba(24, 144, 255, 0.2)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#d9d9d9';
+                        e.target.style.backgroundColor = '#f5f5f5';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={handleSendMessage}
                       disabled={!newMessage.trim() || sending}
-                      className="inline-flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      style={{
+                        borderRadius: '50%',
+                        height: '40px',
+                        width: '40px',
+                        minWidth: '40px',
+                        padding: '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
+                        borderColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
+                        transition: 'all 0.2s ease',
+                        boxShadow: 'none',
+                        border: 'none',
+                        cursor: newMessage.trim() && !sending ? 'pointer' : 'not-allowed',
+                        opacity: (!newMessage.trim() || sending) ? 0.5 : 1
+                      }}
+                      onMouseEnter={(e) => {
+                        if (newMessage.trim()) {
+                          e.currentTarget.style.backgroundColor = '#2563EB';
+                          e.currentTarget.style.borderColor = '#2563EB';
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (newMessage.trim()) {
+                          e.currentTarget.style.backgroundColor = '#3B82F6';
+                          e.currentTarget.style.borderColor = '#3B82F6';
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }
+                      }}
                     >
-                      <PaperAirplaneIcon className="h-5 w-5" />
+                      <PaperAirplaneIcon className="h-5 w-5 text-white" />
                     </button>
-                  </form>
+                  </div>
+                  
+                  {/* Typing Indicator */}
+                  {sending && (
+                    <div className="mt-2 flex items-center space-x-2 text-gray-500">
+                      <div className="flex space-x-1">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                      <span className="text-xs text-blue-600">Sending...</span>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
