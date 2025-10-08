@@ -33,10 +33,13 @@ const initialState: ChatState = {
 
 export const fetchChatMessages = createAsyncThunk(
   'chat/fetchMessages',
-  async (appointmentId: number, { rejectWithValue }) => {
+  async (appointmentId: number, { rejectWithValue, getState }) => {
     try {
-      const response = await chatAPI.getMessages(appointmentId);
-      return response.data;
+      const state = getState() as { chat: ChatState };
+      const existing = state.chat.messages;
+      const lastId = existing.length > 0 ? existing[existing.length - 1].id : undefined;
+      const response = await chatAPI.getMessages(appointmentId, lastId);
+      return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch messages');
     }
@@ -53,7 +56,7 @@ export const sendMessage = createAsyncThunk(
   }, { rejectWithValue }) => {
     try {
       const response = await chatAPI.sendMessage(appointmentId, message, type, attachment);
-      return response.data;
+      return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to send message');
     }
@@ -90,12 +93,21 @@ const chatSlice = createSlice({
     builder
       // Fetch Messages
       .addCase(fetchChatMessages.pending, (state) => {
-        state.loading = true;
         state.error = null;
+        // Only show loading spinner when there are no messages yet to avoid flicker
+        state.loading = state.messages.length === 0;
       })
       .addCase(fetchChatMessages.fulfilled, (state, action: PayloadAction<ChatMessage[]>) => {
         state.loading = false;
-        state.messages = action.payload;
+        if (state.messages.length === 0) {
+          state.messages = action.payload;
+          return;
+        }
+        const existingIds = new Set(state.messages.map(m => m.id));
+        const newOnes = action.payload.filter(m => !existingIds.has(m.id));
+        if (newOnes.length > 0) {
+          state.messages = [...state.messages, ...newOnes];
+        }
       })
       .addCase(fetchChatMessages.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -108,7 +120,9 @@ const chatSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action: PayloadAction<ChatMessage>) => {
         state.sending = false;
-        state.messages.push(action.payload);
+        if (!state.messages.find(m => m.id === action.payload.id)) {
+          state.messages.push(action.payload);
+        }
       })
       .addCase(sendMessage.rejected, (state, action: PayloadAction<any>) => {
         state.sending = false;

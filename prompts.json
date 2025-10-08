@@ -1,6 +1,40 @@
 {
   "prompts": [
     {
+      "id": "admin_patients_view_icon_v1",
+      "path": "prompts/admin_patients_view_icon_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "in admin module , patient section , i need icon instead of view text",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_dermatologists_view_modal_v1",
+      "path": "prompts/admin_dermatologists_view_modal_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistController.php",
+        "frontend/admin/src/pages/Dermatologists.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:20:00Z",
+      "user_prompt": "Update the existing API /admin/dermatologists/{id} to fetch full details from both the users and dermatologist tables, and add a View button in the admin UI to display these details in a styled card modal — similar to the Patient View modal feature.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_patients_view_modal_v1",
+      "path": "prompts/admin_patients_view_modal_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:05:00Z",
+      "user_prompt": "so pelase replace the drawer with model",
+      "prompt_type": "user_request"
+    },
+    {
       "id": "hair_skin_health_setup_v1",
       "path": "prompts/hair_skin_health_setup_v1.md",
       "used_in": [
@@ -739,6 +773,115 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "dermatologist_login_security_fix_v1",
+      "path": "prompts/dermatologist_login_security_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/Layout.tsx",
+        "frontend/dermatologist/src/components/ProtectedRoute.tsx",
+        "frontend/dermatologist/src/pages/Login.tsx",
+        "frontend/dermatologist/src/index.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T10:30:00Z",
+      "user_prompt": "Uncaught DOMException: The operation is insecure. receiving this error when try to login",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_dashboard_loading_fix_v1",
+      "path": "prompts/dermatologist_dashboard_loading_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T10:45:00Z",
+      "user_prompt": "Dashboard is not showing only loading",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_refresh_auth_fix_v1",
+      "path": "prompts/dermatologist_refresh_auth_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/components/Layout.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T11:00:00Z",
+      "user_prompt": "First time when i logged in that time all things working fine after that it's not. There is no api call when i refresh the page",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "appointment_chat_feature_v1",
+      "path": "prompts/appointment_chat_feature_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentChatController.php",
+        "routes/api.php",
+        "frontend/patient/src/store/api/chatAPI.ts",
+        "frontend/patient/src/store/slices/chatSlice.ts",
+        "frontend/patient/src/store/store.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "In appointments listing screen give chat option where patient can chat with the dermatologist. Do the needful for frontend and backend api as well",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "chat_page_implementation",
+      "path": "prompts/chat_page_implementation_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Chat.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/Sidebar.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T11:00:00Z",
+      "user_prompt": "I want new chat page where we display all the past chat messge and can send new chat messge. Don't want any model for that..",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "chat_page_deeplink_v1",
+      "path": "prompts/chat_page_deeplink_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "When patient click on the chat button appoitments listing. That time it will redirect to chat with the dermatologist selected",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_chat_feature_v1",
+      "path": "prompts/dermatologist_chat_feature_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Chat.tsx",
+        "frontend/dermatologist/src/store/api/chatAPI.ts",
+        "frontend/dermatologist/src/store/slices/chatSlice.ts",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/Header.tsx",
+        "frontend/dermatologist/src/components/NotificationDropdown.tsx",
+        "frontend/dermatologist/src/hooks/useNotifications.ts",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T12:00:00Z",
+      "user_prompt": "Now the I want same chat feature in dermatologist. When patient send messge there messge will be displayed in dermatologist side as well. And after that i need notification feature for the chat.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_chat_api_v1",
+      "path": "prompts/dermatologist_chat_api_v1.md",
+      "used_in": [
+        "routes/api.php",
+        "frontend/dermatologist/src/store/api/chatAPI.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "I think you need to create new api endpoint and all the requried things for dermatologist",
+      "prompt_type": "user_request"
+    },
+    {
       "id": "swagger_comprehensive_documentation_v1",
       "path": "prompts/swagger_comprehensive_documentation_v1.md",
       "used_in": [
@@ -801,8 +944,286 @@
       ],
       "author": "AI Assistant",
       "date": "2025-10-07T00:10:00Z",
-      "user_prompt": "Add this all subscription API in swagger",
+      "user_prompt": "Add this all subscription API in swagger"
+
+    },
+    {
+      "id": "patient_antd_common_components_v1",
+      "path": "prompts/patient_antd_common_components_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/PageHeader.tsx",
+        "frontend/patient/src/components/common/LoadingSpinner.tsx",
+        "frontend/patient/src/components/common/EmptyState.tsx",
+        "frontend/patient/src/components/common/StatusTag.tsx",
+        "frontend/patient/src/components/common/FormField.tsx",
+        "frontend/patient/src/components/common/Modal.tsx",
+        "frontend/patient/src/components/common/Card.tsx",
+        "frontend/patient/src/components/common/Button.tsx",
+        "frontend/patient/src/components/common/ProgressBar.tsx",
+        "frontend/patient/src/components/common/index.ts",
+        "frontend/patient/src/pages/Login.tsx",
+        "frontend/patient/src/pages/Register.tsx",
+        "frontend/patient/src/pages/Dashboard.tsx",
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/Quiz.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T15:00:00Z",
+      "user_prompt": "in patient module , make sure all the pages use ant design component and common components , use component folder also",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "patient_date_picker_fix_v1",
+      "path": "prompts/patient_date_picker_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/FormField.tsx",
+        "frontend/patient/src/pages/Profile.tsx",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T16:00:00Z",
+      "user_prompt": "i am getting this error",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_antd_conversion_v1",
+      "path": "prompts/dermatologist_antd_conversion_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/common/PageHeader.tsx",
+        "frontend/dermatologist/src/components/common/LoadingSpinner.tsx",
+        "frontend/dermatologist/src/components/common/EmptyState.tsx",
+        "frontend/dermatologist/src/components/common/StatusTag.tsx",
+        "frontend/dermatologist/src/components/common/FormField.tsx",
+        "frontend/dermatologist/src/components/common/Modal.tsx",
+        "frontend/dermatologist/src/components/common/Card.tsx",
+        "frontend/dermatologist/src/components/common/Button.tsx",
+        "frontend/dermatologist/src/components/common/index.ts",
+        "frontend/dermatologist/src/pages/Login.tsx",
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/Profile.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T17:00:00Z",
+      "user_prompt": "in dermitologist module , i want same thing , all the pages should be using ant conponent , refer components folder also here",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_navigation_loop_fix_v1",
+      "path": "prompts/dermatologist_navigation_loop_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/Layout.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/ProtectedRoute.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T17:30:00Z",
+      "user_prompt": "Console errors showing infinite loops and navigation issues",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_chat_route_fix_v1",
+      "path": "prompts/dermatologist_chat_route_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Chat.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/common/LoadingSpinner.tsx",
+        "frontend/dermatologist/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T18:00:00Z",
+      "user_prompt": "getting this on chat",
+      "prompt_type": "ai_response"
+    },
+    {
+      "id": "dermatologist_extended_fields_v1",
+      "path": "prompts/dermatologist_extended_fields_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistController.php",
+        "frontend/admin/src/components/features/DermatologistModal.tsx",
+        "frontend/admin/src/pages/Dermatologists.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T18:30:00Z",
+      "user_prompt": "Extend the **Dermatologist Create and Edit** forms and APIs to include additional fields stored in the `dermatologist` table. Table: `dermatologist` fields to be added: license_number, specialization, years_of_experience, qualifications, consultation_fees, bio. Manage both frontend and backend for this requirements.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_columns_cleanup_v1",
+      "path": "prompts/patient_columns_cleanup_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_08_064223_drop_columns_from_patient_profiles_table.php",
+        "app/Models/PatientProfile.php",
+        "app/Http/Controllers/Api/PatientController.php",
+        "database/seeders/UserSeeder.php",
+        "frontend/admin/src/pages/Patients.tsx",
+        "frontend/patient/src/pages/Profile.tsx",
+        "frontend/dermatologist/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T19:00:00Z",
+      "user_prompt": "Safely remove several columns from the `patient_profiles` table and clean up all related code across the whole project - frontend backend both. Target Table: `patient_profiles`. Columns to be dropped: medical_history, lifestyle, dietary_habits, stress_level, sleep_pattern, hair_care_routine, family_history. Generate a new migration file to drop these columns. Ensure rollback support by re-adding them in the `down()` method.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_extended_fields_v1",
+      "path": "prompts/patient_extended_fields_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/PatientController.php",
+        "frontend/admin/src/components/features/PatientModal.tsx",
+        "frontend/admin/src/components/PatientModal.tsx",
+        "frontend/admin/src/pages/Patients.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T19:30:00Z",
+      "user_prompt": "Extend the Create and Edit patient forms and backend APIs to include new fields from the `patient_profiles` table. 1️⃣ TARGET TABLE: `patient_profiles` Fields to be added: allergies, current_medications, smoking, alcohol_consumption. Manage frontend and backend APIs both.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_register_extended_v1",
+      "path": "prompts/patient_register_extended_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AuthController.php",
+        "frontend/patient/src/pages/Register.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T20:00:00Z",
+      "user_prompt": "In register page of patient module, I have not all the fields there, which also present in patient_profile page, so please add that field in signup page from frontend and backend api both.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_typescript_errors_fix_v1",
+      "path": "prompts/patient_typescript_errors_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/Chat.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T20:30:00Z",
+      "user_prompt": "Fix this issue in patient side",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_fixes_v1",
+      "path": "prompts/patient_appointments_fixes_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "app/Models/Appointment.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:00:00Z",
+      "user_prompt": "@Appointments.tsx in this page there is some issue with book new appointments button, Right now it's opening 2 model for booking. And some how in appointmets lisitng screen dr name is not displayed. Also chat icon is also missing in the listing screen items. Also check the backned for dataSource to understand the data which is comming in api. Root dirctory is the api backned",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_dropdown_chat_fix_v1",
+      "path": "prompts/patient_appointments_dropdown_chat_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:30:00Z",
+      "user_prompt": "@Appointments.tsx in this fine when booking model is openned at that time select Dermatologist dropdown is showing blank data. but there are Dermatologist. also chat button should redirect to chat page with the chat selected",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_dermatologist_dropdown_api_fix_v1",
+      "path": "prompts/patient_dermatologist_dropdown_api_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:45:00Z",
+      "user_prompt": "Still in the Dropdown of select dermatologist is empty. check the api call as well for that dropdown. @Appointments.tsx",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_icon_alignment_fix_v1",
+      "path": "prompts/patient_chat_icon_alignment_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:00:00Z",
+      "user_prompt": "Now working fine. Change the chat icon position it should be align with the status",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_modern_ui_v1",
+      "path": "prompts/patient_appointments_modern_ui_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:15:00Z",
+      "user_prompt": "Now everything is working fine. But can you change the appointment listing screen UI/UX mordern and good looking",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_list_view_v1",
+      "path": "prompts/patient_appointments_list_view_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:30:00Z",
+      "user_prompt": "Need the list view not grid view",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_button_enhancement_v1",
+      "path": "prompts/patient_appointments_button_enhancement_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:45:00Z",
+      "user_prompt": "Looks good, Can you do some UI/UX changes for the chat icon and view detail icon as well",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_error_boundary_v1",
+      "path": "prompts/patient_error_boundary_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/ErrorBoundary.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:00:00Z",
+      "user_prompt": "read this file and i want to create this type of error Boundary in patient settup",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_error_boundary_v1",
+      "path": "prompts/admin_error_boundary_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/common/ErrorBoundary.tsx",
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_error_boundary_v1",
+      "path": "prompts/dermatologist_error_boundary_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/common/ErrorBoundary.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
       "prompt_type": "user_request"
     }
   ]
 }
+

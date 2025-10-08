@@ -1,7 +1,5 @@
 // Generated via prompt: prompts/antd_admin_full_conversion_v1.md
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import React, { useEffect } from 'react';
 import { 
   Card, 
   Row, 
@@ -9,7 +7,8 @@ import {
   Statistic, 
   Typography, 
   Spin,
-  Space
+  Space,
+  Alert
 } from 'antd';
 import {
   TeamOutlined,
@@ -21,12 +20,31 @@ import {
   SettingOutlined
 } from '@ant-design/icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store/store';
+import { fetchDashboardData, clearError } from '../store/slices/dashboardSlice';
 
 const { Title, Text } = Typography;
 
 const Dashboard: React.FC = () => {
-  // Mock data for now - no API calls to prevent loops
-  const stats = {
+  const dispatch = useDispatch<AppDispatch>();
+  const { data, loading, error } = useSelector((state: RootState) => state.dashboard);
+
+  useEffect(() => {
+    dispatch(fetchDashboardData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) {
+      // Auto-clear error after 5 seconds
+      const timer = setTimeout(() => {
+        dispatch(clearError());
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, dispatch]);
+
+  const stats = data?.stats || {
     total_patients: 0,
     total_dermatologists: 0,
     total_appointments: 0,
@@ -34,9 +52,9 @@ const Dashboard: React.FC = () => {
     pending_appointments: 0,
     active_subscriptions: 0,
   };
-  const monthlyAppointments: any[] = [];
-  const monthlyRevenue: any[] = [];
-  const loading = false;
+  
+  const monthlyAppointments = data?.monthly_appointments || [];
+  const monthlyRevenue = data?.monthly_revenue || [];
 
   const statCards = [
     {
@@ -100,6 +118,17 @@ const Dashboard: React.FC = () => {
           Overview of your platform's performance and key metrics.
         </Text>
       </div>
+
+      {error && (
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          closable
+          onClose={() => dispatch(clearError())}
+        />
+      )}
 
       {/* Stats Grid */}
       <Row gutter={[16, 16]}>

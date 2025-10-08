@@ -17,17 +17,10 @@ class PatientProfile extends Model
      */
     protected $fillable = [
         'user_id',
-        'medical_history',
         'allergies',
         'current_medications',
-        'lifestyle',
         'smoking',
         'alcohol_consumption',
-        'dietary_habits',
-        'stress_level',
-        'sleep_pattern',
-        'hair_care_routine',
-        'family_history',
     ];
 
     /**

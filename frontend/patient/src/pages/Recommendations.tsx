@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { LightBulbIcon, ShoppingBagIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { Card, Row, Col, Typography, Button, Space, Alert } from 'antd';
+import { BulbOutlined, ShoppingCartOutlined, CalendarOutlined } from '@ant-design/icons';
+import { PageHeader, LoadingSpinner, EmptyState, StatusTag } from '../components/common';
 
 interface Recommendation {
   type: string;
@@ -10,6 +12,8 @@ interface Recommendation {
   product_id?: number;
   priority: string;
 }
+
+const { Title, Text } = Typography;
 
 const Recommendations: React.FC = () => {
   const { isSubmitted } = useSelector((state: RootState) => state.quiz);
@@ -56,137 +60,117 @@ const Recommendations: React.FC = () => {
     fetchRecommendations();
   }, []);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'low':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'product':
-        return <ShoppingBagIcon className="h-6 w-6" />;
+        return <ShoppingCartOutlined className="text-2xl" />;
       case 'consultation':
-        return <CalendarDaysIcon className="h-6 w-6" />;
+        return <CalendarOutlined className="text-2xl" />;
       default:
-        return <LightBulbIcon className="h-6 w-6" />;
+        return <BulbOutlined className="text-2xl" />;
+    }
+  };
+
+  const getButtonType = (type: string) => {
+    switch (type) {
+      case 'product':
+        return 'primary';
+      case 'consultation':
+        return 'default';
+      case 'lifestyle':
+        return 'dashed';
+      default:
+        return 'default';
     }
   };
 
   if (!isSubmitted) {
     return (
-      <div className="text-center py-12">
-        <LightBulbIcon className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No recommendations yet</h3>
-        <p className="mt-1 text-sm text-gray-500">
-          Complete the hair loss quiz to get personalized recommendations.
-        </p>
-        <div className="mt-6">
-          <a
-            href="/quiz"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-          >
-            Take Quiz
-          </a>
-        </div>
-      </div>
+      <EmptyState
+        icon={<BulbOutlined className="text-4xl text-gray-400" />}
+        title="No recommendations yet"
+        description="Complete the hair loss quiz to get personalized recommendations."
+        actionText="Take Quiz"
+        onAction={() => window.location.href = '/quiz'}
+      />
     );
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Personalized Recommendations</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Based on your quiz responses, here are our recommendations for your hair health journey.
-        </p>
-      </div>
+      <PageHeader
+        title="Personalized Recommendations"
+        description="Based on your quiz responses, here are our recommendations for your hair health journey."
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <Row gutter={[16, 16]}>
         {(Array.isArray(recommendations) ? recommendations : []).map((recommendation, index) => (
-          <div key={index} className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-6">
-              <div className="flex items-center">
+          <Col xs={24} lg={12} key={index}>
+            <Card
+              hoverable
+              className="h-full"
+              actions={[
+                <Button
+                  type={getButtonType(recommendation.type)}
+                  className="w-full"
+                >
+                  {recommendation.type === 'product' && 'View Product'}
+                  {recommendation.type === 'consultation' && 'Book Consultation'}
+                  {recommendation.type === 'lifestyle' && 'Learn More'}
+                </Button>
+              ]}
+            >
+              <div className="flex items-center mb-4">
                 <div className="flex-shrink-0">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-md bg-blue-100 text-blue-600">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-50 text-blue-600">
                     {getTypeIcon(recommendation.type)}
                   </div>
                 </div>
                 <div className="ml-4 flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <Title level={4} className="!mb-0">
                       {recommendation.title}
-                    </h3>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(recommendation.priority)}`}>
-                      {recommendation.priority}
-                    </span>
+                    </Title>
+                    <StatusTag status={recommendation.priority} />
                   </div>
-                  <p className="mt-2 text-sm text-gray-500">
-                    {recommendation.description}
-                  </p>
                 </div>
               </div>
               
-              <div className="mt-4">
-                {recommendation.type === 'product' && (
-                  <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                    View Product
-                  </button>
-                )}
-                {recommendation.type === 'consultation' && (
-                  <button className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
-                    Book Consultation
-                  </button>
-                )}
-                {recommendation.type === 'lifestyle' && (
-                  <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
-                    Learn More
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+              <Text type="secondary">
+                {recommendation.description}
+              </Text>
+            </Card>
+          </Col>
         ))}
-      </div>
+      </Row>
 
       {/* Additional Resources */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-medium text-blue-900 mb-2">
-          Additional Resources
-        </h3>
-        <p className="text-blue-700 mb-4">
-          For more personalized advice, consider booking a consultation with one of our dermatologists.
-        </p>
-        <div className="flex space-x-4">
-          <a
-            href="/appointments"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200"
-          >
-            Book Appointment
-          </a>
-          <a
-            href="/products"
-            className="inline-flex items-center px-4 py-2 border border-blue-300 text-sm font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50"
-          >
-            Browse Products
-          </a>
-        </div>
-      </div>
+      <Alert
+        message="Additional Resources"
+        description="For more personalized advice, consider booking a consultation with one of our dermatologists."
+        type="info"
+        showIcon
+        action={
+          <Space>
+            <Button
+              type="link"
+              onClick={() => window.location.href = '/appointments'}
+            >
+              Book Appointment
+            </Button>
+            <Button
+              type="link"
+              onClick={() => window.location.href = '/products'}
+            >
+              Browse Products
+            </Button>
+          </Space>
+        }
+      />
     </div>
   );
 };

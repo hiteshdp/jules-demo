@@ -6,6 +6,7 @@ import appointmentReducer from './slices/appointmentSlice';
 import productReducer from './slices/productSlice';
 import paymentReducer from './slices/paymentSlice';
 import settingsReducer from './slices/settingsSlice';
+import dashboardReducer from './slices/dashboardSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     product: productReducer,
     payment: paymentReducer,
     settings: settingsReducer,
+    dashboard: dashboardReducer,
   },
 });
 

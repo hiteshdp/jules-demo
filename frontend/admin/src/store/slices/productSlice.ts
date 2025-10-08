@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { productAPI } from '../api/productAPI';
 
 interface Product {
@@ -27,7 +27,7 @@ const initialState: ProductState = {
 
 export const fetchProducts = createAsyncThunk(
   'product/fetchProducts',
-  async (_, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await productAPI.getProducts();
       return response.data;
@@ -39,7 +39,7 @@ export const fetchProducts = createAsyncThunk(
 
 export const createProduct = createAsyncThunk(
   'product/createProduct',
-  async (productData: any, { rejectWithValue }) => {
+  async (productData: any, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await productAPI.createProduct(productData);
       return response.data;
@@ -51,7 +51,7 @@ export const createProduct = createAsyncThunk(
 
 export const updateProduct = createAsyncThunk(
   'product/updateProduct',
-  async ({ id, data }: { id: number; data: any }, { rejectWithValue }) => {
+  async ({ id, data }: { id: number; data: any }, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
     try {
       const response = await productAPI.updateProduct(id, data);
       return response.data;
@@ -65,51 +65,51 @@ const productSlice = createSlice({
   name: 'product',
   initialState,
   reducers: {
-    clearError: (state) => {
+    clearError: (state: any) => {
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: (builder: any) => {
     builder
       // Fetch Products
-      .addCase(fetchProducts.pending, (state) => {
+      .addCase(fetchProducts.pending, (state: any) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchProducts.fulfilled, (state: any, action: any) => {
         state.loading = false;
         state.products = action.payload.data;
       })
-      .addCase(fetchProducts.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchProducts.rejected, (state: any, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Create Product
-      .addCase(createProduct.pending, (state) => {
+      .addCase(createProduct.pending, (state: any) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createProduct.fulfilled, (state, action: PayloadAction<Product>) => {
+      .addCase(createProduct.fulfilled, (state: any, action: any) => {
         state.loading = false;
         state.products.unshift(action.payload);
       })
-      .addCase(createProduct.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(createProduct.rejected, (state: any, action: any) => {
         state.loading = false;
         state.error = action.payload;
       })
       // Update Product
-      .addCase(updateProduct.pending, (state) => {
+      .addCase(updateProduct.pending, (state: any) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateProduct.fulfilled, (state, action: PayloadAction<Product>) => {
+      .addCase(updateProduct.fulfilled, (state: any, action: any) => {
         state.loading = false;
-        const index = state.products.findIndex(product => product.id === action.payload.id);
+        const index = state.products.findIndex((product: any) => product.id === action.payload.id);
         if (index !== -1) {
           state.products[index] = action.payload;
         }
       })
-      .addCase(updateProduct.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(updateProduct.rejected, (state: any, action: any) => {
         state.loading = false;
         state.error = action.payload;
       });

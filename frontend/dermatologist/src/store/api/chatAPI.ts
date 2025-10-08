@@ -9,34 +9,35 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
+// Add token to requests (dermatologist-specific key, fallback to generic)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token =
+    localStorage.getItem('dermatologist_token') ||
+    localStorage.getItem('token');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    const headers = {
+      ...(config.headers || {}),
+      Authorization: `Bearer ${token}`,
+    } as any;
+    config.headers = headers;
   }
   return config;
 });
 
 export const chatAPI = {
-  getMessages: (appointmentId: number) =>
-    api.get(`/dermatologist/appointments/${appointmentId}/messages`),
+  getMessages: (appointmentId: number, afterId?: number) =>
+    api.get(`/dermatologist/appointments/${appointmentId}/chat${afterId ? `?after_id=${afterId}` : ''}`),
   
   sendMessage: (appointmentId: number, message: string, type: string = 'text', attachment?: File) => {
-    const formData = new FormData();
-    formData.append('message', message);
-    formData.append('type', type);
-    if (attachment) {
-      formData.append('attachment', attachment);
-    }
+    const payload = {
+      message,
+      type,
+      attachment: attachment ? attachment.name : undefined
+    };
     
-    return api.post(`/dermatologist/appointments/${appointmentId}/messages`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    return api.post(`/dermatologist/appointments/${appointmentId}/chat`, payload);
   },
   
   markAsRead: (appointmentId: number) =>
-    api.put(`/dermatologist/appointments/${appointmentId}/messages/read`),
+    api.put(`/dermatologist/appointments/${appointmentId}/chat/read`),
 };

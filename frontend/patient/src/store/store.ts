@@ -3,6 +3,7 @@ import authReducer from './slices/authSlice';
 import quizReducer from './slices/quizSlice';
 import appointmentReducer from './slices/appointmentSlice';
 import dermatologistReducer from './slices/dermatologistSlice';
+import chatReducer from './slices/chatSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     quiz: quizReducer,
     appointment: appointmentReducer,
     dermatologist: dermatologistReducer,
+    chat: chatReducer,
   },
 });
 

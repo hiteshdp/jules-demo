@@ -23,12 +23,6 @@ class Dermatologist extends Model
         'qualifications',
         'bio',
         'consultation_fee',
-        'available_days',
-        'start_time',
-        'end_time',
-        'timezone',
-        'is_available',
-        'max_patients_per_day',
     ];
 
     /**
@@ -39,9 +33,7 @@ class Dermatologist extends Model
     protected function casts(): array
     {
         return [
-            'available_days' => 'array',
             'consultation_fee' => 'decimal:2',
-            'is_available' => 'boolean',
         ];
     }
 

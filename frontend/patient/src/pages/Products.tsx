@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingBagIcon, CurrencyRupeeIcon } from '@heroicons/react/24/outline';
+import { Card, Row, Col, Tag, Button, Typography, Space } from 'antd';
+import { ShoppingCartOutlined, DollarOutlined } from '@ant-design/icons';
+import { PageHeader, LoadingSpinner, EmptyState } from '../components/common';
 
 interface Product {
   id: number;
@@ -11,6 +13,8 @@ interface Product {
   image?: string;
   requires_prescription: boolean;
 }
+
+const { Title, Text } = Typography;
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -93,106 +97,103 @@ const Products: React.FC = () => {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'shampoo':
-        return 'bg-blue-100 text-blue-800';
+        return 'blue';
       case 'treatment':
-        return 'bg-red-100 text-red-800';
+        return 'red';
       case 'supplement':
-        return 'bg-green-100 text-green-800';
+        return 'green';
       case 'oil':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'orange';
       case 'conditioner':
-        return 'bg-purple-100 text-purple-800';
+        return 'purple';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'default';
     }
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Browse our curated selection of hair care products.
-        </p>
-      </div>
+      <PageHeader
+        title="Products"
+        description="Browse our curated selection of hair care products."
+      />
 
       {/* Category Filter */}
-      <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              selectedCategory === category
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            {category.charAt(0).toUpperCase() + category.slice(1)}
-          </button>
-        ))}
-      </div>
+      <Card>
+        <Space wrap>
+          {categories.map((category) => (
+            <Button
+              key={category}
+              type={selectedCategory === category ? 'primary' : 'default'}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </Button>
+          ))}
+        </Space>
+      </Card>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <Row gutter={[16, 16]}>
         {filteredProducts.map((product) => (
-          <div key={product.id} className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-6">
+          <Col xs={24} sm={12} lg={8} key={product.id}>
+            <Card
+              hoverable
+              className="h-full"
+              actions={[
+                <Button
+                  type="primary"
+                  icon={<ShoppingCartOutlined />}
+                  className="w-full"
+                >
+                  Add to Cart
+                </Button>
+              ]}
+            >
               <div className="flex items-center justify-between mb-4">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(product.category)}`}>
+                <Tag color={getCategoryColor(product.category)}>
                   {product.category}
-                </span>
+                </Tag>
                 {product.requires_prescription && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    Prescription Required
-                  </span>
+                  <Tag color="red">Prescription Required</Tag>
                 )}
               </div>
               
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <Title level={4} className="!mb-2">
                 {product.name}
-              </h3>
+              </Title>
               
-              <p className="text-sm text-gray-500 mb-4">
+              <Text type="secondary" className="block mb-4">
                 {product.description}
-              </p>
+              </Text>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center text-lg font-semibold text-gray-900">
-                  <CurrencyRupeeIcon className="h-5 w-5 text-gray-400 mr-1" />
-                  {product.price.toLocaleString()}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center">
+                  <DollarOutlined className="mr-1 text-gray-400" />
+                  <Text strong className="text-lg">
+                    ₹{product.price.toLocaleString()}
+                  </Text>
                 </div>
-                
-                <button className="flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
-                  <ShoppingBagIcon className="h-4 w-4 mr-2" />
-                  Add to Cart
-                </button>
               </div>
               
-              <div className="mt-2 text-xs text-gray-500">
+              <Text type="secondary" className="text-xs">
                 Brand: {product.brand}
-              </div>
-            </div>
-          </div>
+              </Text>
+            </Card>
+          </Col>
         ))}
-      </div>
+      </Row>
 
       {filteredProducts.length === 0 && (
-        <div className="text-center py-12">
-          <ShoppingBagIcon className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Try selecting a different category.
-          </p>
-        </div>
+        <EmptyState
+          icon={<ShoppingCartOutlined className="text-4xl text-gray-400" />}
+          title="No products found"
+          description="Try selecting a different category."
+        />
       )}
     </div>
   );
