@@ -1,44 +1,33 @@
-// Generated via prompt: prompts/razorpay_recurring_payments_v1.md
+// Generated via prompt: prompts/razorpay_dynamic_payment_pages_v1.md
 
-import React, { useEffect, useState } from 'react';
-import apiClient from '../store/api/apiClient';
-
-type Subscription = {
-  amount: number;
-  status: 'created' | 'active' | 'cancelled' | 'failed';
-  next_payment_date?: string | null;
-  next_billing_date?: string | null;
-  payment_id?: string | null;
-  razorpay_subscription_id?: string | null;
-  starts_at?: string | null;
-  ends_at?: string | null;
-};
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store/store';
+import { fetchSubscriptionStatus, cancelSubscription } from '../store/slices/subscriptionSlice';
+import toast from 'react-hot-toast';
 
 const SubscriptionStatus: React.FC = () => {
-  const [sub, setSub] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const fetchStatus = async () => {
-    setLoading(true);
-    try {
-      const { data } = await apiClient.get('/patient/subscription/status');
-      setSub(data.data);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const cancelSubscription = async () => {
-    await apiClient.post('/patient/subscription/cancel');
-    await fetchStatus();
-  };
+  const dispatch = useDispatch<AppDispatch>();
+  const { subscription, loading, error } = useSelector((state: RootState) => state.subscription);
 
   useEffect(() => {
-    fetchStatus();
-  }, []);
+    dispatch(fetchSubscriptionStatus());
+  }, [dispatch]);
+
+  const handleCancelSubscription = () => {
+    dispatch(cancelSubscription())
+      .unwrap()
+      .then(() => {
+        toast.success('Subscription cancelled successfully!');
+        dispatch(fetchSubscriptionStatus());
+      })
+      .catch((error) => {
+        toast.error(error || 'Failed to cancel subscription');
+      });
+  };
 
   if (loading) return <div>Loading subscription...</div>;
-  if (!sub) return <div>No subscription found.</div>;
+  if (!subscription) return <div>No subscription found.</div>;
 
   const formatAmount = (amount: number) => {
     return `₹${(amount / 100).toFixed(2)}`;
@@ -63,81 +52,81 @@ const SubscriptionStatus: React.FC = () => {
         <div>
           <strong className="text-gray-600">Amount:</strong>
           <span className="ml-2 text-lg font-semibold text-green-600">
-            {formatAmount(sub.amount || 0)}
+            {formatAmount(subscription.amount || 0)}
           </span>
         </div>
         
         <div>
           <strong className="text-gray-600">Status:</strong>
           <span className={`ml-2 px-2 py-1 rounded text-sm font-medium ${
-            sub.status === 'active' ? 'bg-green-100 text-green-800' :
-            sub.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-            sub.status === 'failed' ? 'bg-red-100 text-red-800' :
+            subscription.status === 'active' ? 'bg-green-100 text-green-800' :
+            subscription.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+            subscription.status === 'failed' ? 'bg-red-100 text-red-800' :
             'bg-yellow-100 text-yellow-800'
           }`}>
-            {sub.status.toUpperCase()}
+            {subscription.status.toUpperCase()}
           </span>
         </div>
         
-        {sub.payment_id && (
+        {subscription.payment_id && (
           <div>
             <strong className="text-gray-600">Payment ID:</strong>
             <span className="ml-2 font-mono text-sm text-gray-700">
-              {sub.payment_id}
+              {subscription.payment_id}
             </span>
           </div>
         )}
         
-        {sub.razorpay_subscription_id && (
+        {subscription.razorpay_subscription_id && (
           <div>
             <strong className="text-gray-600">Subscription ID:</strong>
             <span className="ml-2 font-mono text-sm text-gray-700">
-              {sub.razorpay_subscription_id}
+              {subscription.razorpay_subscription_id}
             </span>
           </div>
         )}
         
-        {sub.starts_at && (
+        {subscription.starts_at && (
           <div>
             <strong className="text-gray-600">Start Date:</strong>
             <span className="ml-2 text-gray-700">
-              {formatDate(sub.starts_at)}
+              {formatDate(subscription.starts_at)}
             </span>
           </div>
         )}
         
-        {sub.ends_at && (
+        {subscription.ends_at && (
           <div>
             <strong className="text-gray-600">End Date:</strong>
             <span className="ml-2 text-gray-700">
-              {formatDate(sub.ends_at)}
+              {formatDate(subscription.ends_at)}
             </span>
           </div>
         )}
         
-        {sub.next_payment_date && (
+        {subscription.next_payment_date && (
           <div>
             <strong className="text-gray-600">Next Payment:</strong>
             <span className="ml-2 text-gray-700">
-              {formatDate(sub.next_payment_date)}
+              {formatDate(subscription.next_payment_date)}
             </span>
           </div>
         )}
         
-        {sub.next_billing_date && (
+        {subscription.next_billing_date && (
           <div>
             <strong className="text-gray-600">Next Billing:</strong>
             <span className="ml-2 text-gray-700">
-              {formatDate(sub.next_billing_date)}
+              {formatDate(subscription.next_billing_date)}
             </span>
           </div>
         )}
       </div>
       
-      {sub.status === 'active' && (
+      {subscription.status === 'active' && (
         <div className="mt-4 pt-4 border-t">
           <button 
-            onClick={cancelSubscription} 
+            onClick={handleCancelSubscription} 
             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
           >
             Cancel Subscription
