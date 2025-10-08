@@ -1,6 +1,6 @@
 // Generated via prompt: prompts/zoom_video_call_integration_v1.md
 import React, { useState, useEffect } from 'react';
-import { VideoCameraIcon, PlayIcon, ClockIcon, UserIcon, KeyIcon } from '@heroicons/react/24/outline';
+import { VideoCameraIcon, PlayIcon, ClockIcon, UserIcon, KeyIcon, ClipboardIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import apiClient from '../store/api/apiClient';
 
@@ -89,7 +89,21 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
     }
   };
 
+  const copyPassword = () => {
+    if (!meetingData?.password) return;
+    
+    navigator.clipboard.writeText(meetingData.password).then(() => {
+      toast.success('Password copied to clipboard!');
+    }).catch(() => {
+      toast.error('Failed to copy password');
+    });
+  };
+
   const getStatusMessage = () => {
+    if (!appointmentId) {
+      return 'Please select an appointment to join video calls';
+    }
+    
     switch (status) {
       case 'not_created':
         return 'Waiting for dermatologist to create the meeting...';
@@ -130,7 +144,11 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
           </div>
         </div>
 
-        {status === 'started' && meetingData ? (
+        {!appointmentId ? (
+          <div className="flex items-center space-x-2 text-gray-500">
+            <span className="text-sm font-medium">Select an appointment first</span>
+          </div>
+        ) : status === 'started' && meetingData ? (
           <button
             onClick={joinMeeting}
             disabled={isJoining}
@@ -190,12 +208,21 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
             
             {meetingData.password && (
               <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                <div className="flex items-center space-x-2 text-green-700">
-                  <KeyIcon className="h-4 w-4" />
-                  <span className="text-sm font-medium">Meeting Password:</span>
-                  <span className="font-mono text-sm bg-white px-2 py-1 rounded border">
-                    {meetingData.password}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 text-green-700">
+                    <KeyIcon className="h-4 w-4" />
+                    <span className="text-sm font-medium">Meeting Password:</span>
+                    <span className="font-mono text-sm bg-white px-2 py-1 rounded border">
+                      {meetingData.password}
+                    </span>
+                  </div>
+                  <button
+                    onClick={copyPassword}
+                    className="inline-flex items-center text-green-600 hover:text-green-700 text-xs font-medium transition-colors"
+                  >
+                    <ClipboardIcon className="h-3 w-3 mr-1" />
+                    Copy
+                  </button>
                 </div>
               </div>
             )}

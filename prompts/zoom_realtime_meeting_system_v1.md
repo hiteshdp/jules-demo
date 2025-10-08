@@ -50,3 +50,24 @@ Implemented a complete real-time Zoom meeting system with database storage and p
 - **Proper error handling** and logging
 
 The system now provides a complete real-time video consultation experience where patients wait for dermatologists to start calls, join when ready, and automatically reset when calls end.
+
+## Fix Applied:
+- **Issue**: "Appointment ID is required" error when dermatologist tries to start call
+- **Root Cause**: Missing `appointmentId` prop in ZoomMeetingButton components
+- **Solution**: Added `appointmentId` prop to both patient and dermatologist Chat pages
+- **UI Enhancement**: Added helpful messages when no appointment is selected
+- **Result**: Video calls now work properly with selected appointments
+
+## UI Fix Applied:
+- **Issue**: Meeting details still showing after call ends
+- **Root Cause**: Meeting details section not checking for 'ended' status
+- **Solution**: Added `status !== 'ended'` condition to hide meeting details when call ends
+- **Enhancement**: Dynamic status display (Call Active vs Ready to start)
+- **Result**: Clean UI after call ends, meeting details only show when relevant
+
+## Password Copy Feature Added:
+- **Enhancement**: Added copy button for meeting password on patient side
+- **Functionality**: One-click password copying to clipboard
+- **UI**: Copy button positioned beside the password with hover effects
+- **Feedback**: Toast notifications for successful copy or error handling
+- **Result**: Improved user experience for patients joining meetings with passwords

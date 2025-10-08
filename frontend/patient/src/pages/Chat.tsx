@@ -130,6 +130,7 @@ const Chat: React.FC = () => {
       {/* Zoom Meeting Button - Always visible at top */}
       <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-4">
         <ZoomMeetingButton 
+          appointmentId={selectedAppointmentId}
           dermatologistName={selectedAppointmentId ? appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.user?.name : 'Dermatologist'}
           isPatient={true}
         />

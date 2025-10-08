@@ -63,7 +63,7 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
 
   const createMeeting = async () => {
     if (!appointmentId) {
-      toast.error('Appointment ID is required');
+      toast.error('Please select an appointment first');
       return;
     }
 
@@ -156,6 +156,10 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
   };
 
   const getStatusMessage = () => {
+    if (!appointmentId) {
+      return 'Please select an appointment to start a video call';
+    }
+    
     switch (status) {
       case 'not_created':
         return `Create and start a video call with ${patientName}`;
@@ -185,7 +189,11 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
           </div>
         </div>
 
-        {status === 'not_created' ? (
+        {!appointmentId ? (
+          <div className="flex items-center space-x-2 text-gray-500">
+            <span className="text-sm font-medium">Select an appointment first</span>
+          </div>
+        ) : status === 'not_created' ? (
           <button
             onClick={createMeeting}
             disabled={isCreating}
@@ -278,7 +286,7 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
         )}
       </div>
 
-      {meetingData && (
+      {meetingData && status !== 'ended' && (
         <div className="mt-4 pt-4 border-t border-indigo-200">
           <div className="bg-white rounded-lg p-4 shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
@@ -295,7 +303,9 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
               <div className="flex items-center space-x-2">
                 <VideoCameraIcon className="h-4 w-4 text-indigo-500" />
                 <span className="text-gray-600">Status:</span>
-                <span className="font-medium text-green-600">Ready to start</span>
+                <span className={`font-medium ${status === 'started' ? 'text-green-600' : 'text-blue-600'}`}>
+                  {status === 'started' ? 'Call Active' : 'Ready to start'}
+                </span>
               </div>
             </div>
             
