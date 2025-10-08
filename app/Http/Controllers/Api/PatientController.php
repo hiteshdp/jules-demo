@@ -206,7 +206,7 @@ class PatientController extends Controller
                     'max:255',
                     Rule::unique('users', 'email'),
                 ],
-                'phone_no' => 'required|string|max:20',
+                'phone_no' => 'nullable|string|max:20',
                 'password' => 'required|string|min:6',
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
@@ -220,7 +220,7 @@ class PatientController extends Controller
             $userData = [
                 'name' => $patientData['name'],
                 'email' => $patientData['email'],
-                'phone' => $patientData['phone_no'],
+                'phone' => $patientData['phone_no'] ?? null,
                 'password' => Hash::make($patientData['password']),
                 'date_of_birth' => $patientData['dob'] ?? null,
                 'gender' => $patientData['gender'],
@@ -364,7 +364,7 @@ class PatientController extends Controller
                     'max:255',
                     Rule::unique('users', 'email')->ignore($patient->id),
                 ],
-                'phone_no' => 'sometimes|required|string|max:20',
+                'phone_no' => 'sometimes|nullable|string|max:20',
                 'password' => 'sometimes|nullable|string|min:6',
                 'dob' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
@@ -383,7 +383,7 @@ class PatientController extends Controller
             if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
             if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
             if (isset($updateData['phone_no'])) {
-                $userData['phone'] = $updateData['phone_no'];
+                $userData['phone'] = $updateData['phone_no'] ?: null;
                 unset($updateData['phone_no']);
             }
             if (isset($updateData['dob'])) {

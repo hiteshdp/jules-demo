@@ -901,6 +901,53 @@
       "prompt_type": "ai_response"
     },
     {
+      "id": "razorpay_recurring_payments_v1",
+      "path": "prompts/razorpay_recurring_payments_v1.md",
+      "used_in": [
+        "config/services.php",
+        "database/migrations/2025_10_07_000001_create_subscriptions_table.php",
+        "database/migrations/2025_10_07_000002_create_razorpay_logs_table.php",
+        "app/Models/Subscription.php",
+        "app/Models/RazorpayLog.php",
+        "app/Services/RazorpayService.php",
+        "app/Http/Controllers/Api/SubscriptionController.php",
+        "app/Http/Controllers/Api/WebhookController.php",
+        "routes/api.php",
+        "frontend/patient/src/hooks/useRazorpay.ts",
+        "frontend/patient/src/components/SubscribeButton.tsx",
+        "frontend/patient/src/components/SubscriptionStatus.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "You are helping build a recurring payment system using Razorpay with Laravel 12 (backend) and React 18 (frontend).",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_subscription_nav_v1",
+      "path": "prompts/razorpay_subscription_nav_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Subscription.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/Sidebar.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:05:00Z",
+      "user_prompt": "give subscription page route in sidebar so i can click and test payment",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_subscription_swagger_v1",
+      "path": "prompts/razorpay_subscription_swagger_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/SubscriptionController.php",
+        "app/Http/Controllers/Api/WebhookController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:10:00Z",
+      "user_prompt": "Add this all subscription API in swagger"
+
+    },
+    {
       "id": "patient_antd_common_components_v1",
       "path": "prompts/patient_antd_common_components_v1.md",
       "used_in": [
@@ -1097,6 +1144,113 @@
       "author": "AI Assistant",
       "date": "2025-01-08T12:30:00Z",
       "user_prompt": "please for test zoom video call feature make test route",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_dropdown_chat_fix_v1",
+      "path": "prompts/patient_appointments_dropdown_chat_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:30:00Z",
+      "user_prompt": "@Appointments.tsx in this fine when booking model is openned at that time select Dermatologist dropdown is showing blank data. but there are Dermatologist. also chat button should redirect to chat page with the chat selected",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_dermatologist_dropdown_api_fix_v1",
+      "path": "prompts/patient_dermatologist_dropdown_api_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/store/slices/appointmentSlice.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T21:45:00Z",
+      "user_prompt": "Still in the Dropdown of select dermatologist is empty. check the api call as well for that dropdown. @Appointments.tsx",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_chat_icon_alignment_fix_v1",
+      "path": "prompts/patient_chat_icon_alignment_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:00:00Z",
+      "user_prompt": "Now working fine. Change the chat icon position it should be align with the status",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_modern_ui_v1",
+      "path": "prompts/patient_appointments_modern_ui_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:15:00Z",
+      "user_prompt": "Now everything is working fine. But can you change the appointment listing screen UI/UX mordern and good looking",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_list_view_v1",
+      "path": "prompts/patient_appointments_list_view_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:30:00Z",
+      "user_prompt": "Need the list view not grid view",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_appointments_button_enhancement_v1",
+      "path": "prompts/patient_appointments_button_enhancement_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T22:45:00Z",
+      "user_prompt": "Looks good, Can you do some UI/UX changes for the chat icon and view detail icon as well",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_error_boundary_v1",
+      "path": "prompts/patient_error_boundary_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/common/ErrorBoundary.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:00:00Z",
+      "user_prompt": "read this file and i want to create this type of error Boundary in patient settup",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_error_boundary_v1",
+      "path": "prompts/admin_error_boundary_v1.md",
+      "used_in": [
+        "frontend/admin/src/components/common/ErrorBoundary.tsx",
+        "frontend/admin/src/App.tsx",
+        "frontend/admin/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_error_boundary_v1",
+      "path": "prompts/dermatologist_error_boundary_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/components/common/ErrorBoundary.tsx",
+        "frontend/dermatologist/src/App.tsx",
+        "frontend/dermatologist/src/components/common/index.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T23:15:00Z",
+      "user_prompt": "now this add same error boundary in admin and demostartor setup too",
       "prompt_type": "user_request"
     }
   ]
