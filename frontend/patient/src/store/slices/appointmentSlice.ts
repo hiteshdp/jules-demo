@@ -3,9 +3,20 @@ import { appointmentAPI } from '../api/appointmentAPI';
 
 interface Dermatologist {
   id: number;
-  name: string;
-  email: string;
-  phone?: string;
+  user_id?: number;
+  license_number: string;
+  specialization?: string;
+  years_of_experience: number;
+  qualifications: string;
+  bio?: string;
+  consultation_fee?: number;
+  is_available?: boolean;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    phone?: string;
+  };
 }
 
 interface Appointment {
