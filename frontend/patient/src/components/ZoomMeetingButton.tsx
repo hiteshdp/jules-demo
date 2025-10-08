@@ -1,125 +1,204 @@
 // Generated via prompt: prompts/zoom_video_call_integration_v1.md
-import React, { useState } from 'react';
-import { VideoCameraIcon, PlayIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from 'react';
+import { VideoCameraIcon, PlayIcon, ClockIcon, UserIcon, KeyIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import apiClient from '../store/api/apiClient';
 
 interface ZoomMeetingData {
   id: string;
+  meeting_id: string;
   join_url: string;
   start_url: string;
   password?: string;
   topic: string;
   start_time: string;
   duration: number;
+  status: 'created' | 'started' | 'ended';
+  started_at?: string;
+  ended_at?: string;
 }
 
 interface ZoomMeetingButtonProps {
-  appointmentId: number;
+  appointmentId?: number;
   dermatologistName?: string;
   isPatient?: boolean;
 }
 
 const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({ 
-  appointmentId, 
+  appointmentId,
   dermatologistName = 'Dermatologist',
   isPatient = true 
 }) => {
   const [meetingData, setMeetingData] = useState<ZoomMeetingData | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(true);
+  const [isJoining, setIsJoining] = useState(false);
+  const [status, setStatus] = useState<'not_created' | 'created' | 'started' | 'ended'>('not_created');
 
-  const createMeeting = async () => {
-    setIsCreating(true);
-    try {
-      const response = await fetch('/api/zoom/create-meeting', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          topic: `Consultation with ${dermatologistName}`,
-          start_time: new Date(Date.now() + 2 * 60 * 1000).toISOString(), // 2 minutes from now
-          duration: 30
-        })
-      });
+  // Check meeting status in real-time
+  useEffect(() => {
+    if (!appointmentId) return;
 
-      const data = await response.json();
+    const checkMeetingStatus = async () => {
+      try {
+        const response = await apiClient.get(`/zoom-meetings/status/${appointmentId}`);
+        const data = response.data;
 
-      if (data.success) {
-        setMeetingData(data.data);
-        toast.success('Zoom meeting created successfully!');
-      } else {
-        throw new Error(data.message || 'Failed to create meeting');
+        if (data.success) {
+          setStatus(data.data.status);
+          
+          if (data.data.status === 'started' && data.data.meeting) {
+            setMeetingData(data.data.meeting);
+            setIsWaiting(false);
+          } else if (data.data.status === 'ended') {
+            setMeetingData(null);
+            setIsWaiting(true);
+            setStatus('not_created');
+          } else if (data.data.status === 'created') {
+            setIsWaiting(true);
+            setStatus('created');
+          } else {
+            setIsWaiting(true);
+            setStatus('not_created');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking meeting status:', error);
       }
+    };
+
+    // Check immediately
+    checkMeetingStatus();
+
+    // Set up polling every 3 seconds
+    const interval = setInterval(checkMeetingStatus, 3000);
+
+    return () => clearInterval(interval);
+  }, [appointmentId]);
+
+  const joinMeeting = () => {
+    if (!meetingData?.join_url) return;
+    
+    setIsJoining(true);
+    try {
+      window.open(meetingData.join_url, '_blank', 'noopener,noreferrer');
+      toast.success('Joining video call...');
     } catch (error) {
-      console.error('Error creating Zoom meeting:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to create Zoom meeting');
+      toast.error('Failed to open video call');
     } finally {
-      setIsCreating(false);
+      setIsJoining(false);
     }
   };
 
-  const openMeeting = (url: string) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+  const getStatusMessage = () => {
+    switch (status) {
+      case 'not_created':
+        return 'Waiting for dermatologist to create the meeting...';
+      case 'created':
+        return 'Meeting created - waiting for dermatologist to start the call...';
+      case 'started':
+        return `Ready to join call with ${dermatologistName}`;
+      case 'ended':
+        return 'Call has ended';
+      default:
+        return 'Waiting for dermatologist to start the call...';
+    }
+  };
+
+  const getStatusColor = () => {
+    switch (status) {
+      case 'started':
+        return 'text-green-600';
+      case 'ended':
+        return 'text-red-600';
+      default:
+        return 'text-amber-600';
+    }
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4">
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-4 shadow-sm">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-            <VideoCameraIcon className="h-6 w-6 text-blue-600" />
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+            <VideoCameraIcon className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h3 className="text-sm font-medium text-gray-900">Video Consultation</h3>
-            <p className="text-xs text-gray-500">
-              Start a video call with {dermatologistName}
+            <h3 className="text-lg font-semibold text-gray-900">Video Consultation</h3>
+            <p className="text-sm text-gray-600">
+              {getStatusMessage()}
             </p>
           </div>
         </div>
 
-        {!meetingData ? (
+        {status === 'started' && meetingData ? (
           <button
-            onClick={createMeeting}
-            disabled={isCreating}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            onClick={joinMeeting}
+            disabled={isJoining}
+            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
-            {isCreating ? (
+            {isJoining ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Creating...
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                Joining...
               </>
             ) : (
               <>
-                <VideoCameraIcon className="h-4 w-4 mr-2" />
-                Start Video Call
+                <PlayIcon className="h-5 w-5 mr-3" />
+                Join Video Call
               </>
             )}
           </button>
+        ) : status !== 'ended' ? (
+          <div className="flex items-center space-x-3">
+            <div className={`flex items-center space-x-2 ${getStatusColor()}`}>
+              <ClockIcon className="h-5 w-5 animate-pulse" />
+              <span className="text-sm font-medium">
+                {status === 'created' ? 'Meeting Created' : 'Waiting...'}
+              </span>
+            </div>
+            <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 bg-amber-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
         ) : (
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => openMeeting(meetingData.join_url)}
-              className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <PlayIcon className="h-4 w-4 mr-2" />
-              {isPatient ? 'Join Call' : 'Start Call'}
-            </button>
-            {meetingData.password && (
-              <div className="text-xs text-gray-500">
-                Pass: {meetingData.password}
-              </div>
-            )}
+          <div className="flex items-center space-x-2 text-red-600">
+            <span className="text-sm font-medium">Call Ended</span>
           </div>
         )}
       </div>
 
-      {meetingData && (
-        <div className="mt-3 pt-3 border-t border-gray-200">
-          <div className="text-xs text-gray-600">
-            <p><strong>Meeting ID:</strong> {meetingData.id}</p>
-            <p><strong>Topic:</strong> {meetingData.topic}</p>
-            <p><strong>Duration:</strong> {meetingData.duration} minutes</p>
+      {meetingData && status === 'started' && (
+        <div className="mt-4 pt-4 border-t border-blue-200">
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+              <div className="flex items-center space-x-2">
+                <UserIcon className="h-4 w-4 text-blue-500" />
+                <span className="text-gray-600">Meeting ID:</span>
+                <span className="font-mono text-gray-900">{meetingData.meeting_id}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <ClockIcon className="h-4 w-4 text-blue-500" />
+                <span className="text-gray-600">Duration:</span>
+                <span className="font-medium text-gray-900">{meetingData.duration} min</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <VideoCameraIcon className="h-4 w-4 text-blue-500" />
+                <span className="text-gray-600">Status:</span>
+                <span className="font-medium text-green-600">Ready to join</span>
+              </div>
+            </div>
+            
+            {meetingData.password && (
+              <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                <div className="flex items-center space-x-2 text-green-700">
+                  <KeyIcon className="h-4 w-4" />
+                  <span className="text-sm font-medium">Meeting Password:</span>
+                  <span className="font-mono text-sm bg-white px-2 py-1 rounded border">
+                    {meetingData.password}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
