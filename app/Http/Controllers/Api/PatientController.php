@@ -559,4 +559,235 @@ class PatientController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/patient/profile",
+     *     summary="Get patient profile",
+     *     description="Get current authenticated patient's profile information",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Patient profile retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Profile retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="patient@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
+     *                 @OA\Property(property="gender", type="string", example="male"),
+     *                 @OA\Property(
+     *                     property="patientProfile",
+     *                     type="object",
+     *                     @OA\Property(property="allergies", type="string", example="None known"),
+     *                     @OA\Property(property="current_medications", type="string", example="None"),
+     *                     @OA\Property(property="smoking", type="boolean", example=false),
+     *                     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated")
+     *         )
+     *     )
+     * )
+     */
+    public function getProfile(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if ($user->role !== 'patient') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Patient role required.'
+                ], 403);
+            }
+
+            $user->load('patientProfile');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile retrieved successfully',
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'date_of_birth' => $user->date_of_birth,
+                    'gender' => $user->gender,
+                    'patientProfile' => $user->patientProfile
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve profile',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/patient/profile",
+     *     summary="Update patient profile",
+     *     description="Update current authenticated patient's profile information",
+     *     tags={"Patients"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+     *             @OA\Property(property="phone", type="string", example="+1234567890"),
+     *             @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
+     *             @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="male"),
+     *             @OA\Property(property="allergies", type="string", example="None known"),
+     *             @OA\Property(property="current_medications", type="string", example="None"),
+     *             @OA\Property(property="smoking", type="boolean", example=false),
+     *             @OA\Property(property="alcohol_consumption", type="boolean", example=false)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Profile updated successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="patient@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1990-01-01"),
+     *                 @OA\Property(property="gender", type="string", example="male"),
+     *                 @OA\Property(
+     *                     property="patientProfile",
+     *                     type="object",
+     *                     @OA\Property(property="allergies", type="string", example="None known"),
+     *                     @OA\Property(property="current_medications", type="string", example="None"),
+     *                     @OA\Property(property="smoking", type="boolean", example=false),
+     *                     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation errors"),
+     *             @OA\Property(property="errors", type="object", example={"field": "The field is required."})
+     *         )
+     *     )
+     * )
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if ($user->role !== 'patient') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Patient role required.'
+                ], 403);
+            }
+
+            $updateData = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'email' => [
+                    'sometimes',
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($user->id),
+                ],
+                'phone' => 'sometimes|nullable|string|max:20',
+                'date_of_birth' => 'nullable|date|before:today',
+                'gender' => 'nullable|in:male,female,other',
+                // Patient profile fields
+                'allergies' => 'nullable|string',
+                'current_medications' => 'nullable|string',
+                'smoking' => 'nullable|boolean',
+                'alcohol_consumption' => 'nullable|boolean',
+            ]);
+
+            // Separate user and profile data
+            $userData = [];
+            $profileData = [];
+
+            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
+            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
+            if (isset($updateData['phone'])) $userData['phone'] = $updateData['phone'];
+            if (isset($updateData['date_of_birth'])) $userData['date_of_birth'] = $updateData['date_of_birth'];
+            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
+
+            // Profile fields
+            if (isset($updateData['allergies'])) $profileData['allergies'] = $updateData['allergies'];
+            if (isset($updateData['current_medications'])) $profileData['current_medications'] = $updateData['current_medications'];
+            if (isset($updateData['smoking'])) $profileData['smoking'] = $updateData['smoking'];
+            if (isset($updateData['alcohol_consumption'])) $profileData['alcohol_consumption'] = $updateData['alcohol_consumption'];
+
+            // Update user data
+            if (!empty($userData)) {
+                $user->update($userData);
+            }
+
+            // Update or create profile data
+            if (!empty($profileData)) {
+                $profile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
+                if ($profile) {
+                    $profile->update($profileData);
+                } else {
+                    $profileData['user_id'] = $user->id;
+                    \App\Models\PatientProfile::create($profileData);
+                }
+            }
+
+            // Reload user with profile
+            $user->load('patientProfile');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'date_of_birth' => $user->date_of_birth,
+                    'gender' => $user->gender,
+                    'patientProfile' => $user->patientProfile
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update profile',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
