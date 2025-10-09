@@ -1434,6 +1434,181 @@
       "author": "AI Assistant",
       "date": "2025-10-09T11:00:00Z",
       "user_prompt": "Create a complete **Appointments Management module** in the Admin section that allows the admin to view and manage all patient–dermatologist appointments across the system. Allow the Admin to view and manage all appointments created via booking and payment process in one place. This helps ensure smooth coordination, payment tracking, and consultation follow-ups.",
+      "id": "razorpay_cancel_subscription_v1",
+      "path": "prompts/razorpay_cancel_subscription_v1.md",
+      "used_in": [
+        "app/Services/RazorpayService.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:20:00Z",
+      "user_prompt": "currentlu when call cancel subscription then only status update in database but i want to cancel in razorpay dashboard also so can not recusrring next time",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_payment_id_storage_v1",
+      "path": "prompts/razorpay_payment_id_storage_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_08_132341_add_payment_id_to_subscriptions_table.php",
+        "app/Models/Subscription.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:25:00Z",
+      "user_prompt": "now i want to store payment id also in subscription table",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_next_billing_date_v1",
+      "path": "prompts/razorpay_next_billing_date_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_08_134022_add_next_billing_date_to_subscriptions_table.php",
+        "app/Models/Subscription.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:40:00Z",
+      "user_prompt": "one more fiels need to add in subscription table like add next billing date",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_start_end_dates_v1",
+      "path": "prompts/razorpay_start_end_dates_v1.md",
+      "used_in": [
+        "app/Models/Subscription.php",
+        "app/Http/Controllers/Api/SubscriptionController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T13:45:00Z",
+      "user_prompt": "Store start and end date too in subscription",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "razorpay_dynamic_payment_pages_v1",
+      "path": "prompts/razorpay_dynamic_payment_pages_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/PaymentSuccess.tsx",
+        "frontend/patient/src/components/PaymentFailed.tsx",
+        "frontend/patient/src/components/SubscribeButton.tsx",
+        "frontend/patient/src/pages/PaymentSuccess.tsx",
+        "frontend/patient/src/pages/PaymentFailed.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/SubscriptionStatus.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-08T14:00:00Z",
+      "user_prompt": "After payment done then show success or failed pages base on response currently show sample success and faild message but i want to add in dynamic",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_payment_integration_v1",
+      "path": "prompts/appointment_payment_integration_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_09_082920_create_appointments_payment_table.php",
+        "app/Models/AppointmentPayment.php",
+        "app/Models/Appointment.php",
+        "app/Http/Controllers/Api/AppointmentPaymentController.php",
+        "routes/api.php",
+        "frontend/patient/src/store/api/appointmentAPI.ts",
+        "frontend/patient/src/store/slices/appointmentSlice.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-09T08:30:00Z",
+      "user_prompt": "now i want to add functionality like when click on booking appointment button then first one time payment in razor pay once payment is done then store payment information with create new table sppointments_payment and store all the payment information",
+      "id": "appointment_enhancements_v1",
+      "path": "prompts/appointment_enhancements_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php",
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T01:30:00Z",
+      "user_prompt": "Display Enhancements: Show the Consultation Fee properly for each appointment in both Patient and Dermatologist lists. Display the Appointment Date and Time clearly in a user-friendly format (e.g., DD MMM YYYY, hh:mm A). Filtering Features: Add all possible filters on the appointment list for both roles: Filter by Patient Name / Dermatologist Name (depending on logged-in role). Filter by Date Range (From–To). Optional: Status filter (e.g., Upcoming, Completed, Cancelled) if available in DB schema. Export Feature: Implement Export to Excel / CSV option for filtered appointment data. Create corresponding API endpoint (Laravel) for export functionality. Integrate this export feature on both Patient and Dermatologist React modules. API Updates: Update existing appointment listing APIs to include consultation_fee, formatted_date_time, and accept filter parameters (name, date_from, date_to, etc.). Create new route and controller method for export API returning downloadable Excel file.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_export_auth_fix_v1",
+      "path": "prompts/dermatologist_export_auth_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:00:00Z",
+      "user_prompt": "Dermatologist export says Unauthenticated please check and fix it",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_export_token_fix_v1",
+      "path": "prompts/dermatologist_export_token_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:15:00Z",
+      "user_prompt": "Unauthenticated - Still say on dermatologist export excel",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_details_redesign_v1",
+      "path": "prompts/appointment_details_redesign_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/AppointmentDetail.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:30:00Z",
+      "user_prompt": "Appointment Details - need to open both side on that page need to remove 2 features like view patient history and reschedule and notes added from Dermatologist and patient can show only",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_notes_relationship_fix_v1",
+      "path": "prompts/appointment_notes_relationship_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:45:00Z",
+      "user_prompt": "On update notes gives error",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_notes_modal_implementation_v1",
+      "path": "prompts/appointment_notes_modal_implementation_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T03:00:00Z",
+      "user_prompt": "One more need to change notes should not show on list of appointment add new button for notes on click notes button model open and in model show notes on list on details page do not change anything",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_notes_removal_fix_v1",
+      "path": "prompts/dermatologist_notes_removal_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T03:15:00Z",
+      "user_prompt": "why dermatologist side on list appointment notes not removed ?",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "remove_cancelled_status_v1",
+      "path": "prompts/remove_cancelled_status_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T03:30:00Z",
+      "user_prompt": "Remove Cancelled status on appointment Details",
       "prompt_type": "user_request"
     }
   ]

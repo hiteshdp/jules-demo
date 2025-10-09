@@ -56,6 +56,82 @@ class RazorpayService
             return false;
         }
     }
+
+    public function cancelSubscription(string $subscriptionId)
+    {
+        try {
+            // Cancel the subscription in Razorpay
+            $subscription = $this->api->subscription->fetch($subscriptionId);
+            $subscription->cancel();
+            
+            Log::info('Razorpay subscription cancelled', [
+                'subscription_id' => $subscriptionId,
+            ]);
+            
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('Failed to cancel Razorpay subscription', [
+                'subscription_id' => $subscriptionId,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    public function getSubscription(string $subscriptionId)
+    {
+        try {
+            return $this->api->subscription->fetch($subscriptionId);
+        } catch (\Throwable $e) {
+            Log::error('Failed to fetch Razorpay subscription', [
+                'subscription_id' => $subscriptionId,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    public function createOrder(int $amount, string $currency, array $options = [])
+    {
+        try {
+            $orderData = [
+                'amount' => $amount,
+                'currency' => $currency,
+                'receipt' => $options['receipt'] ?? 'order_' . time(),
+            ];
+
+            if (isset($options['notes'])) {
+                $orderData['notes'] = $options['notes'];
+            }
+
+            // Add payment method restriction if specified
+            if (isset($options['method'])) {
+                $orderData['method'] = $options['method'];
+            }
+
+            return $this->api->order->create($orderData);
+        } catch (\Throwable $e) {
+            Log::error('Failed to create Razorpay order', [
+                'amount' => $amount,
+                'currency' => $currency,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    public function getOrder(string $orderId)
+    {
+        try {
+            return $this->api->order->fetch($orderId);
+        } catch (\Throwable $e) {
+            Log::error('Failed to fetch Razorpay order', [
+                'order_id' => $orderId,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
 }
 
 

@@ -73,4 +73,12 @@ class Appointment extends Model
     {
         return $this->morphMany(Payment::class, 'payable');
     }
+
+    /**
+     * Get the appointment payment for the appointment.
+     */
+    public function appointmentPayment()
+    {
+        return $this->hasOne(AppointmentPayment::class);
+    }
 }
