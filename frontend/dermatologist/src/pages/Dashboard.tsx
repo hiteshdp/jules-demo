@@ -93,7 +93,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Welcome back, Dr. ${user?.name || 'User'}!`}
+        title={`Welcome back, ${user?.name || 'User'}!`}
         description="Here's your practice overview for today."
       />
 

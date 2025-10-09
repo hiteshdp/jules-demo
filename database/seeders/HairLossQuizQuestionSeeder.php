@@ -1,5 +1,5 @@
 <?php
-// Generated via prompt: prompts/hair_skin_health_setup_v1.md
+// Generated via prompt: prompts/quiz_questionnaire_update_v1.md
 
 namespace Database\Seeders;
 
@@ -14,74 +14,107 @@ class HairLossQuizQuestionSeeder extends Seeder
     public function run(): void
     {
         $questions = [
+            // Basic Info
             [
-                'question' => 'How long have you been experiencing hair loss?',
-                'type' => 'single_choice',
-                'options' => ['Less than 3 months', '3-6 months', '6-12 months', '1-2 years', 'More than 2 years'],
+                'question' => 'What is your age?',
+                'type' => 'text',
+                'options' => null,
                 'order' => 1,
                 'is_required' => true,
             ],
             [
-                'question' => 'What type of hair loss are you experiencing?',
-                'type' => 'multiple_choice',
-                'options' => ['Thinning on top', 'Receding hairline', 'Bald patches', 'Overall thinning', 'Hair breakage'],
+                'question' => 'What is your gender?',
+                'type' => 'single_choice',
+                'options' => ['Male', 'Female', 'Other'],
                 'order' => 2,
                 'is_required' => true,
             ],
+            // Hair Loss History
             [
-                'question' => 'How much hair do you lose daily?',
+                'question' => 'When did you first notice hair loss?',
                 'type' => 'single_choice',
-                'options' => ['Less than 50 hairs', '50-100 hairs', '100-150 hairs', 'More than 150 hairs', 'Not sure'],
+                'options' => ['Less than 6 months ago', '6 months – 1 year', '1–3 years', 'More than 3 years'],
                 'order' => 3,
+                'is_required' => true,
+            ],
+            [
+                'question' => 'Where do you notice hair loss the most?',
+                'type' => 'single_choice',
+                'options' => ['Temples / hairline', 'Crown / top', 'Diffuse thinning all over', 'Patchy spots'],
+                'order' => 4,
+                'is_required' => true,
+            ],
+            [
+                'question' => 'How fast is your hair loss progressing?',
+                'type' => 'single_choice',
+                'options' => ['Slow (gradual over years)', 'Moderate (noticeable in 1–2 years)', 'Rapid (big changes in a few months)'],
+                'order' => 5,
                 'is_required' => true,
             ],
             [
                 'question' => 'Do you have a family history of hair loss?',
                 'type' => 'single_choice',
-                'options' => ['Yes, on mother\'s side', 'Yes, on father\'s side', 'Yes, on both sides', 'No family history', 'Not sure'],
-                'order' => 4,
-                'is_required' => true,
-            ],
-            [
-                'question' => 'What is your current stress level?',
-                'type' => 'scale',
-                'options' => ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-                'order' => 5,
-                'is_required' => true,
-            ],
-            [
-                'question' => 'How many hours of sleep do you get per night?',
-                'type' => 'single_choice',
-                'options' => ['Less than 5 hours', '5-6 hours', '6-7 hours', '7-8 hours', 'More than 8 hours'],
+                'options' => ['Yes', 'No', 'Not sure'],
                 'order' => 6,
                 'is_required' => true,
             ],
+            // Health & Lifestyle
             [
-                'question' => 'What is your current diet?',
-                'type' => 'single_choice',
-                'options' => ['Very healthy', 'Moderately healthy', 'Average', 'Poor', 'Very poor'],
+                'question' => 'Do you have any known medical conditions?',
+                'type' => 'multiple_choice',
+                'options' => ['Thyroid', 'Hormonal imbalance', 'Autoimmune', 'High stress', 'None'],
                 'order' => 7,
                 'is_required' => true,
             ],
             [
-                'question' => 'Do you currently take any medications?',
-                'type' => 'text',
-                'options' => null,
+                'question' => 'Are you currently taking any regular medications or supplements?',
+                'type' => 'single_choice',
+                'options' => ['Yes', 'No'],
                 'order' => 8,
-                'is_required' => false,
+                'is_required' => true,
             ],
             [
-                'question' => 'Have you recently experienced any major life changes?',
+                'question' => 'What is your current diet quality?',
                 'type' => 'single_choice',
-                'options' => ['Yes, major stress', 'Yes, moderate stress', 'Yes, minor stress', 'No major changes', 'Not applicable'],
+                'options' => ['Balanced', 'Poor', 'Irregular'],
                 'order' => 9,
                 'is_required' => true,
             ],
             [
-                'question' => 'What hair care products do you currently use?',
-                'type' => 'multiple_choice',
-                'options' => ['Regular shampoo', 'Anti-hair loss shampoo', 'Conditioner', 'Hair oil', 'Hair masks', 'Hair supplements', 'None'],
+                'question' => 'How would you rate your sleep quality?',
+                'type' => 'single_choice',
+                'options' => ['Good', 'Average', 'Poor'],
                 'order' => 10,
+                'is_required' => true,
+            ],
+            [
+                'question' => 'What is your current stress level?',
+                'type' => 'single_choice',
+                'options' => ['Low', 'Moderate', 'High'],
+                'order' => 11,
+                'is_required' => true,
+            ],
+            [
+                'question' => 'Do you smoke or consume alcohol regularly?',
+                'type' => 'single_choice',
+                'options' => ['Yes', 'No'],
+                'order' => 12,
+                'is_required' => true,
+            ],
+            // Previous Treatments
+            [
+                'question' => 'Have you tried any hair loss treatments before?',
+                'type' => 'multiple_choice',
+                'options' => ['Minoxidil', 'Finasteride / Dutasteride', 'PRP / Hair transplant', 'Natural remedies', 'None'],
+                'order' => 13,
+                'is_required' => true,
+            ],
+            // Goals
+            [
+                'question' => 'What\'s your main goal?',
+                'type' => 'single_choice',
+                'options' => ['Regrow lost hair', 'Slow/stop further hair loss', 'Maintain current hair', 'Explore all options'],
+                'order' => 14,
                 'is_required' => true,
             ],
         ];

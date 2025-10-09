@@ -48,4 +48,8 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
     ],
 
+    'mail' => [
+        'admin_email' => env('MAIL_ADMIN_EMAIL', 'admin@hairskinhealth.com'),
+    ],
+
 ];

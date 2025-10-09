@@ -3,12 +3,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
-use App\Models\Subscription;
+use App\Models\Payment;
 use App\Models\RazorpayLog;
+use App\Models\Subscription;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\PaymentNotificationService;
 
 /**
  * @OA\Tag(
@@ -18,6 +18,9 @@ use App\Models\RazorpayLog;
  */
 class WebhookController extends Controller
 {
+    public function __construct(private PaymentNotificationService $notificationService)
+    {
+    }
     /**
      * Razorpay webhook handler
      *
@@ -67,12 +70,38 @@ class WebhookController extends Controller
         if ($event === 'subscription.charged') {
             $subId = $data['payload']['subscription']['entity']['id'] ?? null;
             $next = $data['payload']['subscription']['entity']['charge_at'] ?? null;
+            $paymentId = $data['payload']['payment']['entity']['id'] ?? null;
+            $amount = $data['payload']['payment']['entity']['amount'] ?? null;
+            
             if ($subId) {
-                Subscription::where('razorpay_subscription_id', $subId)
-                    ->update([
+                $subscription = Subscription::where('razorpay_subscription_id', $subId)->first();
+                
+                if ($subscription) {
+                    $subscription->update([
                         'status' => 'active',
                         'next_payment_date' => $next ? date('Y-m-d H:i:s', $next) : null,
                     ]);
+
+                    // Create payment record for recurring payment
+                    if ($paymentId && $amount) {
+                        $payment = Payment::create([
+                            'user_id' => $subscription->user_id,
+                            'payable_type' => Subscription::class,
+                            'payable_id' => $subscription->id,
+                            'type' => 'subscription',
+                            'amount' => $amount / 100, // Convert from paise
+                            'currency' => 'INR',
+                            'razorpay_payment_id' => $paymentId,
+                            'razorpay_order_id' => null,
+                            'status' => 'completed',
+                            'razorpay_response' => $data,
+                            'paid_at' => now(),
+                        ]);
+
+                        // Send payment success notifications
+                        $this->notificationService->sendPaymentSuccessNotifications($payment);
+                    }
+                }
             }
         } elseif ($event === 'payment.failed') {
             $subId = $data['payload']['payment']['entity']['subscription_id'] ?? null;

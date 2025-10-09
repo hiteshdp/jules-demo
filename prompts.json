@@ -1374,6 +1374,36 @@
       "date": "2025-01-27T23:15:00Z",
       "user_prompt": "now this add same error boundary in admin and demostartor setup too",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "quiz_questionnaire_update_v1",
+      "path": "prompts/quiz_questionnaire_update_v1.md",
+      "used_in": [
+        "database/seeders/HairLossQuizQuestionSeeder.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2024-12-19T12:00:00Z",
+      "user_prompt": "Replace the current HairLossQuizQuestionSeeder with a new questionnaire structure that includes: 1. Basic Info (Age, Gender) 2. Hair Loss History (When noticed, Where, How fast, Family history) 3. Health & Lifestyle (Medical conditions, Medications, Diet, Sleep, Stress, Smoking/Alcohol) 4. Previous Treatments (What treatments tried) 5. Goals (Main objective)",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "payment_email_notifications_v1",
+      "path": "prompts/payment_email_notifications_v1.md",
+      "used_in": [
+        "app/Mail/PaymentSuccessMail.php",
+        "app/Mail/AdminPaymentNotificationMail.php",
+        "app/Services/PaymentNotificationService.php",
+        "app/Http/Controllers/Api/PaymentController.php",
+        "app/Http/Controllers/Api/SubscriptionController.php",
+        "app/Http/Controllers/Api/WebhookController.php",
+        "resources/views/emails/payment-success.blade.php",
+        "resources/views/emails/admin-payment-notification.blade.php",
+        "config/services.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-07T00:00:00Z",
+      "user_prompt": "Implement Email Notification on Payment Success (Laravel + React) & Review Payment Flow",
+      "prompt_type": "user_request"
     }
   ]
 }

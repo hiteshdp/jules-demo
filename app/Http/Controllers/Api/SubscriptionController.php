@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\RazorpayService;
+use App\Services\PaymentNotificationService;
 use App\Models\Subscription;
+use App\Models\Payment;
 
 /**
  * @OA\Tag(
@@ -17,8 +19,10 @@ use App\Models\Subscription;
  */
 class SubscriptionController extends Controller
 {
-    public function __construct(private RazorpayService $razorpay)
-    {
+    public function __construct(
+        private RazorpayService $razorpay,
+        private PaymentNotificationService $notificationService
+    ) {
     }
 
     /**
@@ -134,8 +138,29 @@ class SubscriptionController extends Controller
             ], 422);
         }
 
-        Subscription::where('razorpay_subscription_id', $attributes['razorpay_subscription_id'])
-            ->update(['status' => 'active']);
+        $subscription = Subscription::where('razorpay_subscription_id', $attributes['razorpay_subscription_id'])->first();
+        
+        if ($subscription) {
+            $subscription->update(['status' => 'active']);
+            
+            // Create a payment record for the subscription
+            $payment = Payment::create([
+                'user_id' => Auth::id(),
+                'payable_type' => Subscription::class,
+                'payable_id' => $subscription->id,
+                'type' => 'subscription',
+                'amount' => $subscription->price,
+                'currency' => 'INR',
+                'razorpay_payment_id' => $attributes['razorpay_payment_id'],
+                'razorpay_order_id' => null, // Subscription payments don't have order IDs
+                'status' => 'completed',
+                'razorpay_response' => $attributes,
+                'paid_at' => now(),
+            ]);
+
+            // Send payment success notifications
+            $this->notificationService->sendPaymentSuccessNotifications($payment);
+        }
 
         return response()->json([
             'success' => true,
