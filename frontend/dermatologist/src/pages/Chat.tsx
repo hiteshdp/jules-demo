@@ -126,8 +126,8 @@ const Chat: React.FC = () => {
       {/* Zoom Meeting Button - Always visible at top */}
       <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-4">
         <ZoomMeetingButton 
-          appointmentId={selectedAppointmentId}
-          patientName={selectedAppointmentId ? appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.user?.name : 'Patient'}
+          appointmentId={selectedAppointmentId || undefined}
+          patientName={selectedAppointmentId ? appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.name || 'Patient' : 'Patient'}
           isPatient={false}
         />
       </div>
@@ -153,7 +153,7 @@ const Chat: React.FC = () => {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-gray-900">
-                          {appointment.patient?.user?.name || 'Unknown Patient'}
+                          {appointment.patient?.name || 'Unknown Patient'}
                         </p>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
                           {appointment.status}
@@ -192,7 +192,7 @@ const Chat: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-medium text-gray-900">
-                        {appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.user?.name || 'Patient'}
+                        {appointments.find((a: any) => a.id === selectedAppointmentId)?.patient?.name || 'Patient'}
                       </h3>
                       <p className="text-sm text-gray-600">
                         {appointments.find((a: any) => a.id === selectedAppointmentId)?.status || 'Appointment'}

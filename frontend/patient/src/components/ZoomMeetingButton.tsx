@@ -27,10 +27,9 @@ interface ZoomMeetingButtonProps {
 const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({ 
   appointmentId,
   dermatologistName = 'Dermatologist',
-  isPatient = true 
+//   isPatient = true 
 }) => {
   const [meetingData, setMeetingData] = useState<ZoomMeetingData | null>(null);
-  const [isWaiting, setIsWaiting] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
   const [status, setStatus] = useState<'not_created' | 'created' | 'started' | 'ended'>('not_created');
 
@@ -48,16 +47,12 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
           
           if (data.data.status === 'started' && data.data.meeting) {
             setMeetingData(data.data.meeting);
-            setIsWaiting(false);
           } else if (data.data.status === 'ended') {
             setMeetingData(null);
-            setIsWaiting(true);
             setStatus('not_created');
           } else if (data.data.status === 'created') {
-            setIsWaiting(true);
             setStatus('created');
           } else {
-            setIsWaiting(true);
             setStatus('not_created');
           }
         }
