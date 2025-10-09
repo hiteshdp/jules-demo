@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { dashboardAPI } from '../api/dashboardAPI';
 
 export interface DashboardStats {
@@ -37,7 +37,7 @@ const initialState: DashboardState = {
 // Async thunk for fetching dashboard data
 export const fetchDashboardData = createAsyncThunk(
     'dashboard/fetchData',
-    async (_, { rejectWithValue }: { rejectWithValue: any }) => {
+    async (_: void, { rejectWithValue }: { rejectWithValue: (value: any) => void }) => {
         try {
             const response = await dashboardAPI.getDashboard();
             return response.data.data;
