@@ -1,0 +1,91 @@
+stages:
+  - Stage
+
+build_laravel:
+  stage: Stage
+  tags:
+    - PHP_PROJECTS
+  script:
+    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/
+    - |
+      ssh -o StrictHostKeyChecking=no -p 22 ubuntu@3.109.28.118 << 'EOF'
+        cd /var/www/html/hair-skin-health
+        php artisan down
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan config:cache
+        php artisan migrate --force
+        php artisan l5-swagger:generate
+        php artisan up
+      EOF
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "stage"'
+      changes:
+        - app/**
+        - bootstrap/**
+        - config/**
+        - database/**
+        - public/**
+        - resources/**
+        - routes/**
+        - composer.json
+        - composer.lock
+        - artisan
+  allow_failure: false
+
+build_admin:
+  stage: Stage
+  tags:
+    - REACTJS_RPOJECT
+  before_script:
+    - cd $CI_PROJECT_DIR/frontend/admin
+    - source ~/.bash_profile
+    - nvm use 20.18.1
+  script:
+    - rm -rf build
+    - npm install
+    - npm run build
+    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/admin/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/admin/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "stage"'
+      changes:
+        - frontend/admin/**
+  allow_failure: false
+
+build_dermatologist:
+  stage: Stage
+  tags:
+    - REACTJS_RPOJECT
+  before_script:
+    - cd $CI_PROJECT_DIR/frontend/dermatologist
+    - source ~/.bash_profile
+    - nvm use 20.18.1
+  script:
+    - rm -rf build
+    - npm install
+    - npm run build
+    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/dermatologist/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/dermatologist/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "stage"'
+      changes:
+        - frontend/dermatologist/**
+  allow_failure: false
+
+build_patient:
+  stage: Stage
+  tags:
+    - REACTJS_RPOJECT
+  before_script:
+    - cd $CI_PROJECT_DIR/frontend/patient
+    - source ~/.bash_profile
+    - nvm use 20.18.1
+  script:
+    - rm -rf build
+    - npm install
+    - npm run build
+    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "stage"'
+      changes:
+        - frontend/patient/**
+  allow_failure: false

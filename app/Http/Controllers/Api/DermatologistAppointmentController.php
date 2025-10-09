@@ -13,7 +13,7 @@ use App\Models\User;
  *     schema="AppointmentStatusUpdateRequest",
  *     type="object",
  *     required={"status"},
- *     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="completed"),
+ *     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="completed"),
  *     @OA\Property(property="notes", type="string", example="Consultation completed successfully")
  * )
  * 
@@ -35,7 +35,7 @@ class DermatologistAppointmentController extends Controller
      *         in="query",
      *         description="Filter by appointment status",
      *         required=false,
-     *         @OA\Schema(type="string", enum={"scheduled", "in_progress", "completed", "cancelled"})
+     *         @OA\Schema(type="string", enum={"scheduled", "in_progress", "completed"})
      *     ),
      *     @OA\Parameter(
      *         name="date",
@@ -61,7 +61,7 @@ class DermatologistAppointmentController extends Controller
                          @OA\Property(property="patient_id", type="integer", example=1),
                          @OA\Property(property="dermatologist_id", type="integer", example=2),
                          @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                         @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="scheduled"),
+                         @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
                          @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
                          @OA\Property(property="notes", type="string", example="Follow-up consultation"),
                          @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
@@ -85,15 +85,25 @@ class DermatologistAppointmentController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== 'dermatologist') {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
+        // Check if user is a dermatologist by checking if they have a dermatologist profile
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+        
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Dermatologist profile not found.'
+            ], 403);
+        }
+
         $query = Appointment::with(['patient', 'dermatologist'])
-            ->where('dermatologist_id', $user->id);
+            ->where('dermatologist_id', $dermatologist->id);
 
         // Apply filters
         if ($request->has('patient_name')) {
@@ -163,7 +173,7 @@ class DermatologistAppointmentController extends Controller
                      @OA\Property(property="patient_id", type="integer", example=1),
                      @OA\Property(property="dermatologist_id", type="integer", example=2),
                      @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="scheduled"),
+                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
                      @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
                      @OA\Property(property="notes", type="string", example="Follow-up consultation"),
                      @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
@@ -193,16 +203,25 @@ class DermatologistAppointmentController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== 'dermatologist') {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
-        $appointment = Appointment::with(['patient.user', 'dermatologist.user'])
+        // Check if user is a dermatologist by checking if they have a dermatologist profile
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Dermatologist profile not found.'
+            ], 403);
+        }
+
+        $appointment = Appointment::with(['patient', 'dermatologist.user'])
             ->where('id', $id)
-            ->where('dermatologist_id', $user->id)
+            ->where('dermatologist_id', $dermatologist->id)
             ->first();
 
         if (!$appointment) {
@@ -237,7 +256,7 @@ class DermatologistAppointmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", enum={"scheduled", "in_progress", "completed", "cancelled"}),
+     *             @OA\Property(property="status", type="string", enum={"scheduled", "in_progress", "completed"}),
      *             @OA\Property(property="notes", type="string", description="Optional consultation notes")
      *         )
      *     ),
@@ -255,7 +274,7 @@ class DermatologistAppointmentController extends Controller
                      @OA\Property(property="patient_id", type="integer", example=1),
                      @OA\Property(property="dermatologist_id", type="integer", example=2),
                      @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="scheduled"),
+                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
                      @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
                      @OA\Property(property="notes", type="string", example="Follow-up consultation"),
                      @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
@@ -285,20 +304,29 @@ class DermatologistAppointmentController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== 'dermatologist') {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
+        // Check if user is a dermatologist by checking if they have a dermatologist profile
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Dermatologist profile not found.'
+            ], 403);
+        }
+
         $request->validate([
-            'status' => 'required|in:scheduled,in_progress,completed,cancelled',
+            'status' => 'required|in:scheduled,in_progress,completed',
             'notes' => 'nullable|string|max:1000'
         ]);
 
         $appointment = Appointment::where('id', $id)
-            ->where('dermatologist_id', $user->id)
+            ->where('dermatologist_id', $dermatologist->id)
             ->first();
 
         if (!$appointment) {
@@ -313,7 +341,7 @@ class DermatologistAppointmentController extends Controller
             'notes' => $request->notes ?? $appointment->notes
         ]);
 
-        $appointment->load(['patient.user', 'dermatologist.user']);
+        $appointment->load(['patient', 'dermatologist.user']);
 
         return response()->json([
             'success' => true,
@@ -386,14 +414,17 @@ class DermatologistAppointmentController extends Controller
      */
     private function exportToExcel($appointments, $filename)
     {
-        // For Excel export, we'll use a simple CSV with .xlsx extension
-        // In a production environment, you might want to use PhpSpreadsheet
+        // Create a proper Excel-compatible CSV with UTF-8 BOM for Excel compatibility
         $headers = [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Type' => 'application/vnd.ms-excel',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'max-age=0',
         ];
 
         $callback = function() use ($appointments) {
+            // Add UTF-8 BOM for Excel compatibility
+            echo "\xEF\xBB\xBF";
+            
             $file = fopen('php://output', 'w');
             
             // Excel headers

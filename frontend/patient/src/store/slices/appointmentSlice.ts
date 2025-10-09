@@ -111,6 +111,35 @@ export const bookAppointment = createAsyncThunk(
   }
 );
 
+export const createAppointmentPayment = createAsyncThunk(
+  'appointment/createAppointmentPayment',
+  async (appointmentData: { dermatologist_id: number; scheduled_at: string }, { rejectWithValue }) => {
+    try {
+      const response = await appointmentAPI.createAppointmentPayment(appointmentData);
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to create payment order');
+    }
+  }
+);
+
+export const verifyAppointmentPayment = createAsyncThunk(
+  'appointment/verifyAppointmentPayment',
+  async (paymentData: {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+    payment_id: number;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await appointmentAPI.verifyAppointmentPayment(paymentData);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to verify payment');
+    }
+  }
+);
+
 const appointmentSlice = createSlice({
   name: 'appointment',
   initialState,
@@ -161,6 +190,33 @@ const appointmentSlice = createSlice({
         state.appointments.unshift(action.payload);
       })
       .addCase(bookAppointment.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Create Appointment Payment
+      .addCase(createAppointmentPayment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createAppointmentPayment.fulfilled, (state) => {
+        state.loading = false;
+        // Payment order created, no need to update appointments array
+      })
+      .addCase(createAppointmentPayment.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Verify Appointment Payment
+      .addCase(verifyAppointmentPayment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyAppointmentPayment.fulfilled, (state) => {
+        state.loading = false;
+        // Payment verified, refresh appointments
+        state.appointmentsLoaded = false;
+      })
+      .addCase(verifyAppointmentPayment.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });

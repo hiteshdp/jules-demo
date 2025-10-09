@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
 use App\Http\Controllers\ZoomController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\AppointmentPaymentController;
 use App\Http\Controllers\Api\WebhookController;
 // use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\AdminController;
@@ -26,7 +27,7 @@ use App\Http\Controllers\Api\AdminController;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
 |
-*/  
+*/
 
 // Admin routes
 Route::prefix('admin')->group(function () {
@@ -74,6 +75,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/subscription/verify', [SubscriptionController::class, 'verifyPayment']);
         Route::get('/subscription/status', [SubscriptionController::class, 'status']);
         Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel']);
+
+        // Appointment Payments
+        Route::post('/appointment/payment/create', [AppointmentPaymentController::class, 'createPayment']);
+        Route::post('/appointment/payment/verify', [AppointmentPaymentController::class, 'verifyPayment']);
     });
 
     // Dermatologist routes
@@ -97,7 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Zoom video call routes (available to both patients and dermatologists)
     Route::post('/zoom/create-meeting', [ZoomController::class, 'create']);
-    
+
     // New Zoom meeting management routes
     Route::post('/zoom-meetings', [App\Http\Controllers\Api\ZoomMeetingController::class, 'create']);
     Route::post('/zoom-meetings/{id}/start', [App\Http\Controllers\Api\ZoomMeetingController::class, 'start']);
@@ -112,11 +117,41 @@ Route::middleware('auth:sanctum')->group(function () {
         // Dermatologist management CRUD
         Route::apiResource('dermatologists', DermatologistController::class);
 
+        // Product management CRUD
+        Route::get('/products', [AdminController::class, 'getProducts']);
+        Route::post('/products', [AdminController::class, 'createProduct']);
+        Route::get('/products/{id}', [AdminController::class, 'getProduct']);
+        Route::put('/products/{id}', [AdminController::class, 'updateProduct']);
+        Route::delete('/products/{id}', [AdminController::class, 'deleteProduct']);
+
         // Admin settings
         Route::get('/settings', [AdminController::class, 'getSettings']);
         Route::put('/settings', [AdminController::class, 'updateSettings']);
+
+        // Appointments management
+        Route::get('/appointments', [AdminController::class, 'getAppointments']);
+        Route::get('/appointments/{id}', [AdminController::class, 'getAppointmentDetails']);
+        Route::get('/appointments/{id}/chat', [AdminController::class, 'getAppointmentChat']);
+        Route::get('/appointments/filters/dermatologists', [AdminController::class, 'getDermatologistsForFilter']);
+        Route::get('/appointments/filters/patients', [AdminController::class, 'getPatientsForFilter']);
+        Route::put('/appointments/{id}/payment-status', [AdminController::class, 'updateAppointmentPaymentStatus']);
     });
 });
 
 // Razorpay webhook (public)
 Route::post('/razorpay/webhook', [WebhookController::class, 'handle']);
+
+// Test route for appointments (temporary - remove in production)
+Route::get('/test/appointments', function () {
+    $appointments = \App\Models\Appointment::with([
+        'patient',
+        'dermatologist.user',
+        'chatMessages',
+        'payments'
+    ])->orderBy('scheduled_at', 'desc')->paginate(20);
+
+    return response()->json([
+        'success' => true,
+        'data' => $appointments
+    ]);
+});

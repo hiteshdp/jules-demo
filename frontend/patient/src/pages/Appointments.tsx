@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchAppointments, fetchDermatologists, bookAppointment } from '../store/slices/appointmentSlice';
-import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col, Divider } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined } from '@ant-design/icons';
+import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined,FileTextOutlined } from '@ant-design/icons';
+import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col } from 'antd';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -24,6 +24,11 @@ const Appointments: React.FC = () => {
     date_from: null,
     date_to: null,
     status: ''
+  });
+  const [notesModal, setNotesModal] = useState({
+    visible: false,
+    notes: '',
+    appointmentId: null as number | null
   });
 
   useEffect(() => {
@@ -92,7 +97,7 @@ const Appointments: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const queryParams = new URLSearchParams();
-      
+      // Apply current filters to export
       if (filters.dermatologist_name) queryParams.append('dermatologist_name', filters.dermatologist_name);
       if (filters.date_from) queryParams.append('date_from', filters.date_from);
       if (filters.date_to) queryParams.append('date_to', filters.date_to);
@@ -102,7 +107,7 @@ const Appointments: React.FC = () => {
       const response = await fetch(`/api/patient/appointments?${queryParams.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': format === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv'
+          'Accept': format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv'
         }
       });
 
@@ -111,13 +116,15 @@ const Appointments: React.FC = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `appointments_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.${format}`;
+        a.download = `patient_appointments_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.${format === 'excel' ? 'xls' : 'csv'}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
         toast.success(`Appointments exported as ${format.toUpperCase()} successfully!`);
       } else {
+        const errorText = await response.text();
+        console.error('Export failed:', errorText);
         toast.error('Failed to export appointments');
       }
     } catch (error) {
@@ -126,34 +133,107 @@ const Appointments: React.FC = () => {
     }
   };
 
+  const handleShowNotes = (appointment: any) => {
+    setNotesModal({
+      visible: true,
+      notes: appointment.notes || 'No notes available for this appointment.',
+      appointmentId: appointment.id
+    });
+  };
+
   // Debug: Log dermatologists data
   useEffect(() => {
     console.log('Dermatologists data:', dermatologists);
   }, [dermatologists]);
 
   const handleBookingSubmit = (values: any) => {
-    dispatch(bookAppointment({
+    // Create payment order first
+    dispatch(createAppointmentPayment({
       dermatologist_id: parseInt(values.dermatologist_id),
       scheduled_at: values.scheduled_at,
     }))
       .unwrap()
-      .then(() => {
-        setShowBookingForm(false);
-        form.resetFields();
-        toast.success('Appointment booked successfully!');
-        dispatch(fetchAppointments());
+      .then((paymentData) => {
+        console.log('Payment data received:', paymentData);
+        // Initialize Razorpay payment
+        const options = {
+          key: paymentData.key,
+          amount: paymentData.amount,
+          currency: paymentData.currency,
+          name: 'Hair & Skin Health',
+          description: 'Appointment Booking Payment',
+          order_id: paymentData.order_id,
+          handler: async (response: any) => {
+            // Verify payment on backend
+            dispatch(verifyAppointmentPayment({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              payment_id: paymentData.payment_id,
+            }))
+              .unwrap()
+              .then(() => {
+                setShowBookingForm(false);
+                form.resetFields();
+                toast.success('Payment successful! Appointment booked.');
+                dispatch(fetchAppointments());
+              })
+              .catch((error) => {
+                toast.error(error || 'Payment verification failed');
+              });
+          },
+          prefill: {
+            name: 'Patient',
+            email: 'patient@example.com',
+            contact: '9999999999'
+          },
+          notes: {
+            address: 'Hair & Skin Health Platform'
+          },
+          theme: {
+            color: '#3399cc'
+          },
+          // Restrict payment methods to only cards
+          method: {
+            netbanking: false,
+            wallet: false,
+            upi: false,
+            emi: false,
+            paylater: false,
+            card: true
+          },
+          // Additional options to ensure only card payments
+          modal: {
+            ondismiss: function() {
+              console.log('Payment modal dismissed');
+            }
+          }
+        };
+
+        // Check if Razorpay is loaded
+        if (typeof window !== 'undefined' && window.Razorpay) {
+          console.log('Razorpay loaded, opening payment modal...');
+          const razorpay = new window.Razorpay(options);
+          razorpay.on('payment.failed', () => {
+            toast.error('Payment failed. Please try again.');
+          });
+          razorpay.open();
+        } else {
+          console.error('Razorpay not loaded');
+          toast.error('Payment gateway not loaded. Please refresh the page and try again.');
+        }
       })
       .catch((error) => {
-        toast.error(error || 'Failed to book appointment');
+        toast.error(error || 'Failed to create payment order');
       });
   };
 
+
+
   return (
-    <>
     <div className="space-y-6">
       <PageHeader
         title="Appointments"
-        description="Manage your consultations with dermatologists."
         extra={
           <Space>
             <Button
@@ -190,7 +270,7 @@ const Appointments: React.FC = () => {
         open={showBookingForm}
         onCancel={() => setShowBookingForm(false)}
         onOk={() => form.submit()}
-        okText="Book Appointment"
+        okText="Proceed to Payment"
         loading={loading}
         width={600}
       >
@@ -392,7 +472,7 @@ const Appointments: React.FC = () => {
                           <CalendarOutlined className="text-blue-500 text-lg flex-shrink-0" />
                           <div>
                             <Text className="text-sm font-medium text-gray-900">
-                              {appointment.formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
+                              {(appointment as any).formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -400,7 +480,7 @@ const Appointments: React.FC = () => {
                               })}
                             </Text>
                             <Text className="text-sm text-gray-500">
-                              {appointment.formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
+                              {(appointment as any).formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })}
@@ -417,17 +497,16 @@ const Appointments: React.FC = () => {
                             <Text className="text-lg font-bold text-green-600">
                               ₹{appointment.consultation_fee ? Number(appointment.consultation_fee).toFixed(2) : '0.00'}
                             </Text>
+                            {appointment.is_paid && (
+                              <div className="flex items-center space-x-1 mt-1">
+                                <CreditCardOutlined className="text-green-600 text-xs" />
+                                <Text className="text-xs text-green-600 font-medium">Paid</Text>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      {appointment.notes && (
-                        <div className="mt-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-                          <Text className="text-sm text-gray-700">
-                            <strong>Notes:</strong> {appointment.notes}
-                          </Text>
-                        </div>
-                      )}
                     </div>
                   </div>
 
@@ -437,7 +516,7 @@ const Appointments: React.FC = () => {
                     <Button
                       type="primary"
                       icon={<MessageOutlined />}
-                      onClick={() => navigate(`/chat?appointmentId=${appointment.id}`)}
+                      onClick={() => window.location.href = `/chat?appointmentId=${appointment.id}`}
                       className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="middle"
                     >
@@ -448,10 +527,22 @@ const Appointments: React.FC = () => {
                     <Button
                       type="default"
                       icon={<EyeOutlined />}
+                      onClick={() => navigate(`/appointments/${appointment.id}`)}
                       className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 text-gray-700 hover:text-gray-900"
                       size="middle"
                     >
                       <span className="font-medium">View Details</span>
+                    </Button>
+                    
+                    {/* Notes Button */}
+                    <Button
+                      type="default"
+                      icon={<FileTextOutlined />}
+                      onClick={() => handleShowNotes(appointment)}
+                      className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 text-gray-700 hover:text-gray-900"
+                      size="middle"
+                    >
+                      <span className="font-medium">Notes</span>
                     </Button>
                   </div>
                 </div>
@@ -460,9 +551,26 @@ const Appointments: React.FC = () => {
           </div>
         )}
         </div>
+        </div>
+        {/* Notes Modal */}
+      <Modal
+        title="Consultation Notes"
+        open={notesModal.visible}
+        onCancel={() => setNotesModal({ visible: false, notes: '', appointmentId: null })}
+        footer={[
+          <Button key="close" onClick={() => setNotesModal({ visible: false, notes: '', appointmentId: null })}>
+            Close
+          </Button>
+        ]}
+        width={600}
+      >
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <Text className="whitespace-pre-wrap text-gray-700">
+            {notesModal.notes}
+          </Text>
+        </div>
+      </Modal>
       </div>
-    </div>
-    </>
   );
 };
 

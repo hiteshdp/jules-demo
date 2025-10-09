@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppDispatch, RootState } from '../store/store';
+import { updateAppointmentStatus } from '../store/slices/appointmentSlice';
 import { 
   CalendarOutlined, 
   UserOutlined, 
   DollarOutlined, 
   ClockCircleOutlined,
   MessageOutlined,
-  FileTextOutlined,
-  EditOutlined
+  EditOutlined,
+  SaveOutlined
 } from '@ant-design/icons';
-import { Card, Row, Col, Typography, Space, Button, Input, Descriptions } from 'antd';
+import { Card, Row, Col, Typography, Space, Button, Input, Descriptions, message } from 'antd';
 import { PageHeader, StatusTag } from '../components/common';
 
 const { Text } = Typography;
@@ -19,12 +20,20 @@ const { TextArea } = Input;
 
 const AppointmentDetail: React.FC = () => {
   const { id } = useParams();
+  const dispatch = useDispatch<AppDispatch>();
   const { appointments } = useSelector((state: RootState) => state.appointment);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
-  const [notes, setNotes] = useState('Patient shows signs of early pattern hair loss. Recommended minoxidil treatment and follow-up in 3 months.');
+  const [notes, setNotes] = useState('');
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
 
   // Find the appointment by ID
   const appointment = (Array.isArray(appointments) ? appointments : []).find(apt => apt.id === parseInt(id || '0'));
+
+  useEffect(() => {
+    if (appointment) {
+      setNotes(appointment.notes || '');
+    }
+  }, [appointment]);
 
   if (!appointment) {
     return (
@@ -42,6 +51,40 @@ const AppointmentDetail: React.FC = () => {
 
   const formatDateTime = (dateTime: string) => {
     return new Date(dateTime).toLocaleString();
+  };
+
+  const handleSaveNotes = async () => {
+    if (!appointment) return;
+    
+    setIsSavingNotes(true);
+    try {
+      await dispatch(updateAppointmentStatus({
+        appointmentId: appointment.id,
+        status: appointment.status,
+        notes: notes
+      }));
+      setIsEditingNotes(false);
+      message.success('Notes saved successfully');
+    } catch (error) {
+      message.error('Failed to save notes');
+    } finally {
+      setIsSavingNotes(false);
+    }
+  };
+
+  const handleStatusUpdate = async (newStatus: string) => {
+    if (!appointment) return;
+    
+    try {
+      await dispatch(updateAppointmentStatus({
+        appointmentId: appointment.id,
+        status: newStatus,
+        notes: notes
+      }));
+      message.success('Status updated successfully');
+    } catch (error) {
+      message.error('Failed to update status');
+    }
   };
 
   return (
@@ -93,10 +136,12 @@ const AppointmentDetail: React.FC = () => {
             title="Consultation Notes"
             extra={
               <Button
-                icon={<EditOutlined />}
-                onClick={() => setIsEditingNotes(!isEditingNotes)}
+                icon={isEditingNotes ? <SaveOutlined /> : <EditOutlined />}
+                onClick={isEditingNotes ? handleSaveNotes : () => setIsEditingNotes(true)}
+                loading={isSavingNotes}
+                type={isEditingNotes ? 'primary' : 'default'}
               >
-                {isEditingNotes ? 'Cancel' : 'Edit'}
+                {isEditingNotes ? 'Save Notes' : 'Edit Notes'}
               </Button>
             }
           >
@@ -114,16 +159,20 @@ const AppointmentDetail: React.FC = () => {
                   </Button>
                   <Button 
                     type="primary" 
-                    onClick={() => setIsEditingNotes(false)}
+                    onClick={handleSaveNotes}
+                    loading={isSavingNotes}
+                    icon={<SaveOutlined />}
                   >
                     Save Notes
                   </Button>
                 </Space>
               </Space>
             ) : (
-              <Text className="whitespace-pre-wrap">
-                {notes || 'No notes available for this appointment.'}
-              </Text>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <Text className="whitespace-pre-wrap text-gray-700">
+                  {notes || 'No notes available for this appointment. Click "Edit Notes" to add consultation notes.'}
+                </Text>
+              </div>
             )}
           </Card>
         </Col>
@@ -141,36 +190,41 @@ const AppointmentDetail: React.FC = () => {
                 >
                   Start Chat
                 </Button>
-                <Button 
-                  icon={<FileTextOutlined />}
-                  className="w-full"
-                >
-                  View Patient History
-                </Button>
-                <Button 
-                  icon={<CalendarOutlined />}
-                  className="w-full"
-                >
-                  Reschedule
-                </Button>
               </Space>
             </Card>
 
             <Card title="Update Status">
               <Space direction="vertical" className="w-full">
-                {['scheduled', 'in_progress', 'completed', 'cancelled'].map((status) => (
+                {['scheduled', 'in_progress', 'completed'].map((status) => (
                   <Button
                     key={status}
+                    onClick={() => handleStatusUpdate(status)}
                     className={`w-full text-left ${
                       appointment.status === status
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-blue-100 text-blue-800 border-blue-300'
+                        : 'text-gray-700 hover:bg-gray-100 border-gray-300'
                     }`}
+                    type={appointment.status === status ? 'primary' : 'default'}
                   >
                     {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
                   </Button>
                 ))}
               </Space>
+            </Card>
+
+            {/* Patient Information */}
+            <Card title="Patient Details">
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label="Name">
+                  <Text strong>{appointment.patient?.name || 'N/A'}</Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Email">
+                  <Text>{appointment.patient?.email || 'N/A'}</Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Phone">
+                  <Text>{appointment.patient?.phone || 'N/A'}</Text>
+                </Descriptions.Item>
+              </Descriptions>
             </Card>
           </Space>
         </Col>
