@@ -34,10 +34,6 @@ const Appointments: React.FC = () => {
     }
   });
 
-  const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString();
-  };
-
   const handleAppointmentClick = (appointmentId: number) => {
     navigate(`/appointments/${appointmentId}`);
   };

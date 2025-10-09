@@ -27,7 +27,7 @@ interface ZoomMeetingButtonProps {
 const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({ 
   appointmentId,
   patientName = 'Patient',
-  isPatient = false 
+//   isPatient = false 
 }) => {
   const [meetingData, setMeetingData] = useState<ZoomMeetingData | null>(null);
   const [isCreating, setIsCreating] = useState(false);
