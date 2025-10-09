@@ -4,13 +4,13 @@ import {
   HomeIcon,
   CalendarDaysIcon,
   UserIcon,
-  ChatBubbleLeftRightIcon,
+//   ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Appointments', href: '/appointments', icon: CalendarDaysIcon },
-  { name: 'Patient Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
+//   { name: 'Patient Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
   { name: 'Profile', href: '/profile', icon: UserIcon },
 ];
 

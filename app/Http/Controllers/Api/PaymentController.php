@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\Appointment;
+use App\Services\PaymentNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Razorpay\Api\Api;
@@ -15,13 +16,15 @@ use Razorpay\Api\Errors\SignatureVerificationError;
 class PaymentController extends Controller
 {
     private $razorpay;
+    private $notificationService;
 
-    public function __construct()
+    public function __construct(PaymentNotificationService $notificationService)
     {
         $this->razorpay = new Api(
             config('services.razorpay.key_id'),
             config('services.razorpay.key_secret')
         );
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -206,6 +209,9 @@ class PaymentController extends Controller
                     'is_paid' => true,
                 ]);
             }
+
+            // Send payment success notifications
+            $this->notificationService->sendPaymentSuccessNotifications($payment);
 
             return response()->json([
                 'success' => true,

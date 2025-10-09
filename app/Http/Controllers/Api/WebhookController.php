@@ -3,12 +3,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Config;
-use App\Models\Subscription;
+use Carbon\Carbon;
+use App\Models\Payment;
 use App\Models\RazorpayLog;
+use App\Models\Subscription;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\PaymentNotificationService;
 
 /**
  * @OA\Tag(
@@ -18,6 +19,9 @@ use App\Models\RazorpayLog;
  */
 class WebhookController extends Controller
 {
+    public function __construct(private PaymentNotificationService $notificationService)
+    {
+    }
     /**
      * Razorpay webhook handler
      *
@@ -76,8 +80,7 @@ class WebhookController extends Controller
 
                 // Insert new cycle record
                 Subscription::create([
-                   // 'user_id' => $user_id,
-                    'user_id' => 1,
+                    'user_id' => $user_id ?? null,
                     'razorpay_subscription_id' => $subId,
                     'razorpay_payment_id' => $payment['id'] ?? null,
                     'plan_id' => $subscription['plan_id'],
@@ -93,6 +96,9 @@ class WebhookController extends Controller
                     'is_latest' => true,
                     'next_payment_date' => $next ? date('Y-m-d H:i:s', $next) : null,
                 ]);
+
+				// Send payment success notifications
+				$this->notificationService->sendPaymentSuccessNotifications($payment);
             }
         } elseif ($event === 'payment.failed') {
             $payment = $data['payload']['payment']['entity'] ?? null;
@@ -105,8 +111,7 @@ class WebhookController extends Controller
 
                 // Insert new failed record
                 Subscription::create([
-                    //'user_id' => $user_id,
-                    'user_id' => 1,
+                    'user_id' => $user_id ?? null,
                     'razorpay_subscription_id' => $subId,
                     'razorpay_payment_id' => $payment['id'] ?? null,
                     'plan_id' => $payment['plan_id'] ?? null,
@@ -134,8 +139,7 @@ class WebhookController extends Controller
         
                 // Insert cancellation record
                 Subscription::create([
-                    //'user_id' => $user_id,
-                    'user_id' => 1,
+                    'user_id' => $user_id ?? null,
                     'razorpay_subscription_id' => $subId,
                     'razorpay_payment_id' => null,
                     'plan_id' => $subscription['plan_id'] ?? null,
