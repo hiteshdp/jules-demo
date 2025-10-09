@@ -47,6 +47,23 @@ class Appointment extends Model
     }
 
     /**
+     * Normalize Zoom link by ensuring protocol is present when saving.
+     */
+    public function setZoomLinkAttribute($value): void
+    {
+        if (empty($value)) {
+            $this->attributes['zoom_link'] = null;
+            return;
+        }
+
+        $link = trim($value);
+        if (!preg_match('/^https?:\/\//i', $link)) {
+            $link = 'https://' . $link;
+        }
+        $this->attributes['zoom_link'] = $link;
+    }
+
+    /**
      * Get the patient that owns the appointment.
      */
     public function patient()

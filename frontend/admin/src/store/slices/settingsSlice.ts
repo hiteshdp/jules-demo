@@ -54,6 +54,7 @@ const settingsSlice = createSlice({
       })
       .addCase(fetchSettings.fulfilled, (state: any, action: any) => {
         state.loading = false;
+        // Expect flattened primitives from backend
         state.settings = action.payload.data || action.payload;
       })
       .addCase(fetchSettings.rejected, (state: any, action: any) => {
@@ -65,9 +66,8 @@ const settingsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateSettings.fulfilled, (state: any, action: any) => {
+      .addCase(updateSettings.fulfilled, (state: any) => {
         state.loading = false;
-        state.settings = { ...state.settings, ...action.payload };
       })
       .addCase(updateSettings.rejected, (state: any, action: any) => {
         state.loading = false;
