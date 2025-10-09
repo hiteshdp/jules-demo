@@ -104,6 +104,11 @@ class RazorpayService
                 $orderData['notes'] = $options['notes'];
             }
 
+            // Add payment method restriction if specified
+            if (isset($options['method'])) {
+                $orderData['method'] = $options['method'];
+            }
+
             return $this->api->order->create($orderData);
         } catch (\Throwable $e) {
             Log::error('Failed to create Razorpay order', [

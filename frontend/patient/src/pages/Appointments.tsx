@@ -160,7 +160,7 @@ const Appointments: React.FC = () => {
               .then(() => {
                 setShowBookingForm(false);
                 form.resetFields();
-                toast.success('Payment successful! Appointmachhaent booked.');
+                toast.success('Payment successful! Appointment booked.');
                 dispatch(fetchAppointments());
               })
               .catch((error) => {
@@ -177,6 +177,21 @@ const Appointments: React.FC = () => {
           },
           theme: {
             color: '#3399cc'
+          },
+          // Restrict payment methods to only cards
+          method: {
+            netbanking: false,
+            wallet: false,
+            upi: false,
+            emi: false,
+            paylater: false,
+            card: true
+          },
+          // Additional options to ensure only card payments
+          modal: {
+            ondismiss: function() {
+              console.log('Payment modal dismissed');
+            }
           }
         };
 

@@ -87,7 +87,9 @@ class AppointmentPaymentController extends Controller
                     'dermatologist_id' => $request->dermatologist_id,
                     'scheduled_at' => $request->scheduled_at,
                     'consultation_fee' => $dermatologist->consultation_fee,
-                ]
+                ],
+                // Restrict payment methods to only cards
+                'method' => 'card'
             ]);
 
             // Create payment record (without appointment_id)
