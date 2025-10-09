@@ -198,7 +198,7 @@ const appointmentSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createAppointmentPayment.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(createAppointmentPayment.fulfilled, (state) => {
         state.loading = false;
         // Payment order created, no need to update appointments array
       })
@@ -211,7 +211,7 @@ const appointmentSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyAppointmentPayment.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(verifyAppointmentPayment.fulfilled, (state) => {
         state.loading = false;
         // Payment verified, refresh appointments
         state.appointmentsLoaded = false;
