@@ -13,7 +13,7 @@ use App\Models\User;
  *     schema="AppointmentStatusUpdateRequest",
  *     type="object",
  *     required={"status"},
- *     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="completed"),
+ *     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="completed"),
  *     @OA\Property(property="notes", type="string", example="Consultation completed successfully")
  * )
  * 
@@ -35,7 +35,7 @@ class DermatologistAppointmentController extends Controller
      *         in="query",
      *         description="Filter by appointment status",
      *         required=false,
-     *         @OA\Schema(type="string", enum={"scheduled", "in_progress", "completed", "cancelled"})
+     *         @OA\Schema(type="string", enum={"scheduled", "in_progress", "completed"})
      *     ),
      *     @OA\Parameter(
      *         name="date",
@@ -61,7 +61,7 @@ class DermatologistAppointmentController extends Controller
                          @OA\Property(property="patient_id", type="integer", example=1),
                          @OA\Property(property="dermatologist_id", type="integer", example=2),
                          @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                         @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="scheduled"),
+                         @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
                          @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
                          @OA\Property(property="notes", type="string", example="Follow-up consultation"),
                          @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
@@ -173,7 +173,7 @@ class DermatologistAppointmentController extends Controller
                      @OA\Property(property="patient_id", type="integer", example=1),
                      @OA\Property(property="dermatologist_id", type="integer", example=2),
                      @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="scheduled"),
+                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
                      @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
                      @OA\Property(property="notes", type="string", example="Follow-up consultation"),
                      @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
@@ -219,7 +219,7 @@ class DermatologistAppointmentController extends Controller
             ], 403);
         }
 
-        $appointment = Appointment::with(['patient.user', 'dermatologist.user'])
+        $appointment = Appointment::with(['patient', 'dermatologist.user'])
             ->where('id', $id)
             ->where('dermatologist_id', $dermatologist->id)
             ->first();
@@ -256,7 +256,7 @@ class DermatologistAppointmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", enum={"scheduled", "in_progress", "completed", "cancelled"}),
+     *             @OA\Property(property="status", type="string", enum={"scheduled", "in_progress", "completed"}),
      *             @OA\Property(property="notes", type="string", description="Optional consultation notes")
      *         )
      *     ),
@@ -274,7 +274,7 @@ class DermatologistAppointmentController extends Controller
                      @OA\Property(property="patient_id", type="integer", example=1),
                      @OA\Property(property="dermatologist_id", type="integer", example=2),
                      @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed","cancelled"}, example="scheduled"),
+                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
                      @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
                      @OA\Property(property="notes", type="string", example="Follow-up consultation"),
                      @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
@@ -321,7 +321,7 @@ class DermatologistAppointmentController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:scheduled,in_progress,completed,cancelled',
+            'status' => 'required|in:scheduled,in_progress,completed',
             'notes' => 'nullable|string|max:1000'
         ]);
 
@@ -341,7 +341,7 @@ class DermatologistAppointmentController extends Controller
             'notes' => $request->notes ?? $appointment->notes
         ]);
 
-        $appointment->load(['patient.user', 'dermatologist.user']);
+        $appointment->load(['patient', 'dermatologist.user']);
 
         return response()->json([
             'success' => true,
