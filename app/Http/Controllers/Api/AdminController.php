@@ -317,6 +317,11 @@ class AdminController extends Controller
             'payments'
         ])->findOrFail($id);
 
+        // Ensure zoom_link is absolute for frontend safety
+        if (!empty($appointment->zoom_link) && !preg_match('/^https?:\/\//i', $appointment->zoom_link)) {
+            $appointment->zoom_link = 'https://' . $appointment->zoom_link;
+        }
+
         return response()->json([
             'success' => true,
             'data' => $appointment
@@ -611,9 +616,22 @@ class AdminController extends Controller
     {
         $settings = AdminSetting::all()->keyBy('key');
 
+        // Flatten for frontend convenience: { key: value }
+        $flat = [];
+        foreach ($settings as $key => $setting) {
+            $val = $setting->value;
+            // Cast booleans and numbers where applicable
+            if ($setting->type === 'number') {
+                $val = is_numeric($val) ? (0 + $val) : $val;
+            } elseif ($setting->type === 'boolean') {
+                $val = $val === 'true' || $val === true ? true : false;
+            }
+            $flat[$key] = $val;
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $settings
+            'data' => $flat
         ]);
     }
 
