@@ -109,9 +109,10 @@ const Appointments: React.FC = () => {
 
   const handleExport = async (format: 'excel' | 'csv') => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('dermatologist_token') || localStorage.getItem('token');
       const queryParams = new URLSearchParams();
       
+      // Apply current filters to export
       if (filters.patient_name) queryParams.append('patient_name', filters.patient_name);
       if (filters.date_from) queryParams.append('date_from', filters.date_from);
       if (filters.date_to) queryParams.append('date_to', filters.date_to);
@@ -121,7 +122,7 @@ const Appointments: React.FC = () => {
       const response = await fetch(`/api/dermatologist/appointments?${queryParams.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': format === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv'
+          'Accept': format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv'
         }
       });
 
@@ -130,13 +131,15 @@ const Appointments: React.FC = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `dermatologist_appointments_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.${format}`;
+        a.download = `dermatologist_appointments_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.${format === 'excel' ? 'xls' : 'csv'}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
         toast.success(`Appointments exported as ${format.toUpperCase()} successfully!`);
       } else {
+        const errorText = await response.text();
+        console.error('Export failed:', errorText);
         toast.error('Failed to export appointments');
       }
     } catch (error) {
@@ -347,7 +350,7 @@ const Appointments: React.FC = () => {
                             <CalendarOutlined className="text-blue-500 text-lg flex-shrink-0" />
                             <div>
                               <Text className="text-sm font-medium text-gray-900">
-                                {appointment.formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
+                                {(appointment as any).formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
                                   weekday: 'long',
                                   year: 'numeric',
                                   month: 'long',
@@ -355,7 +358,7 @@ const Appointments: React.FC = () => {
                                 })}
                               </Text>
                               <Text className="text-sm text-gray-500">
-                                {appointment.formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
+                                {(appointment as any).formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
                                   hour: '2-digit',
                                   minute: '2-digit'
                                 })}

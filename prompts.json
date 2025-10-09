@@ -1388,6 +1388,28 @@
       "date": "2025-01-28T01:30:00Z",
       "user_prompt": "Display Enhancements: Show the Consultation Fee properly for each appointment in both Patient and Dermatologist lists. Display the Appointment Date and Time clearly in a user-friendly format (e.g., DD MMM YYYY, hh:mm A). Filtering Features: Add all possible filters on the appointment list for both roles: Filter by Patient Name / Dermatologist Name (depending on logged-in role). Filter by Date Range (From–To). Optional: Status filter (e.g., Upcoming, Completed, Cancelled) if available in DB schema. Export Feature: Implement Export to Excel / CSV option for filtered appointment data. Create corresponding API endpoint (Laravel) for export functionality. Integrate this export feature on both Patient and Dermatologist React modules. API Updates: Update existing appointment listing APIs to include consultation_fee, formatted_date_time, and accept filter parameters (name, date_from, date_to, etc.). Create new route and controller method for export API returning downloadable Excel file.",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_export_auth_fix_v1",
+      "path": "prompts/dermatologist_export_auth_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:00:00Z",
+      "user_prompt": "Dermatologist export says Unauthenticated please check and fix it",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_export_token_fix_v1",
+      "path": "prompts/dermatologist_export_token_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:15:00Z",
+      "user_prompt": "Unauthenticated - Still say on dermatologist export excel",
+      "prompt_type": "user_request"
     }
   ]
 }
