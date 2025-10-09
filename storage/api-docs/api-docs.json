@@ -353,8 +353,67 @@
                     "Appointments"
                 ],
                 "summary": "Get patient appointments",
-                "description": "Get all appointments for the authenticated patient",
+                "description": "Get all appointments for the authenticated patient with filtering and export options",
                 "operationId": "2352f7518fca29e35bdbe534bf272f62",
+                "parameters": [
+                    {
+                        "name": "dermatologist_name",
+                        "in": "query",
+                        "description": "Filter by dermatologist name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Filter appointments from date (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Filter appointments to date (YYYY-MM-DD)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by appointment status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "scheduled",
+                                "in_progress",
+                                "completed",
+                                "cancelled"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "export",
+                        "in": "query",
+                        "description": "Export format (excel, csv)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "excel",
+                                "csv"
+                            ]
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Appointments retrieved successfully",
@@ -566,6 +625,193 @@
                 "security": [
                     {
                         "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/patient/appointment/payment/create": {
+            "post": {
+                "tags": [
+                    "Appointment Payment"
+                ],
+                "summary": "Create payment order for appointment",
+                "description": "Create Razorpay order for appointment payment",
+                "operationId": "7c2357e305376bf28c3ec7985d4d007e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "dermatologist_id",
+                                    "scheduled_at"
+                                ],
+                                "properties": {
+                                    "dermatologist_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "scheduled_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-10-15T10:00:00Z"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment order created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment order created"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "key": {
+                                                    "type": "string",
+                                                    "example": "rzp_test_xxxxx"
+                                                },
+                                                "order_id": {
+                                                    "type": "string",
+                                                    "example": "order_123456789"
+                                                },
+                                                "amount": {
+                                                    "type": "integer",
+                                                    "example": 100000
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "INR"
+                                                },
+                                                "appointment_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/patient/appointment/payment/verify": {
+            "post": {
+                "tags": [
+                    "Appointment Payment"
+                ],
+                "summary": "Verify appointment payment",
+                "description": "Verify Razorpay payment for appointment",
+                "operationId": "6846c11818e21cf19790adfff65187a4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "razorpay_payment_id",
+                                    "razorpay_order_id",
+                                    "razorpay_signature",
+                                    "payment_id"
+                                ],
+                                "properties": {
+                                    "razorpay_payment_id": {
+                                        "type": "string",
+                                        "example": "pay_29QQoUBi66xm2f"
+                                    },
+                                    "razorpay_order_id": {
+                                        "type": "string",
+                                        "example": "order_00000000000001"
+                                    },
+                                    "razorpay_signature": {
+                                        "type": "string",
+                                        "example": "generated_signature_here"
+                                    },
+                                    "payment_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment verified and appointment created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment verified and appointment created"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "appointment_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid signature",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid signature"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
                     }
                 ]
             }
@@ -1890,6 +2136,320 @@
                 ]
             }
         },
+        "/dermatologist/profile": {
+            "get": {
+                "tags": [
+                    "Dermatologists"
+                ],
+                "summary": "Get dermatologist profile",
+                "description": "Get current authenticated dermatologist's profile information",
+                "operationId": "9b8fbe857bb8e9a9a12f8037358f1268",
+                "responses": {
+                    "200": {
+                        "description": "Dermatologist profile retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Dr. Jane Smith"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "dermatologist@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+1234567890"
+                                                },
+                                                "date_of_birth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1985-01-01"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "female"
+                                                },
+                                                "dermatologistProfile": {
+                                                    "properties": {
+                                                        "license_number": {
+                                                            "type": "string",
+                                                            "example": "MD123456"
+                                                        },
+                                                        "specialization": {
+                                                            "type": "string",
+                                                            "example": "Hair Loss Treatment"
+                                                        },
+                                                        "years_of_experience": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "qualifications": {
+                                                            "type": "string",
+                                                            "example": "MD, Dermatology"
+                                                        },
+                                                        "consultation_fee": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 100
+                                                        },
+                                                        "bio": {
+                                                            "type": "string",
+                                                            "example": "Experienced dermatologist specializing in hair loss treatment"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Dermatologists"
+                ],
+                "summary": "Update dermatologist profile",
+                "description": "Update current authenticated dermatologist's profile information",
+                "operationId": "dd4a5982a48c8acc07a02a72e5cb4dde",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Dr. Jane Smith"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "dermatologist@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+1234567890"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1985-01-01"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "example": "female"
+                                    },
+                                    "license_number": {
+                                        "type": "string",
+                                        "example": "MD123456"
+                                    },
+                                    "specialization": {
+                                        "type": "string",
+                                        "example": "Hair Loss Treatment"
+                                    },
+                                    "years_of_experience": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "qualifications": {
+                                        "type": "string",
+                                        "example": "MD, Dermatology"
+                                    },
+                                    "consultation_fee": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    },
+                                    "bio": {
+                                        "type": "string",
+                                        "example": "Experienced dermatologist specializing in hair loss treatment"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Dr. Jane Smith"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "dermatologist@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+1234567890"
+                                                },
+                                                "date_of_birth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1985-01-01"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "female"
+                                                },
+                                                "dermatologistProfile": {
+                                                    "properties": {
+                                                        "license_number": {
+                                                            "type": "string",
+                                                            "example": "MD123456"
+                                                        },
+                                                        "specialization": {
+                                                            "type": "string",
+                                                            "example": "Hair Loss Treatment"
+                                                        },
+                                                        "years_of_experience": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "qualifications": {
+                                                            "type": "string",
+                                                            "example": "MD, Dermatology"
+                                                        },
+                                                        "consultation_fee": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 100
+                                                        },
+                                                        "bio": {
+                                                            "type": "string",
+                                                            "example": "Experienced dermatologist specializing in hair loss treatment"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation errors"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "field": "The field is required."
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/admin/patients": {
             "get": {
                 "tags": [
@@ -2330,6 +2890,293 @@
                 ]
             }
         },
+        "/patient/profile": {
+            "get": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Get patient profile",
+                "description": "Get current authenticated patient's profile information",
+                "operationId": "19c2e40942a53f910c74abe21fbe3404",
+                "responses": {
+                    "200": {
+                        "description": "Patient profile retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "patient@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+1234567890"
+                                                },
+                                                "date_of_birth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1990-01-01"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "male"
+                                                },
+                                                "patientProfile": {
+                                                    "properties": {
+                                                        "allergies": {
+                                                            "type": "string",
+                                                            "example": "None known"
+                                                        },
+                                                        "current_medications": {
+                                                            "type": "string",
+                                                            "example": "None"
+                                                        },
+                                                        "smoking": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "alcohol_consumption": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Patients"
+                ],
+                "summary": "Update patient profile",
+                "description": "Update current authenticated patient's profile information",
+                "operationId": "a365b3130806b8e8534fa5ec04141598",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "patient@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+1234567890"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-01-01"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ],
+                                        "example": "male"
+                                    },
+                                    "allergies": {
+                                        "type": "string",
+                                        "example": "None known"
+                                    },
+                                    "current_medications": {
+                                        "type": "string",
+                                        "example": "None"
+                                    },
+                                    "smoking": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "alcohol_consumption": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile updated successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "patient@example.com"
+                                                },
+                                                "phone": {
+                                                    "type": "string",
+                                                    "example": "+1234567890"
+                                                },
+                                                "date_of_birth": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "1990-01-01"
+                                                },
+                                                "gender": {
+                                                    "type": "string",
+                                                    "example": "male"
+                                                },
+                                                "patientProfile": {
+                                                    "properties": {
+                                                        "allergies": {
+                                                            "type": "string",
+                                                            "example": "None known"
+                                                        },
+                                                        "current_medications": {
+                                                            "type": "string",
+                                                            "example": "None"
+                                                        },
+                                                        "smoking": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "alcohol_consumption": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation errors"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "field": "The field is required."
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/patient/quiz/questions": {
             "get": {
                 "tags": [
@@ -2701,10 +3548,29 @@
                                                     "type": "string",
                                                     "example": "sub_123"
                                                 },
+                                                "payment_id": {
+                                                    "type": "string",
+                                                    "example": "pay_29QQoUBi66xm2f"
+                                                },
                                                 "next_payment_date": {
                                                     "type": "string",
                                                     "format": "date-time",
                                                     "example": "2025-10-31T10:00:00Z"
+                                                },
+                                                "next_billing_date": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-11-08T10:00:00Z"
+                                                },
+                                                "starts_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-10-08T10:00:00Z"
+                                                },
+                                                "ends_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-11-08T10:00:00Z"
                                                 }
                                             },
                                             "type": "object",
@@ -2730,7 +3596,7 @@
                     "Subscription"
                 ],
                 "summary": "Cancel subscription",
-                "description": "Cancel current user's subscription (local state)",
+                "description": "Cancel current user's subscription (both local and Razorpay)",
                 "operationId": "5b5bb2cdb6b63fb27bd807303b8c289f",
                 "responses": {
                     "200": {
@@ -2745,7 +3611,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Subscription cancelled"
+                                            "example": "Subscription cancelled successfully"
                                         }
                                     },
                                     "type": "object"
@@ -2755,6 +3621,9 @@
                     },
                     "404": {
                         "description": "No subscription found"
+                    },
+                    "400": {
+                        "description": "Failed to cancel subscription"
                     }
                 },
                 "security": [
@@ -2764,14 +3633,14 @@
                 ]
             }
         },
-        "/api/razorpay/webhook": {
+        "/razorpay/webhook": {
             "post": {
                 "tags": [
                     "Razorpay Webhook"
                 ],
                 "summary": "Handle Razorpay webhook events",
                 "description": "Verifies X-Razorpay-Signature and processes events like subscription.charged, payment.failed, subscription.cancelled",
-                "operationId": "fa6a65a32cc5e71da64742b2923e8926",
+                "operationId": "203e9d6063352d111115caa1a6765160",
                 "requestBody": {
                     "description": "Razorpay event payload",
                     "required": true,
@@ -3692,6 +4561,10 @@
             "description": "Appointment management endpoints"
         },
         {
+            "name": "Appointment Payment",
+            "description": "Razorpay payment APIs for appointment booking"
+        },
+        {
             "name": "Authentication",
             "description": "User authentication endpoints"
         },
@@ -3716,16 +4589,16 @@
             "description": "Hair loss quiz endpoints"
         },
         {
-            "name": "Admin Settings",
-            "description": "Admin Settings"
-        },
-        {
             "name": "Subscription",
             "description": "Razorpay subscription APIs for patients"
         },
         {
             "name": "Razorpay Webhook",
             "description": "Webhook endpoint for Razorpay events"
+        },
+        {
+            "name": "Admin Settings",
+            "description": "Admin Settings"
         }
     ],
     "security": [
