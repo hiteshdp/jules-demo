@@ -22,7 +22,7 @@ class WebhookController extends Controller
      * Razorpay webhook handler
      *
      * @OA\Post(
-     *   path="/api/razorpay/webhook",
+     *   path="/razorpay/webhook",
      *   tags={"Razorpay Webhook"},
      *   summary="Handle Razorpay webhook events",
      *   description="Verifies X-Razorpay-Signature and processes events like subscription.charged, payment.failed, subscription.cancelled",
@@ -65,27 +65,94 @@ class WebhookController extends Controller
         $event = $data['event'] ?? '';
 
         if ($event === 'subscription.charged') {
-            $subId = $data['payload']['subscription']['entity']['id'] ?? null;
+            $subscription = $data['payload']['subscription']['entity'];
+            $subId = $subscription['id'];
             $next = $data['payload']['subscription']['entity']['charge_at'] ?? null;
+            $payment = $data['payload']['payment']['entity'] ?? null;
             if ($subId) {
+                // Mark previous as old
                 Subscription::where('razorpay_subscription_id', $subId)
-                    ->update([
-                        'status' => 'active',
-                        'next_payment_date' => $next ? date('Y-m-d H:i:s', $next) : null,
-                    ]);
+                    ->update(['is_latest' => false]);
+
+                // Insert new cycle record
+                Subscription::create([
+                   // 'user_id' => $user_id,
+                    'user_id' => 1,
+                    'razorpay_subscription_id' => $subId,
+                    'razorpay_payment_id' => $payment['id'] ?? null,
+                    'plan_id' => $subscription['plan_id'],
+                    'plan_name' => $subscription['plan_name'],
+                    'description' => $subscription['description'],
+                    'price' => ($payment['amount'] ?? 0) / 100,
+                    'billing_cycle' => $subscription['billing_cycle'],
+                    'status' => $payment['status'] ?? 'active',
+                    'failure_reason' => $payment['error_description'] ?? null,
+                    'payment_response' => $data['payload'],
+                    'starts_at' => Carbon::parse($subscription['current_start']),
+                    'ends_at' => Carbon::parse($subscription['current_end']),
+                    'is_latest' => true,
+                    'next_payment_date' => $next ? date('Y-m-d H:i:s', $next) : null,
+                ]);
             }
         } elseif ($event === 'payment.failed') {
-            $subId = $data['payload']['payment']['entity']['subscription_id'] ?? null;
+            $payment = $data['payload']['payment']['entity'] ?? null;
+            $subId = $payment['subscription_id'] ?? null;
+
             if ($subId) {
+                // Mark previous as old
                 Subscription::where('razorpay_subscription_id', $subId)
-                    ->update(['status' => 'failed']);
+                    ->update(['is_latest' => false]);
+
+                // Insert new failed record
+                Subscription::create([
+                    //'user_id' => $user_id,
+                    'user_id' => 1,
+                    'razorpay_subscription_id' => $subId,
+                    'razorpay_payment_id' => $payment['id'] ?? null,
+                    'plan_id' => $payment['plan_id'] ?? null,
+                    'plan_name' => $payment['notes']['plan_name'] ?? null,
+                    'description' => $payment['notes']['description'] ?? null,
+                    'price' => ($payment['amount'] ?? 0) / 100,
+                    'billing_cycle' => null,
+                    'status' => 'failed',
+                    'failure_reason' => $payment['error_description'] ?? 'Payment failed',
+                    'payment_response' => $data['payload'],
+                    'starts_at' => now(),
+                    'ends_at' => null,
+                    'is_latest' => true,
+                    'next_payment_date' => null,
+                ]);
             }
         } elseif ($event === 'subscription.cancelled') {
-            $subId = $data['payload']['subscription']['entity']['id'] ?? null;
+            $subscription = $data['payload']['subscription']['entity'] ?? null;
+            $subId = $subscription['id'] ?? null;
+        
             if ($subId) {
+                // Mark previous as old
                 Subscription::where('razorpay_subscription_id', $subId)
-                    ->update(['status' => 'cancelled']);
+                    ->update(['is_latest' => false]);
+        
+                // Insert cancellation record
+                Subscription::create([
+                    //'user_id' => $user_id,
+                    'user_id' => 1,
+                    'razorpay_subscription_id' => $subId,
+                    'razorpay_payment_id' => null,
+                    'plan_id' => $subscription['plan_id'] ?? null,
+                    'plan_name' => $subscription['plan_name'] ?? null,
+                    'description' => $subscription['description'] ?? null,
+                    'price' => 0,
+                    'billing_cycle' => $subscription['billing_cycle'] ?? null,
+                    'status' => 'cancelled',
+                    'failure_reason' => null,
+                    'payment_response' => $data['payload'],
+                    'starts_at' => Carbon::parse($subscription['current_start']),
+                    'ends_at' => Carbon::parse($subscription['current_end']),
+                    'is_latest' => true,
+                    'next_payment_date' => null,
+                ]);
             }
+        
         }
 
         return response()->json(['success' => true]);
