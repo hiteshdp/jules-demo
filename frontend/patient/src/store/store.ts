@@ -4,6 +4,7 @@ import quizReducer from './slices/quizSlice';
 import appointmentReducer from './slices/appointmentSlice';
 import dermatologistReducer from './slices/dermatologistSlice';
 import chatReducer from './slices/chatSlice';
+import subscriptionReducer from './slices/subscriptionSlice';
 import profileReducer from './slices/profileSlice';
 
 export const store = configureStore({
@@ -13,6 +14,7 @@ export const store = configureStore({
     appointment: appointmentReducer,
     dermatologist: dermatologistReducer,
     chat: chatReducer,
+    subscription: subscriptionReducer,
     profile: profileReducer,
   },
 });

@@ -14,6 +14,8 @@ import Chat from './pages/Chat';
 import Profile from './pages/Profile';
 import Products from './pages/Products';
 import Subscription from './pages/Subscription';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentFailed from './pages/PaymentFailed';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -41,6 +43,8 @@ function App() {
             <Route path="products" element={<Products />} />
             <Route path="profile" element={<Profile />} />
             <Route path="subscription" element={<Subscription />} />
+            <Route path="payment-success" element={<PaymentSuccess />} />
+            <Route path="payment-failed" element={<PaymentFailed />} />
           </Route>
         </Routes>
       </div>

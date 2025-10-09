@@ -16,9 +16,9 @@ class Subscription extends Model
         // Legacy columns
         'plan_name', 'description', 'price', 'billing_cycle', 'auto_renew', 'starts_at', 'ends_at', 'cancelled_at',
         // Current implementation columns
-        'amount', 'status', 'next_payment_date',
+        'amount', 'status', 'next_payment_date', 'next_billing_date',
         // Common
-        'razorpay_subscription_id', 'razorpay_plan_id',
+        'razorpay_subscription_id', 'razorpay_plan_id', 'payment_id',
     ];
 
     /**
@@ -35,6 +35,7 @@ class Subscription extends Model
             'ends_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'next_payment_date' => 'datetime',
+            'next_billing_date' => 'datetime',
         ];
     }
 

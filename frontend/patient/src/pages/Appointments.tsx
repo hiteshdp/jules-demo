@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchAppointments, fetchDermatologists, bookAppointment } from '../store/slices/appointmentSlice';
+import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined } from '@ant-design/icons';
 import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined, FileTextOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -13,7 +13,6 @@ const { Text } = Typography;
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const { appointments, dermatologists, loading, error } = useSelector((state: RootState) => state.appointment);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [form] = Form.useForm();
@@ -97,7 +96,6 @@ const Appointments: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       const queryParams = new URLSearchParams();
-      
       // Apply current filters to export
       if (filters.dermatologist_name) queryParams.append('dermatologist_name', filters.dermatologist_name);
       if (filters.date_from) queryParams.append('date_from', filters.date_from);
@@ -148,28 +146,93 @@ const Appointments: React.FC = () => {
   }, [dermatologists]);
 
   const handleBookingSubmit = (values: any) => {
-    dispatch(bookAppointment({
+    // Create payment order first
+    dispatch(createAppointmentPayment({
       dermatologist_id: parseInt(values.dermatologist_id),
       scheduled_at: values.scheduled_at,
     }))
       .unwrap()
-      .then(() => {
-        setShowBookingForm(false);
-        form.resetFields();
-        toast.success('Appointment booked successfully!');
-        dispatch(fetchAppointments());
+      .then((paymentData) => {
+        console.log('Payment data received:', paymentData);
+        // Initialize Razorpay payment
+        const options = {
+          key: paymentData.key,
+          amount: paymentData.amount,
+          currency: paymentData.currency,
+          name: 'Hair & Skin Health',
+          description: 'Appointment Booking Payment',
+          order_id: paymentData.order_id,
+          handler: async (response: any) => {
+            // Verify payment on backend
+            dispatch(verifyAppointmentPayment({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              payment_id: paymentData.payment_id,
+            }))
+              .unwrap()
+              .then(() => {
+                setShowBookingForm(false);
+                form.resetFields();
+                toast.success('Payment successful! Appointment booked.');
+                dispatch(fetchAppointments());
+              })
+              .catch((error) => {
+                toast.error(error || 'Payment verification failed');
+              });
+          },
+          prefill: {
+            name: 'Patient',
+            email: 'patient@example.com',
+            contact: '9999999999'
+          },
+          notes: {
+            address: 'Hair & Skin Health Platform'
+          },
+          theme: {
+            color: '#3399cc'
+          },
+          // Restrict payment methods to only cards
+          method: {
+            netbanking: false,
+            wallet: false,
+            upi: false,
+            emi: false,
+            paylater: false,
+            card: true
+          },
+          // Additional options to ensure only card payments
+          modal: {
+            ondismiss: function() {
+              console.log('Payment modal dismissed');
+            }
+          }
+        };
+
+        // Check if Razorpay is loaded
+        if (typeof window !== 'undefined' && window.Razorpay) {
+          console.log('Razorpay loaded, opening payment modal...');
+          const razorpay = new window.Razorpay(options);
+          razorpay.on('payment.failed', () => {
+            toast.error('Payment failed. Please try again.');
+          });
+          razorpay.open();
+        } else {
+          console.error('Razorpay not loaded');
+          toast.error('Payment gateway not loaded. Please refresh the page and try again.');
+        }
       })
       .catch((error) => {
-        toast.error(error || 'Failed to book appointment');
+        toast.error(error || 'Failed to create payment order');
       });
   };
 
+
+
   return (
-    <>
     <div className="space-y-6">
       <PageHeader
         title="Appointments"
-        description="Manage your consultations with dermatologists."
         extra={
           <Space>
             <Button
@@ -206,7 +269,7 @@ const Appointments: React.FC = () => {
         open={showBookingForm}
         onCancel={() => setShowBookingForm(false)}
         onOk={() => form.submit()}
-        okText="Book Appointment"
+        okText="Proceed to Payment"
         loading={loading}
         width={600}
       >
@@ -433,6 +496,12 @@ const Appointments: React.FC = () => {
                             <Text className="text-lg font-bold text-green-600">
                               ₹{appointment.consultation_fee ? Number(appointment.consultation_fee).toFixed(2) : '0.00'}
                             </Text>
+                            {appointment.is_paid && (
+                              <div className="flex items-center space-x-1 mt-1">
+                                <CreditCardOutlined className="text-green-600 text-xs" />
+                                <Text className="text-xs text-green-600 font-medium">Paid</Text>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -446,7 +515,7 @@ const Appointments: React.FC = () => {
                     <Button
                       type="primary"
                       icon={<MessageOutlined />}
-                      onClick={() => navigate(`/chat?appointmentId=${appointment.id}`)}
+                      onClick={() => window.location.href = `/chat?appointmentId=${appointment.id}`}
                       className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="middle"
                     >
@@ -503,6 +572,7 @@ const Appointments: React.FC = () => {
         </div>
       </Modal>
     </>
+    </div>
   );
 };
 
