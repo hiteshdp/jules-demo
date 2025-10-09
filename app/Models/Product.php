@@ -19,16 +19,9 @@ class Product extends Model
         'name',
         'description',
         'category',
-        'brand',
-        'ingredients',
-        'usage_instructions',
-        'dosage',
-        'restrictions',
         'price',
         'image',
-        'requires_prescription',
         'is_active',
-        'stock_quantity',
     ];
 
     /**
@@ -40,7 +33,6 @@ class Product extends Model
     {
         return [
             'price' => 'decimal:2',
-            'requires_prescription' => 'boolean',
             'is_active' => 'boolean',
         ];
     }

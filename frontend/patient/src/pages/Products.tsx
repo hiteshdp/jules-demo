@@ -8,10 +8,9 @@ interface Product {
   name: string;
   description: string;
   category: string;
-  brand: string;
   price: number;
   image?: string;
-  requires_prescription: boolean;
+  is_active: boolean;
 }
 
 const { Title, Text } = Typography;
@@ -32,45 +31,40 @@ const Products: React.FC = () => {
             name: 'Gentle Hair Loss Shampoo',
             description: 'A gentle, sulfate-free shampoo specifically formulated for hair loss prevention and scalp health.',
             category: 'shampoo',
-            brand: 'HairCare Pro',
             price: 1299.00,
-            requires_prescription: false,
+            is_active: true,
           },
           {
             id: 2,
             name: 'Hair Growth Serum',
             description: 'Concentrated serum with minoxidil and natural extracts to promote hair growth.',
             category: 'treatment',
-            brand: 'HairCare Pro',
             price: 2499.00,
-            requires_prescription: true,
+            is_active: true,
           },
           {
             id: 3,
             name: 'Biotin Hair Supplements',
             description: 'High-potency biotin supplements to support healthy hair growth from within.',
             category: 'supplement',
-            brand: 'HairCare Pro',
             price: 899.00,
-            requires_prescription: false,
+            is_active: true,
           },
           {
             id: 4,
             name: 'Scalp Massage Oil',
             description: 'Nourishing oil blend for scalp massage to improve circulation and hair health.',
             category: 'oil',
-            brand: 'HairCare Pro',
             price: 699.00,
-            requires_prescription: false,
+            is_active: true,
           },
           {
             id: 5,
             name: 'Hair Loss Conditioner',
             description: 'Moisturizing conditioner with keratin and amino acids to strengthen hair.',
             category: 'conditioner',
-            brand: 'HairCare Pro',
             price: 1099.00,
-            requires_prescription: false,
+            is_active: true,
           },
         ];
         
@@ -158,9 +152,6 @@ const Products: React.FC = () => {
                 <Tag color={getCategoryColor(product.category)}>
                   {product.category}
                 </Tag>
-                {product.requires_prescription && (
-                  <Tag color="red">Prescription Required</Tag>
-                )}
               </div>
               
               <Title level={4} className="!mb-2">
@@ -180,9 +171,6 @@ const Products: React.FC = () => {
                 </div>
               </div>
               
-              <Text type="secondary" className="text-xs">
-                Brand: {product.brand}
-              </Text>
             </Card>
           </Col>
         ))}

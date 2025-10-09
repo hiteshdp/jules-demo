@@ -6,11 +6,9 @@ interface Product {
   name: string;
   description: string;
   category: string;
-  brand: string;
   price: number;
-  stock_quantity: number;
+  image?: string;
   is_active: boolean;
-  requires_prescription: boolean;
 }
 
 interface ProductState {
@@ -61,6 +59,18 @@ export const updateProduct = createAsyncThunk(
   }
 );
 
+export const deleteProduct = createAsyncThunk(
+  'product/deleteProduct',
+  async (id: number, { rejectWithValue }: { rejectWithValue: (value: any) => any }) => {
+    try {
+      await productAPI.deleteProduct(id);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete product');
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: 'product',
   initialState,
@@ -78,7 +88,9 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state: any, action: any) => {
         state.loading = false;
-        state.products = action.payload.data;
+        // Handle both paginated and non-paginated responses
+        const responseData = action.payload?.data || action.payload;
+        state.products = Array.isArray(responseData) ? responseData : (responseData?.data || []);
       })
       .addCase(fetchProducts.rejected, (state: any, action: any) => {
         state.loading = false;
@@ -110,6 +122,19 @@ const productSlice = createSlice({
         }
       })
       .addCase(updateProduct.rejected, (state: any, action: any) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Delete Product
+      .addCase(deleteProduct.pending, (state: any) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state: any, action: any) => {
+        state.loading = false;
+        state.products = state.products.filter((product: any) => product.id !== action.payload);
+      })
+      .addCase(deleteProduct.rejected, (state: any, action: any) => {
         state.loading = false;
         state.error = action.payload;
       });
