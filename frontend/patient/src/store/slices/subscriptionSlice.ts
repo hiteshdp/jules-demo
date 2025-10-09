@@ -109,7 +109,7 @@ const subscriptionSlice = createSlice({
         state.paymentLoading = true;
         state.paymentError = null;
       })
-      .addCase(createSubscription.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(createSubscription.fulfilled, (state) => {
         state.paymentLoading = false;
         // Don't update subscription here, wait for verification
       })

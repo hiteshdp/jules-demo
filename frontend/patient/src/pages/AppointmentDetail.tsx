@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
@@ -8,8 +8,7 @@ import {
   UserOutlined, 
   DollarOutlined, 
   ClockCircleOutlined,
-  MessageOutlined,
-  FileTextOutlined
+  MessageOutlined
 } from '@ant-design/icons';
 import { Card, Row, Col, Typography, Space, Button, Descriptions } from 'antd';
 import { PageHeader, StatusTag } from '../components/common';

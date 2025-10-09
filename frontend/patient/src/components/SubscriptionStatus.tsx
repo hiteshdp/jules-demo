@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const SubscriptionStatus: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { subscription, loading, error } = useSelector((state: RootState) => state.subscription);
+  const { subscription, loading } = useSelector((state: RootState) => state.subscription);
 
   useEffect(() => {
     dispatch(fetchSubscriptionStatus());
