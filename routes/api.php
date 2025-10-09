@@ -26,7 +26,7 @@ use App\Http\Controllers\Api\AdminController;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
 |
-*/
+*/  
 
 // Admin routes
 Route::prefix('admin')->group(function () {
@@ -56,7 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Appointment Chat
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
-        
+
         // Quiz
         Route::get('/quiz/questions', [QuizController::class, 'questions']);
         Route::post('/quiz/submit', [QuizController::class, 'submit']);
@@ -103,6 +103,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Dermatologist management CRUD
         Route::apiResource('dermatologists', DermatologistController::class);
+
+        // Admin settings
+        Route::get('/settings', [AdminController::class, 'getSettings']);
+        Route::put('/settings', [AdminController::class, 'updateSettings']);
     });
 });
 
