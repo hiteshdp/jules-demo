@@ -1492,6 +1492,66 @@
       "date": "2025-01-28T02:15:00Z",
       "user_prompt": "Unauthenticated - Still say on dermatologist export excel",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_details_redesign_v1",
+      "path": "prompts/appointment_details_redesign_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/AppointmentDetail.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:30:00Z",
+      "user_prompt": "Appointment Details - need to open both side on that page need to remove 2 features like view patient history and reschedule and notes added from Dermatologist and patient can show only",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_notes_relationship_fix_v1",
+      "path": "prompts/appointment_notes_relationship_fix_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T02:45:00Z",
+      "user_prompt": "On update notes gives error",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_notes_modal_implementation_v1",
+      "path": "prompts/appointment_notes_modal_implementation_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T03:00:00Z",
+      "user_prompt": "One more need to change notes should not show on list of appointment add new button for notes on click notes button model open and in model show notes on list on details page do not change anything",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_notes_removal_fix_v1",
+      "path": "prompts/dermatologist_notes_removal_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T03:15:00Z",
+      "user_prompt": "why dermatologist side on list appointment notes not removed ?",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "remove_cancelled_status_v1",
+      "path": "prompts/remove_cancelled_status_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T03:30:00Z",
+      "user_prompt": "Remove Cancelled status on appointment Details",
+      "prompt_type": "user_request"
     }
   ]
 }

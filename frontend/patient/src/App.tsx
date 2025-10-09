@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Quiz from './pages/Quiz';
 import Recommendations from './pages/Recommendations';
 import Appointments from './pages/Appointments';
+import AppointmentDetail from './pages/AppointmentDetail';
 import Chat from './pages/Chat';
 import Profile from './pages/Profile';
 import Products from './pages/Products';
@@ -37,6 +38,7 @@ function App() {
             <Route path="quiz" element={<Quiz />} />
             <Route path="recommendations" element={<Recommendations />} />
             <Route path="appointments" element={<Appointments />} />
+            <Route path="appointments/:id" element={<AppointmentDetail />} />
             <Route path="chat" element={<Chat />} />
             <Route path="products" element={<Products />} />
             <Route path="profile" element={<Profile />} />

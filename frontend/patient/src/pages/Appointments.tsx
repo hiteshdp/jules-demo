@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined } from '@ant-design/icons';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined,FileTextOutlined } from '@ant-design/icons';
 import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col } from 'antd';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
@@ -13,6 +13,7 @@ const { Text } = Typography;
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { appointments, dermatologists, loading, error } = useSelector((state: RootState) => state.appointment);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [form] = Form.useForm();
@@ -23,6 +24,11 @@ const Appointments: React.FC = () => {
     date_from: null,
     date_to: null,
     status: ''
+  });
+  const [notesModal, setNotesModal] = useState({
+    visible: false,
+    notes: '',
+    appointmentId: null as number | null
   });
 
   useEffect(() => {
@@ -125,6 +131,14 @@ const Appointments: React.FC = () => {
       console.error('Export error:', error);
       toast.error('Failed to export appointments');
     }
+  };
+
+  const handleShowNotes = (appointment: any) => {
+    setNotesModal({
+      visible: true,
+      notes: appointment.notes || 'No notes available for this appointment.',
+      appointmentId: appointment.id
+    });
   };
 
   // Debug: Log dermatologists data
@@ -493,13 +507,6 @@ const Appointments: React.FC = () => {
                         </div>
                       </div>
 
-                      {appointment.notes && (
-                        <div className="mt-4 p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-                          <Text className="text-sm text-gray-700">
-                            <strong>Notes:</strong> {appointment.notes}
-                          </Text>
-                        </div>
-                      )}
                     </div>
                   </div>
 
@@ -520,10 +527,22 @@ const Appointments: React.FC = () => {
                     <Button
                       type="default"
                       icon={<EyeOutlined />}
+                      onClick={() => navigate(`/appointments/${appointment.id}`)}
                       className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 text-gray-700 hover:text-gray-900"
                       size="middle"
                     >
                       <span className="font-medium">View Details</span>
+                    </Button>
+                    
+                    {/* Notes Button */}
+                    <Button
+                      type="default"
+                      icon={<FileTextOutlined />}
+                      onClick={() => handleShowNotes(appointment)}
+                      className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 text-gray-700 hover:text-gray-900"
+                      size="middle"
+                    >
+                      <span className="font-medium">Notes</span>
                     </Button>
                   </div>
                 </div>
@@ -532,8 +551,26 @@ const Appointments: React.FC = () => {
           </div>
         )}
         </div>
+        </div>
+        {/* Notes Modal */}
+      <Modal
+        title="Consultation Notes"
+        open={notesModal.visible}
+        onCancel={() => setNotesModal({ visible: false, notes: '', appointmentId: null })}
+        footer={[
+          <Button key="close" onClick={() => setNotesModal({ visible: false, notes: '', appointmentId: null })}>
+            Close
+          </Button>
+        ]}
+        width={600}
+      >
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <Text className="whitespace-pre-wrap text-gray-700">
+            {notesModal.notes}
+          </Text>
+        </div>
+      </Modal>
       </div>
-    </div>
   );
 };
 
