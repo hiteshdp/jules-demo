@@ -50,6 +50,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
+import { useRef } from 'react';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -216,6 +217,34 @@ const Appointments: React.FC = () => {
     dispatch(fetchAppointments(cleanFilters));
   };
 
+  const normalizeZoomUrl = (url?: string) => {
+    if (!url) return '';
+    // If protocol is missing, prepend https
+    if (!/^https?:\/\//i.test(url)) {
+      return `https://${url}`;
+    }
+    return url;
+  };
+
+  const zoomOpenGuardRef = useRef(false);
+
+  const confirmOpenZoom = (url?: string) => {
+    const target = normalizeZoomUrl(url || '');
+    if (!target) return;
+    // Guard against accidental double triggers
+    if (zoomOpenGuardRef.current) return;
+    zoomOpenGuardRef.current = true;
+    setTimeout(() => (zoomOpenGuardRef.current = false), 500);
+
+    const proceed = window.confirm(`Open meeting link?\n${target}`);
+    if (!proceed) return;
+    const win = window.open(target, '_blank', 'noopener,noreferrer');
+    if (!win) {
+      // If blocked, inform user rather than navigating current tab
+      message.info('Popup blocked. Please allow popups for this site or Ctrl/Cmd+Click to open: ' + target);
+    }
+  };
+
   const columns: ColumnsType<Appointment> = [
     {
       title: 'Patient',
@@ -293,7 +322,7 @@ const Appointments: React.FC = () => {
             onClick={() => handleViewDetails(record.id)}
             size="small"
           >
-            View Details
+           
           </Button>
           <Button 
             type="link" 
@@ -301,7 +330,7 @@ const Appointments: React.FC = () => {
             onClick={() => handleViewComments(record.id)}
             size="small"
           >
-            Comments
+           
           </Button>
           <Button 
             type="link" 
@@ -309,15 +338,20 @@ const Appointments: React.FC = () => {
             onClick={() => handleViewChat(record.id)}
             size="small"
           >
-            Chat
+            
           </Button>
           <Button 
             type="link" 
             icon={<VideoCameraOutlined />} 
-            disabled
+            disabled={!record.zoom_link}
+            htmlType="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              confirmOpenZoom(record.zoom_link);
+            }}
             size="small"
           >
-            Zoom
           </Button>
         </Space>
       ),

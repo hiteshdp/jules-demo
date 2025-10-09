@@ -1,5 +1,5 @@
 // Generated via prompt: prompts/antd_admin_remaining_pages_v1.md
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchSettings, updateSettings } from '../store/slices/settingsSlice';
@@ -22,28 +22,34 @@ const Settings: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { settings, loading } = useSelector((state: RootState) => state.settings);
   const [form] = Form.useForm();
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSettings());
   }, [dispatch]);
 
   useEffect(() => {
-    if (settings && settings.data) {
-      // Convert settings data to form values
-      const formValues: Record<string, any> = {};
-      Object.entries(settings.data).forEach(([key, setting]: [string, any]) => {
-        if (setting && typeof setting === 'object' && setting.value !== undefined) {
-          // Convert value based on type
-          if (setting.type === 'number') {
-            formValues[key] = parseFloat(setting.value);
-          } else if (setting.type === 'boolean') {
-            formValues[key] = setting.value === 'true' || setting.value === true;
-          } else {
-            formValues[key] = setting.value;
-          }
-        }
-      });
-      form.setFieldsValue(formValues);
+    if (settings) {
+      // Normalize any accidental object-shaped values into primitives
+      // const normalized: Record<string, any> = {};
+      // Object.entries(settings).forEach(([key, value]) => {
+      //   let v: any = value as any;
+      //   if (v && typeof v === 'object') {
+      //     if ('value' in v) {
+      //       v = (v as any).value;
+      //     } else {
+      //       // Fallback: do not inject objects into inputs
+      //       v = '';
+      //     }
+      //   }
+      //   if (key === 'smtp_port') {
+      //     // Ensure number input receives a number
+      //     const n = Number(v);
+      //     v = Number.isNaN(n) ? undefined : n;
+      //   }
+      //   normalized[key] = v;
+      // });
+      // form.setFieldsValue(normalized);
     }
   }, [settings, form]);
 
@@ -51,6 +57,7 @@ const Settings: React.FC = () => {
     try {
       await dispatch(updateSettings(values)).unwrap();
       toast.success('Settings updated successfully');
+      setIsEditing(false);
     } catch (error) {
       toast.error('Failed to update settings');
     }
@@ -122,7 +129,7 @@ const Settings: React.FC = () => {
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={settings}
+        disabled={!isEditing}
       >
         {settingGroups.map((group) => (
           <Card key={group.title} title={group.title} style={{ marginBottom: 24 }}>
@@ -133,7 +140,7 @@ const Settings: React.FC = () => {
                     name={setting.key}
                     label={setting.label}
                     rules={[
-                      { required: setting.type !== 'password', message: `Please enter ${setting.label.toLowerCase()}` }
+                      { required: isEditing && setting.type !== 'password', message: `Please enter ${setting.label.toLowerCase()}` }
                     ]}
                   >
                     {setting.type === 'password' ? (
@@ -158,12 +165,25 @@ const Settings: React.FC = () => {
           </Card>
         ))}
 
-        <div style={{ textAlign: 'right' }}>
-          <Button type="primary" htmlType="submit" size="large">
-            Save Settings
-          </Button>
-        </div>
       </Form>
+
+      {/* Action buttons placed OUTSIDE the disabled Form so they remain clickable */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+        {!isEditing ? (
+          <Button type="primary" onClick={() => setIsEditing(true)} size="large">
+            Edit
+          </Button>
+        ) : (
+          <>
+            <Button onClick={() => { form.resetFields(); form.setFieldsValue(settings || {}); setIsEditing(false); }}>
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit" size="large" onClick={() => form.submit()}>
+              Save Changes
+            </Button>
+          </>
+        )}
+      </div>
     </Space>
   );
 };
