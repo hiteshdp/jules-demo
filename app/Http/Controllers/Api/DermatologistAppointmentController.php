@@ -95,17 +95,37 @@ class DermatologistAppointmentController extends Controller
         $query = Appointment::with(['patient', 'dermatologist'])
             ->where('dermatologist_id', $user->id);
 
-        // Filter by status
+        // Apply filters
+        if ($request->has('patient_name')) {
+            $query->whereHas('patient', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->patient_name . '%');
+            });
+        }
+
+        if ($request->has('date_from')) {
+            $query->whereDate('scheduled_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to')) {
+            $query->whereDate('scheduled_at', '<=', $request->date_to);
+        }
+
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by date
-        if ($request->has('date')) {
-            $query->whereDate('scheduled_at', $request->date);
-        }
-
         $appointments = $query->orderBy('scheduled_at', 'desc')->get();
+
+        // Add formatted date time and ensure consultation_fee is included
+        $appointments->transform(function ($appointment) {
+            $appointment->formatted_date_time = $appointment->scheduled_at->format('d M Y, h:i A');
+            return $appointment;
+        });
+
+        // Handle export request
+        if ($request->has('export')) {
+            return $this->exportAppointments($appointments, $request->export);
+        }
 
         return response()->json([
             'success' => true,
@@ -302,5 +322,107 @@ class DermatologistAppointmentController extends Controller
                 'appointment' => $appointment
             ]
         ]);
+    }
+
+    /**
+     * Export appointments to Excel or CSV format
+     */
+    private function exportAppointments($appointments, $format)
+    {
+        $filename = 'dermatologist_appointments_' . date('Y-m-d_H-i-s') . '.' . $format;
+        
+        if ($format === 'csv') {
+            return $this->exportToCsv($appointments, $filename);
+        } else {
+            return $this->exportToExcel($appointments, $filename);
+        }
+    }
+
+    /**
+     * Export appointments to CSV format
+     */
+    private function exportToCsv($appointments, $filename)
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($appointments) {
+            $file = fopen('php://output', 'w');
+            
+            // CSV headers
+            fputcsv($file, [
+                'ID',
+                'Patient Name',
+                'Scheduled Date & Time',
+                'Status',
+                'Consultation Fee',
+                'Payment Status',
+                'Notes'
+            ]);
+
+            // CSV data
+            foreach ($appointments as $appointment) {
+                fputcsv($file, [
+                    $appointment->id,
+                    $appointment->patient->name ?? 'N/A',
+                    $appointment->scheduled_at->format('d M Y, h:i A'),
+                    $appointment->status,
+                    '₹' . number_format($appointment->consultation_fee, 2),
+                    $appointment->is_paid ? 'Paid' : 'Unpaid',
+                    $appointment->notes ?? 'N/A'
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export appointments to Excel format
+     */
+    private function exportToExcel($appointments, $filename)
+    {
+        // For Excel export, we'll use a simple CSV with .xlsx extension
+        // In a production environment, you might want to use PhpSpreadsheet
+        $headers = [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($appointments) {
+            $file = fopen('php://output', 'w');
+            
+            // Excel headers
+            fputcsv($file, [
+                'ID',
+                'Patient Name',
+                'Scheduled Date & Time',
+                'Status',
+                'Consultation Fee',
+                'Payment Status',
+                'Notes'
+            ]);
+
+            // Excel data
+            foreach ($appointments as $appointment) {
+                fputcsv($file, [
+                    $appointment->id,
+                    $appointment->patient->name ?? 'N/A',
+                    $appointment->scheduled_at->format('d M Y, h:i A'),
+                    $appointment->status,
+                    '₹' . number_format($appointment->consultation_fee, 2),
+                    $appointment->is_paid ? 'Paid' : 'Unpaid',
+                    $appointment->notes ?? 'N/A'
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

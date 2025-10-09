@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\DermatologistController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
+use App\Http\Controllers\ZoomController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\AppointmentPaymentController;
 use App\Http\Controllers\Api\WebhookController;
@@ -26,7 +27,7 @@ use App\Http\Controllers\Api\AdminController;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
 |
-*/
+*/  
 
 // Admin routes
 Route::prefix('admin')->group(function () {
@@ -56,7 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Appointment Chat
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
-        
+
         // Quiz
         Route::get('/quiz/questions', [QuizController::class, 'questions']);
         Route::post('/quiz/submit', [QuizController::class, 'submit']);
@@ -64,6 +65,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Dermatologists
         Route::get('/dermatologists', [PatientController::class, 'getDermatologists']);
+
+        // Patient Profile Management
+        Route::get('/profile', [PatientController::class, 'getProfile']);
+        Route::put('/profile', [PatientController::class, 'updateProfile']);
 
         // Subscriptions
         Route::post('/subscription/create', [SubscriptionController::class, 'createSubscription']);
@@ -89,7 +94,20 @@ Route::middleware('auth:sanctum')->group(function () {
         // Appointment Chat (Dermatologist)
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
+
+        // Dermatologist Profile Management
+        Route::get('/profile', [DermatologistController::class, 'getProfile']);
+        Route::put('/profile', [DermatologistController::class, 'updateProfile']);
     });
+
+    // Zoom video call routes (available to both patients and dermatologists)
+    Route::post('/zoom/create-meeting', [ZoomController::class, 'create']);
+    
+    // New Zoom meeting management routes
+    Route::post('/zoom-meetings', [App\Http\Controllers\Api\ZoomMeetingController::class, 'create']);
+    Route::post('/zoom-meetings/{id}/start', [App\Http\Controllers\Api\ZoomMeetingController::class, 'start']);
+    Route::post('/zoom-meetings/{id}/end', [App\Http\Controllers\Api\ZoomMeetingController::class, 'end']);
+    Route::get('/zoom-meetings/status/{appointmentId}', [App\Http\Controllers\Api\ZoomMeetingController::class, 'getStatus']);
 
     // Admin routes (protected by auth:sanctum above)
     Route::prefix('admin')->group(function () {
@@ -98,6 +116,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Dermatologist management CRUD
         Route::apiResource('dermatologists', DermatologistController::class);
+
+        // Admin settings
+        Route::get('/settings', [AdminController::class, 'getSettings']);
+        Route::put('/settings', [AdminController::class, 'updateSettings']);
     });
 });
 

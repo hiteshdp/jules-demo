@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
-import { Card, Avatar, Typography, Button, Form } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, CreditCardOutlined } from '@ant-design/icons';
+import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment,bookAppointment } from '../store/slices/appointmentSlice';
+import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col, Divider } from 'antd';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
+import dayjs from 'dayjs';
 
 const { Text } = Typography;
 
@@ -16,11 +17,114 @@ const Appointments: React.FC = () => {
   const { appointments, dermatologists, loading, error } = useSelector((state: RootState) => state.appointment);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    dermatologist_name: '',
+    date_from: null,
+    date_to: null,
+    status: ''
+  });
 
   useEffect(() => {
     dispatch(fetchAppointments());
     dispatch(fetchDermatologists());
   }, [dispatch]);
+
+  // Apply filters to appointments
+  const filteredAppointments = React.useMemo(() => {
+    if (!Array.isArray(appointments)) return [];
+    
+    return appointments.filter(appointment => {
+      if (filters.dermatologist_name && !appointment.dermatologist?.user?.name?.toLowerCase().includes(filters.dermatologist_name.toLowerCase())) {
+        return false;
+      }
+      if (filters.status && appointment.status !== filters.status) {
+        return false;
+      }
+      if (filters.date_from && dayjs(filters.date_from).isValid() && dayjs(appointment.scheduled_at).isBefore(dayjs(filters.date_from))) {
+        return false;
+      }
+      if (filters.date_to && dayjs(filters.date_to).isValid() && dayjs(appointment.scheduled_at).isAfter(dayjs(filters.date_to))) {
+        return false;
+      }
+      return true;
+    });
+  }, [appointments, filters]);
+
+  const handleFilterSubmit = (values: any) => {
+    try {
+      setFilters({
+        dermatologist_name: values.dermatologist_name || '',
+        date_from: values.date_from ? values.date_from.format('YYYY-MM-DD') : null,
+        date_to: values.date_to ? values.date_to.format('YYYY-MM-DD') : null,
+        status: values.status || ''
+      });
+      setShowFilters(false);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      toast.error('Error applying filters. Please try again.');
+    }
+  };
+
+  const handleClearFilters = () => {
+    try {
+      setFilters({
+        dermatologist_name: '',
+        date_from: null,
+        date_to: null,
+        status: ''
+      });
+      filterForm.setFieldsValue({
+        dermatologist_name: '',
+        date_from: null,
+        date_to: null,
+        status: ''
+      });
+      setShowFilters(false);
+    } catch (error) {
+      console.error('Error clearing filters:', error);
+      toast.error('Error clearing filters. Please try again.');
+    }
+  };
+
+  const handleExport = async (format: 'excel' | 'csv') => {
+    try {
+      const token = localStorage.getItem('token');
+      const queryParams = new URLSearchParams();
+      
+      if (filters.dermatologist_name) queryParams.append('dermatologist_name', filters.dermatologist_name);
+      if (filters.date_from) queryParams.append('date_from', filters.date_from);
+      if (filters.date_to) queryParams.append('date_to', filters.date_to);
+      if (filters.status) queryParams.append('status', filters.status);
+      queryParams.append('export', format);
+
+      const response = await fetch(`/api/patient/appointments?${queryParams.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': format === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv'
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `appointments_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        toast.success(`Appointments exported as ${format.toUpperCase()} successfully!`);
+      } else {
+        toast.error('Failed to export appointments');
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export appointments');
+    }
+  };
 
   // Debug: Log dermatologists data
   useEffect(() => {
@@ -97,19 +201,36 @@ const Appointments: React.FC = () => {
 
 
   return (
-    <>
     <div className="space-y-6">
       <PageHeader
-        title="Appointments"
-        description="Manage your consultations with dermatologists."
         extra={
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setShowBookingForm(true)}
-          >
-            Book New Appointment
-          </Button>
+          <Space>
+            <Button
+              icon={<FilterOutlined />}
+              onClick={() => setShowFilters(true)}
+            >
+              Filters
+            </Button>
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={() => handleExport('csv')}
+            >
+              Export CSV
+            </Button>
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={() => handleExport('excel')}
+            >
+              Export Excel
+            </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setShowBookingForm(true)}
+            >
+              Book New Appointment
+            </Button>
+          </Space>
         }
       />
 
@@ -148,6 +269,87 @@ const Appointments: React.FC = () => {
         </Form>
       </Modal>
 
+      {/* Filter Modal */}
+      <Modal
+        title="Filter Appointments"
+        open={showFilters}
+        onCancel={() => setShowFilters(false)}
+        footer={null}
+        width={600}
+      >
+        <Form
+          key={`filter-form-${JSON.stringify(filters)}`}
+          form={filterForm}
+          onFinish={handleFilterSubmit}
+          layout="vertical"
+          initialValues={{
+            dermatologist_name: filters.dermatologist_name || '',
+            date_from: filters.date_from ? dayjs(filters.date_from) : null,
+            date_to: filters.date_to ? dayjs(filters.date_to) : null,
+            status: filters.status || ''
+          }}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="dermatologist_name"
+                label="Dermatologist Name"
+              >
+                <Input
+                  placeholder="Search by dermatologist name"
+                  prefix={<SearchOutlined />}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="status"
+                label="Status"
+              >
+                <Select placeholder="Select status" allowClear>
+                  <Select.Option value="scheduled">Scheduled</Select.Option>
+                  <Select.Option value="in_progress">In Progress</Select.Option>
+                  <Select.Option value="completed">Completed</Select.Option>
+                  <Select.Option value="cancelled">Cancelled</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="date_from"
+                label="From Date"
+              >
+                <DatePicker
+                  placeholder="Select start date"
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="date_to"
+                label="To Date"
+              >
+                <DatePicker
+                  placeholder="Select end date"
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <div className="flex justify-end space-x-2">
+            <Button onClick={handleClearFilters}>
+              Clear Filters
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Apply Filters
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
       {/* Appointments List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -160,9 +362,13 @@ const Appointments: React.FC = () => {
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-blue-600">
-                {Array.isArray(appointments) ? appointments.length : 0}
+                {filteredAppointments.length}
               </div>
-              <div className="text-sm text-gray-500">appointment(s)</div>
+              <div className="text-sm text-gray-500">
+                {filteredAppointments.length === (Array.isArray(appointments) ? appointments.length : 0) 
+                  ? 'appointment(s)' 
+                  : `of ${Array.isArray(appointments) ? appointments.length : 0} appointment(s)`}
+              </div>
             </div>
           </div>
         </div>
@@ -194,17 +400,17 @@ const Appointments: React.FC = () => {
 
         {loading ? (
           <LoadingSpinner />
-        ) : !Array.isArray(appointments) || appointments.length === 0 ? (
+        ) : filteredAppointments.length === 0 ? (
           <EmptyState
             icon={<CalendarOutlined className="text-4xl text-gray-400" />}
-            title="No appointments found"
-            description="Get started by booking your first appointment."
-            actionText="Book Appointment"
-            onAction={() => setShowBookingForm(true)}
+            title={Array.isArray(appointments) && appointments.length > 0 ? "No appointments match your filters" : "No appointments found"}
+            description={Array.isArray(appointments) && appointments.length > 0 ? "Try adjusting your filters to see more results." : "Get started by booking your first appointment."}
+            actionText={Array.isArray(appointments) && appointments.length > 0 ? "Clear Filters" : "Book Appointment"}
+            onAction={() => Array.isArray(appointments) && appointments.length > 0 ? handleClearFilters() : setShowBookingForm(true)}
           />
         ) : (
           <div className="space-y-4">
-            {appointments.map((appointment) => (
+            {filteredAppointments.map((appointment) => (
               <Card
                 key={appointment.id}
                 className="hover:shadow-lg transition-all duration-300 border-0 shadow-sm hover:shadow-md"
@@ -235,7 +441,7 @@ const Appointments: React.FC = () => {
                           <CalendarOutlined className="text-blue-500 text-lg flex-shrink-0" />
                           <div>
                             <Text className="text-sm font-medium text-gray-900">
-                              {new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
+                              {appointment.formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -243,7 +449,7 @@ const Appointments: React.FC = () => {
                               })}
                             </Text>
                             <Text className="text-sm text-gray-500">
-                              {new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
+                              {appointment.formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })}
@@ -258,7 +464,7 @@ const Appointments: React.FC = () => {
                               Consultation Fee
                             </Text>
                             <Text className="text-lg font-bold text-green-600">
-                              ₹{appointment.consultation_fee}
+                              ₹{appointment.consultation_fee ? Number(appointment.consultation_fee).toFixed(2) : '0.00'}
                             </Text>
                             {appointment.is_paid && (
                               <div className="flex items-center space-x-1 mt-1">

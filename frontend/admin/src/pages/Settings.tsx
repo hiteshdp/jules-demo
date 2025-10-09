@@ -28,8 +28,22 @@ const Settings: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (settings) {
-      form.setFieldsValue(settings);
+    if (settings && settings.data) {
+      // Convert settings data to form values
+      const formValues: Record<string, any> = {};
+      Object.entries(settings.data).forEach(([key, setting]: [string, any]) => {
+        if (setting && typeof setting === 'object' && setting.value !== undefined) {
+          // Convert value based on type
+          if (setting.type === 'number') {
+            formValues[key] = parseFloat(setting.value);
+          } else if (setting.type === 'boolean') {
+            formValues[key] = setting.value === 'true' || setting.value === true;
+          } else {
+            formValues[key] = setting.value;
+          }
+        }
+      });
+      form.setFieldsValue(formValues);
     }
   }, [settings, form]);
 

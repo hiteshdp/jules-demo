@@ -65,8 +65,8 @@ const chatSlice = createSlice({
       // Fetch Messages
       .addCase(fetchChatMessages.pending, (state) => {
         state.error = null;
-        // Only show loading spinner when there are no messages yet to avoid flicker
-        state.loading = state.messages.length === 0;
+        // Don't show loading spinner to avoid flicker
+        state.loading = false;
       })
       .addCase(fetchChatMessages.fulfilled, (state, action: PayloadAction<ChatMessage[]>) => {
         state.loading = false;
