@@ -85,15 +85,25 @@ class DermatologistAppointmentController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== 'dermatologist') {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
+        // Check if user is a dermatologist by checking if they have a dermatologist profile
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+        
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Dermatologist profile not found.'
+            ], 403);
+        }
+
         $query = Appointment::with(['patient', 'dermatologist'])
-            ->where('dermatologist_id', $user->id);
+            ->where('dermatologist_id', $dermatologist->id);
 
         // Apply filters
         if ($request->has('patient_name')) {
@@ -193,16 +203,25 @@ class DermatologistAppointmentController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== 'dermatologist') {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated'
             ], 401);
         }
 
+        // Check if user is a dermatologist by checking if they have a dermatologist profile
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Dermatologist profile not found.'
+            ], 403);
+        }
+
         $appointment = Appointment::with(['patient.user', 'dermatologist.user'])
             ->where('id', $id)
-            ->where('dermatologist_id', $user->id)
+            ->where('dermatologist_id', $dermatologist->id)
             ->first();
 
         if (!$appointment) {
@@ -285,11 +304,20 @@ class DermatologistAppointmentController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $user->role !== 'dermatologist') {
+        if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated'
             ], 401);
+        }
+
+        // Check if user is a dermatologist by checking if they have a dermatologist profile
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Dermatologist profile not found.'
+            ], 403);
         }
 
         $request->validate([
@@ -298,7 +326,7 @@ class DermatologistAppointmentController extends Controller
         ]);
 
         $appointment = Appointment::where('id', $id)
-            ->where('dermatologist_id', $user->id)
+            ->where('dermatologist_id', $dermatologist->id)
             ->first();
 
         if (!$appointment) {
@@ -386,14 +414,17 @@ class DermatologistAppointmentController extends Controller
      */
     private function exportToExcel($appointments, $filename)
     {
-        // For Excel export, we'll use a simple CSV with .xlsx extension
-        // In a production environment, you might want to use PhpSpreadsheet
+        // Create a proper Excel-compatible CSV with UTF-8 BOM for Excel compatibility
         $headers = [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Type' => 'application/vnd.ms-excel',
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control' => 'max-age=0',
         ];
 
         $callback = function() use ($appointments) {
+            // Add UTF-8 BOM for Excel compatibility
+            echo "\xEF\xBB\xBF";
+            
             $file = fopen('php://output', 'w');
             
             // Excel headers

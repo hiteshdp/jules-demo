@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments, fetchDermatologists, bookAppointment } from '../store/slices/appointmentSlice';
-import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col, Divider } from 'antd';
+import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col } from 'antd';
 import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
@@ -93,6 +93,7 @@ const Appointments: React.FC = () => {
       const token = localStorage.getItem('token');
       const queryParams = new URLSearchParams();
       
+      // Apply current filters to export
       if (filters.dermatologist_name) queryParams.append('dermatologist_name', filters.dermatologist_name);
       if (filters.date_from) queryParams.append('date_from', filters.date_from);
       if (filters.date_to) queryParams.append('date_to', filters.date_to);
@@ -102,7 +103,7 @@ const Appointments: React.FC = () => {
       const response = await fetch(`/api/patient/appointments?${queryParams.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': format === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv'
+          'Accept': format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv'
         }
       });
 
@@ -111,13 +112,15 @@ const Appointments: React.FC = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `appointments_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.${format}`;
+        a.download = `patient_appointments_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.${format === 'excel' ? 'xls' : 'csv'}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
         toast.success(`Appointments exported as ${format.toUpperCase()} successfully!`);
       } else {
+        const errorText = await response.text();
+        console.error('Export failed:', errorText);
         toast.error('Failed to export appointments');
       }
     } catch (error) {
@@ -392,7 +395,7 @@ const Appointments: React.FC = () => {
                           <CalendarOutlined className="text-blue-500 text-lg flex-shrink-0" />
                           <div>
                             <Text className="text-sm font-medium text-gray-900">
-                              {appointment.formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
+                              {(appointment as any).formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -400,7 +403,7 @@ const Appointments: React.FC = () => {
                               })}
                             </Text>
                             <Text className="text-sm text-gray-500">
-                              {appointment.formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
+                              {(appointment as any).formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })}
