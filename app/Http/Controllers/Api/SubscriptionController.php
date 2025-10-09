@@ -134,8 +134,19 @@ class SubscriptionController extends Controller
             ], 422);
         }
 
+        // Calculate dates
+        $startDate = now();
+        $endDate = now()->addMonth();
+        $nextBillingDate = now()->addMonth();
+        
         Subscription::where('razorpay_subscription_id', $attributes['razorpay_subscription_id'])
-            ->update(['status' => 'active']);
+            ->update([
+                'status' => 'active',
+                'payment_id' => $attributes['razorpay_payment_id'],
+                'next_billing_date' => $nextBillingDate,
+                'starts_at' => $startDate,
+                'ends_at' => $endDate
+            ]);
 
         return response()->json([
             'success' => true,
@@ -161,7 +172,11 @@ class SubscriptionController extends Controller
      *         @OA\Property(property="status", type="string", example="active"),
      *         @OA\Property(property="amount", type="integer", example=50000),
      *         @OA\Property(property="razorpay_subscription_id", type="string", example="sub_123"),
-     *         @OA\Property(property="next_payment_date", type="string", format="date-time", example="2025-10-31T10:00:00Z")
+     *         @OA\Property(property="payment_id", type="string", example="pay_29QQoUBi66xm2f"),
+     *         @OA\Property(property="next_payment_date", type="string", format="date-time", example="2025-10-31T10:00:00Z"),
+     *         @OA\Property(property="next_billing_date", type="string", format="date-time", example="2025-11-08T10:00:00Z"),
+     *         @OA\Property(property="starts_at", type="string", format="date-time", example="2025-10-08T10:00:00Z"),
+     *         @OA\Property(property="ends_at", type="string", format="date-time", example="2025-11-08T10:00:00Z")
      *       )
      *     )
      *   )
@@ -178,7 +193,7 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Cancel current user's subscription (local state)
+     * Cancel current user's subscription (both local and Razorpay)
      *
      * @OA\Post(
      *   path="/patient/subscription/cancel",
@@ -190,12 +205,16 @@ class SubscriptionController extends Controller
      *     description="Cancelled",
      *     @OA\JsonContent(
      *       @OA\Property(property="success", type="boolean", example=true),
-     *       @OA\Property(property="message", type="string", example="Subscription cancelled")
+     *       @OA\Property(property="message", type="string", example="Subscription cancelled successfully")
      *     )
      *   ),
      *   @OA\Response(
      *     response=404,
      *     description="No subscription found"
+     *   ),
+     *   @OA\Response(
+     *     response=400,
+     *     description="Failed to cancel subscription"
      *   )
      * )
      */
@@ -203,12 +222,41 @@ class SubscriptionController extends Controller
     {
         $userId = Auth::id();
         $sub = Subscription::where('user_id', $userId)->latest()->first();
+        
         if (!$sub) {
-            return response()->json(['success' => false, 'message' => 'No subscription found'], 404);
+            return response()->json([
+                'success' => false, 
+                'message' => 'No subscription found'
+            ], 404);
         }
-        $sub->status = 'cancelled';
-        $sub->save();
-        return response()->json(['success' => true, 'message' => 'Subscription cancelled']);
+
+        try {
+            // Cancel subscription in Razorpay first
+            $razorpayCancelled = $this->razorpay->cancelSubscription($sub->razorpay_subscription_id);
+            
+            if (!$razorpayCancelled) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to cancel subscription in Razorpay. Please try again or contact support.'
+                ], 400);
+            }
+
+            // Update local database status
+            $sub->status = 'cancelled';
+            $sub->cancelled_at = now();
+            $sub->save();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Subscription cancelled successfully. You will not be charged for future billing cycles.'
+            ]);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel subscription: ' . $e->getMessage()
+            ], 400);
+        }
     }
 }
 
