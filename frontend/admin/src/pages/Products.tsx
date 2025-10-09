@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchProducts, createProduct, updateProduct } from '../store/slices/productSlice';
+import { fetchProducts, createProduct, updateProduct, deleteProduct } from '../store/slices/productSlice';
 import { 
   Card, 
   Table, 
@@ -18,11 +18,14 @@ import {
   Select, 
   InputNumber, 
   Switch,
+  Popconfirm,
 } from 'antd';
 import { 
   ShoppingOutlined, 
   PlusOutlined, 
-  EditOutlined 
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import toast from 'react-hot-toast';
@@ -36,12 +39,8 @@ interface Product {
   name: string;
   description: string;
   category: string;
-  brand: string;
-  ingredients: string;
-  usage_instructions: string;
   price: number;
-  requires_prescription: boolean;
-  stock_quantity: number;
+  image?: string;
   is_active: boolean;
 }
 
@@ -50,6 +49,7 @@ const Products: React.FC = () => {
   const { products, loading } = useSelector((state: RootState) => state.product);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [viewingProduct, setViewingProduct] = useState<any>(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -79,14 +79,24 @@ const Products: React.FC = () => {
       name: product.name,
       description: product.description,
       category: product.category,
-      brand: product.brand,
-      ingredients: product.ingredients,
-      usage_instructions: product.usage_instructions,
       price: product.price,
-      requires_prescription: product.requires_prescription,
-      stock_quantity: product.stock_quantity,
+      image: product.image,
+      is_active: product.is_active,
     });
     setShowCreateForm(true);
+  };
+
+  const handleDelete = async (product: any) => {
+    try {
+      await dispatch(deleteProduct(product.id)).unwrap();
+      toast.success('Product deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete product');
+    }
+  };
+
+  const handleView = (product: any) => {
+    setViewingProduct(product);
   };
 
   const handleCancel = () => {
@@ -95,13 +105,21 @@ const Products: React.FC = () => {
     form.resetFields();
   };
 
+  const handleViewCancel = () => {
+    setViewingProduct(null);
+  };
+
   const columns: ColumnsType<Product> = [
     {
       title: 'Product',
       key: 'product',
       render: (_, record) => (
         <Space>
-          <Avatar icon={<ShoppingOutlined />} />
+          <Avatar 
+            src={record.image} 
+            icon={<ShoppingOutlined />} 
+            size={40}
+          />
           <div>
             <div style={{ fontWeight: 500 }}>{record.name}</div>
             <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -115,22 +133,20 @@ const Products: React.FC = () => {
       title: 'Category',
       dataIndex: 'category',
       key: 'category',
-    },
-    {
-      title: 'Brand',
-      dataIndex: 'brand',
-      key: 'brand',
+      render: (category) => {
+        const categoryLabels: { [key: string]: string } = {
+          'prescription': 'Prescription',
+          'cosmetic': 'Cosmetic',
+          'lifestyle_support': 'Lifestyle Support'
+        };
+        return categoryLabels[category] || category;
+      },
     },
     {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
       render: (price) => `₹${price}`,
-    },
-    {
-      title: 'Stock',
-      dataIndex: 'stock_quantity',
-      key: 'stock_quantity',
     },
     {
       title: 'Status',
@@ -146,12 +162,36 @@ const Products: React.FC = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <Button 
-          type="text" 
-          icon={<EditOutlined />} 
-          onClick={() => handleEdit(record)}
-          title="Edit"
-        />
+        <Space>
+          <Button 
+            type="text" 
+            icon={<EyeOutlined />} 
+            onClick={() => handleView(record)}
+            title="View"
+          />
+          <Button 
+            type="text" 
+            icon={<EditOutlined />} 
+            onClick={() => handleEdit(record)}
+            title="Edit"
+          />
+          <Popconfirm
+            title="Delete Product"
+            description={`Are you sure you want to delete "${record.name}"? This action cannot be undone.`}
+            onConfirm={() => handleDelete(record)}
+            okText="Yes, Delete"
+            cancelText="Cancel"
+            okType="danger"
+            icon={<DeleteOutlined style={{ color: '#ff4d4f' }} />}
+          >
+            <Button 
+              type="text" 
+              danger
+              icon={<DeleteOutlined />} 
+              title="Delete"
+            />
+          </Popconfirm>
+        </Space>
       ),
     },
   ];
@@ -178,7 +218,7 @@ const Products: React.FC = () => {
       </div>
 
       <Card>
-        {products.length === 0 && !loading ? (
+        {(!products || products.length === 0) && !loading ? (
           <Empty
             image={<ShoppingOutlined style={{ fontSize: 64, color: '#bfbfbf' }} />}
             description="Get started by adding your first product."
@@ -186,7 +226,7 @@ const Products: React.FC = () => {
         ) : (
           <Table
             columns={columns}
-            dataSource={products}
+            dataSource={Array.isArray(products) ? products : []}
             loading={loading}
             rowKey="id"
             pagination={{
@@ -207,7 +247,7 @@ const Products: React.FC = () => {
         onCancel={handleCancel}
         footer={null}
         width={600}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form
           form={form}
@@ -236,41 +276,15 @@ const Products: React.FC = () => {
             rules={[{ required: true, message: 'Please select category' }]}
           >
             <Select placeholder="Select category">
-              <Option value="shampoo">Shampoo</Option>
-              <Option value="treatment">Treatment</Option>
-              <Option value="supplement">Supplement</Option>
-              <Option value="oil">Oil</Option>
-              <Option value="conditioner">Conditioner</Option>
+              <Option value="prescription">Prescription</Option>
+              <Option value="cosmetic">Cosmetic</Option>
+              <Option value="lifestyle_support">Lifestyle Support</Option>
             </Select>
           </Form.Item>
           
           <Form.Item
-            name="brand"
-            label="Brand"
-            rules={[{ required: true, message: 'Please enter brand' }]}
-          >
-            <Input />
-          </Form.Item>
-          
-          <Form.Item
-            name="ingredients"
-            label="Ingredients"
-            rules={[{ required: true, message: 'Please enter ingredients' }]}
-          >
-            <TextArea rows={2} />
-          </Form.Item>
-          
-          <Form.Item
-            name="usage_instructions"
-            label="Usage Instructions"
-            rules={[{ required: true, message: 'Please enter usage instructions' }]}
-          >
-            <TextArea rows={2} />
-          </Form.Item>
-          
-          <Form.Item
             name="price"
-            label="Price"
+            label="Price (per Month)"
             rules={[{ required: true, message: 'Please enter price' }]}
           >
             <InputNumber
@@ -286,19 +300,15 @@ const Products: React.FC = () => {
           </Form.Item>
           
           <Form.Item
-            name="stock_quantity"
-            label="Stock Quantity"
-            rules={[{ required: true, message: 'Please enter stock quantity' }]}
+            name="image"
+            label="Product Image URL"
           >
-            <InputNumber
-              style={{ width: '100%' }}
-              min={0}
-            />
+            <Input placeholder="Enter image URL (optional)" />
           </Form.Item>
           
           <Form.Item
-            name="requires_prescription"
-            label="Requires Prescription"
+            name="is_active"
+            label="Active Status"
             valuePropName="checked"
           >
             <Switch />
@@ -313,6 +323,122 @@ const Products: React.FC = () => {
             </Space>
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* View Product Modal */}
+      <Modal
+        title="Product Details"
+        open={!!viewingProduct}
+        onCancel={handleViewCancel}
+        footer={[
+          <Button key="close" onClick={handleViewCancel}>
+            Close
+          </Button>
+        ]}
+        width={600}
+        destroyOnHidden
+      >
+        {viewingProduct && (
+          <div style={{ padding: '16px 0' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '24px' }}>
+              <Avatar 
+                src={viewingProduct.image} 
+                icon={<ShoppingOutlined />} 
+                size={80}
+                style={{ marginRight: '16px' }}
+              />
+              <div style={{ flex: 1 }}>
+                <Title level={3} style={{ margin: '0 0 8px 0' }}>
+                  {viewingProduct.name}
+                </Title>
+                <Text type="secondary" style={{ display: 'block', marginBottom: '16px' }}>
+                  {viewingProduct.description}
+                </Text>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                  <div>
+                    <Text strong>Category: </Text>
+                    <Tag color="blue">
+                      {viewingProduct.category === 'prescription' ? 'Prescription' :
+                       viewingProduct.category === 'cosmetic' ? 'Cosmetic' :
+                       viewingProduct.category === 'lifestyle_support' ? 'Lifestyle Support' :
+                       viewingProduct.category}
+                    </Tag>
+                  </div>
+                  <div>
+                    <Text strong>Price: </Text>
+                    <Text style={{ fontSize: '16px', fontWeight: 'bold', color: '#1890ff' }}>
+                      ₹{viewingProduct.price}
+                    </Text>
+                    <Text type="secondary" style={{ marginLeft: '4px' }}>/month</Text>
+                  </div>
+                  <div>
+                    <Text strong>Status: </Text>
+                    <Tag color={viewingProduct.is_active ? 'green' : 'red'}>
+                      {viewingProduct.is_active ? 'Active' : 'Inactive'}
+                    </Tag>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {viewingProduct.image && (
+              <div style={{ marginBottom: '16px' }}>
+                <Text strong style={{ display: 'block', marginBottom: '8px' }}>Product Image:</Text>
+                <img 
+                  src={viewingProduct.image} 
+                  alt={viewingProduct.name}
+                  style={{ 
+                    maxWidth: '100%', 
+                    maxHeight: '200px', 
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    border: '1px solid #f0f0f0'
+                  }}
+                />
+              </div>
+            )}
+            
+            <div style={{ 
+              padding: '16px', 
+              backgroundColor: '#fafafa', 
+              borderRadius: '8px',
+              border: '1px solid #f0f0f0'
+            }}>
+              <Text strong style={{ display: 'block', marginBottom: '8px' }}>Product Information:</Text>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <Text type="secondary">Product ID:</Text>
+                  <br />
+                  <Text strong>#{viewingProduct.id}</Text>
+                </div>
+                <div>
+                  <Text type="secondary">Created:</Text>
+                  <br />
+                  <Text strong>
+                    {new Date(viewingProduct.created_at).toLocaleDateString()}
+                  </Text>
+                </div>
+                <div>
+                  <Text type="secondary">Last Updated:</Text>
+                  <br />
+                  <Text strong>
+                    {new Date(viewingProduct.updated_at).toLocaleDateString()}
+                  </Text>
+                </div>
+                <div>
+                  <Text type="secondary">Category Type:</Text>
+                  <br />
+                  <Text strong>
+                    {viewingProduct.category === 'prescription' ? 'Prescription Medicine' :
+                     viewingProduct.category === 'cosmetic' ? 'Cosmetic Product' :
+                     viewingProduct.category === 'lifestyle_support' ? 'Lifestyle Support' :
+                     'Other'}
+                  </Text>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
     </Space>
   );

@@ -12,6 +12,21 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "appointments_payment_status_update_v1",
+      "path": "prompts/appointments_payment_status_update_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AdminController.php",
+        "routes/api.php",
+        "frontend/admin/src/store/api/appointmentAPI.ts",
+        "frontend/admin/src/store/slices/appointmentSlice.ts",
+        "frontend/admin/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-09T11:30:00Z",
+      "user_prompt": "in admin module , appintment section ,  the payment status should be a dropdown with all payment status showable and admin can change the payment status and it should reflect in the database also",
+      "prompt_type": "user_request"
+    }
+    {
       "id": "admin_dermatologists_view_modal_v1",
       "path": "prompts/admin_dermatologists_view_modal_v1.md",
       "used_in": [
@@ -1376,6 +1391,49 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "product_columns_cleanup_v1",
+      "path": "prompts/product_columns_cleanup_v1.md",
+      "used_in": [
+        "app/Models/Product.php",
+        "app/Http/Controllers/Api/AdminController.php",
+        "database/seeders/ProductSeeder.php",
+        "frontend/admin/src/pages/Products.tsx",
+        "frontend/admin/src/store/slices/productSlice.ts",
+        "frontend/patient/src/pages/Products.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-09T09:15:00Z",
+      "user_prompt": "Safely drop specific columns from the `products` table and remove all their related code references across the entire project. Only the core product fields (as per the attached specification image) should remain at the end. Columns to Drop: brand, ingredient, usage_instructions, dosage, restrictions, require_prescription, stock_quality. Remove this safely from whole project",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "product_crud_complete_v1",
+      "path": "prompts/product_crud_complete_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AdminController.php",
+        "routes/api.php",
+        "frontend/admin/src/store/api/productAPI.ts",
+        "frontend/admin/src/store/slices/productSlice.ts",
+        "frontend/admin/src/pages/Products.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-09T10:00:00Z",
+      "user_prompt": "Create a complete **CRUD (Create, Read, Update, Delete) and view** functionality for **Products** in the Admin module, using the fields of the existing `products` database table. Make sure to do this properly and correctly.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointments_management_complete_v1",
+      "path": "prompts/appointments_management_complete_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AdminController.php",
+        "routes/api.php",
+        "frontend/admin/src/store/api/appointmentAPI.ts",
+        "frontend/admin/src/store/slices/appointmentSlice.ts",
+        "frontend/admin/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-09T11:00:00Z",
+      "user_prompt": "Create a complete **Appointments Management module** in the Admin section that allows the admin to view and manage all patient–dermatologist appointments across the system. Allow the Admin to view and manage all appointments created via booking and payment process in one place. This helps ensure smooth coordination, payment tracking, and consultation follow-ups.",
       "id": "razorpay_cancel_subscription_v1",
       "path": "prompts/razorpay_cancel_subscription_v1.md",
       "used_in": [

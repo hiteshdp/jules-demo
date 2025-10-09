@@ -265,13 +265,39 @@ class AdminController extends Controller
     }
 
     /**
-     * Get all appointments
+     * Get all appointments with filters
      */
     public function getAppointments(Request $request)
     {
-        $appointments = Appointment::with(['patient', 'dermatologist.user', 'chatMessages'])
-            ->orderBy('scheduled_at', 'desc')
-            ->paginate(20);
+        $query = Appointment::with([
+            'patient',
+            'dermatologist.user',
+            'chatMessages',
+            'payments'
+        ]);
+
+        // Apply filters
+        if ($request->has('status') && $request->status !== '' && $request->status !== null) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->has('dermatologist_id') && $request->dermatologist_id !== '' && $request->dermatologist_id !== null) {
+            $query->where('dermatologist_id', $request->dermatologist_id);
+        }
+
+        if ($request->has('patient_id') && $request->patient_id !== '' && $request->patient_id !== null) {
+            $query->where('patient_id', $request->patient_id);
+        }
+
+        if ($request->has('date_from') && $request->date_from !== '' && $request->date_from !== null) {
+            $query->whereDate('scheduled_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && $request->date_to !== '' && $request->date_to !== null) {
+            $query->whereDate('scheduled_at', '<=', $request->date_to);
+        }
+
+        $appointments = $query->orderBy('scheduled_at', 'desc')->paginate(20);
 
         return response()->json([
             'success' => true,
@@ -280,18 +306,129 @@ class AdminController extends Controller
     }
 
     /**
-     * Get appointment chat transcript
+     * Get appointment details
      */
-    public function getAppointmentChat(Request $request, $id)
+    public function getAppointmentDetails(Request $request, $id)
     {
-        $appointment = Appointment::with(['patient', 'dermatologist.user', 'chatMessages.sender'])
-            ->findOrFail($id);
+        $appointment = Appointment::with([
+            'patient.patientProfile',
+            'dermatologist.user',
+            'chatMessages',
+            'payments'
+        ])->findOrFail($id);
 
         return response()->json([
             'success' => true,
             'data' => $appointment
         ]);
     }
+
+    /**
+     * Get appointment chat messages
+     */
+    public function getAppointmentChat(Request $request, $id)
+    {
+        $appointment = Appointment::findOrFail($id);
+        $chatMessages = $appointment->chatMessages()
+            ->with('sender')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $chatMessages
+        ]);
+    }
+
+    /**
+     * Get dermatologists for filter dropdown
+     */
+    public function getDermatologistsForFilter()
+    {
+        $dermatologists = Dermatologist::with('user')
+            ->get()
+            ->map(function ($dermatologist) {
+                return [
+                    'id' => $dermatologist->user_id,
+                    'name' => $dermatologist->user->name,
+                    'specialization' => $dermatologist->specialization
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $dermatologists
+        ]);
+    }
+
+    /**
+     * Get patients for filter dropdown
+     */
+    public function getPatientsForFilter()
+    {
+        $patients = User::where('role', 'patient')
+            ->get()
+            ->map(function ($patient) {
+                return [
+                    'id' => $patient->id,
+                    'name' => $patient->name,
+                    'email' => $patient->email
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $patients
+        ]);
+    }
+
+
+    /**
+     * Update an appointment's payment status (admin only)
+     */
+    public function updateAppointmentPaymentStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,completed,failed,refunded,cancelled',
+        ]);
+
+        $appointment = Appointment::with('payments')->findOrFail($id);
+
+        // Get latest payment for this appointment, if any
+        $latestPayment = $appointment->payments()->latest('id')->first();
+
+        if ($latestPayment) {
+            $latestPayment->status = $request->status;
+            // Mark paid_at if completed, otherwise null
+            $latestPayment->paid_at = $request->status === 'completed' ? now() : null;
+            $latestPayment->save();
+        } else {
+            // If no payment record exists yet, create a placeholder record
+            $latestPayment = $appointment->payments()->create([
+                'user_id' => $appointment->patient_id,
+                'type' => 'consultation',
+                'amount' => $appointment->consultation_fee,
+                'currency' => 'INR',
+                'status' => $request->status,
+                'paid_at' => $request->status === 'completed' ? now() : null,
+            ]);
+        }
+
+        // Sync appointment boolean flag based on status
+        $appointment->is_paid = $request->status === 'completed';
+        $appointment->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment status updated successfully',
+            'data' => [
+                'appointment_id' => $appointment->id,
+                'is_paid' => $appointment->is_paid,
+                'payment' => $latestPayment,
+            ],
+        ]);
+    }
+
 
     /**
      * Get all products
@@ -315,12 +452,8 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string',
-            'brand' => 'required|string',
-            'ingredients' => 'required|string',
-            'usage_instructions' => 'required|string',
             'price' => 'required|numeric|min:0',
-            'requires_prescription' => 'boolean',
-            'stock_quantity' => 'required|integer|min:0',
+            'is_active' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -349,13 +482,9 @@ class AdminController extends Controller
             'name' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'category' => 'sometimes|string',
-            'brand' => 'sometimes|string',
-            'ingredients' => 'sometimes|string',
-            'usage_instructions' => 'sometimes|string',
             'price' => 'sometimes|numeric|min:0',
-            'requires_prescription' => 'sometimes|boolean',
+            'image' => 'sometimes|string|nullable',
             'is_active' => 'sometimes|boolean',
-            'stock_quantity' => 'sometimes|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -373,6 +502,33 @@ class AdminController extends Controller
             'success' => true,
             'message' => 'Product updated successfully',
             'data' => $product
+        ]);
+    }
+
+    /**
+     * Get single product
+     */
+    public function getProduct(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $product
+        ]);
+    }
+
+    /**
+     * Delete product
+     */
+    public function deleteProduct(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product deleted successfully'
         ]);
     }
 
