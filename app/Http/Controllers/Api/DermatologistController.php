@@ -479,4 +479,261 @@ class DermatologistController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/dermatologist/profile",
+     *     summary="Get dermatologist profile",
+     *     description="Get current authenticated dermatologist's profile information",
+     *     tags={"Dermatologists"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dermatologist profile retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Profile retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+     *                 @OA\Property(property="email", type="string", example="dermatologist@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1985-01-01"),
+     *                 @OA\Property(property="gender", type="string", example="female"),
+     *                 @OA\Property(
+     *                     property="dermatologistProfile",
+     *                     type="object",
+     *                     @OA\Property(property="license_number", type="string", example="MD123456"),
+     *                     @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+     *                     @OA\Property(property="years_of_experience", type="integer", example=5),
+     *                     @OA\Property(property="qualifications", type="string", example="MD, Dermatology"),
+     *                     @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *                     @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatment")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated")
+     *         )
+     *     )
+     * )
+     */
+    public function getProfile(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if ($user->role !== 'dermatologist') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Dermatologist role required.'
+                ], 403);
+            }
+
+            $user->load('dermatologistProfile');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile retrieved successfully',
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'date_of_birth' => $user->date_of_birth,
+                    'gender' => $user->gender,
+                    'dermatologistProfile' => $user->dermatologistProfile
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve profile',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/dermatologist/profile",
+     *     summary="Update dermatologist profile",
+     *     description="Update current authenticated dermatologist's profile information",
+     *     tags={"Dermatologists"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+     *             @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
+     *             @OA\Property(property="phone", type="string", example="+1234567890"),
+     *             @OA\Property(property="date_of_birth", type="string", format="date", example="1985-01-01"),
+     *             @OA\Property(property="gender", type="string", enum={"male","female","other"}, example="female"),
+     *             @OA\Property(property="license_number", type="string", example="MD123456"),
+     *             @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+     *             @OA\Property(property="years_of_experience", type="integer", example=5),
+     *             @OA\Property(property="qualifications", type="string", example="MD, Dermatology"),
+     *             @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *             @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatment")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Profile updated successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
+     *                 @OA\Property(property="email", type="string", example="dermatologist@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="+1234567890"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1985-01-01"),
+     *                 @OA\Property(property="gender", type="string", example="female"),
+     *                 @OA\Property(
+     *                     property="dermatologistProfile",
+     *                     type="object",
+     *                     @OA\Property(property="license_number", type="string", example="MD123456"),
+     *                     @OA\Property(property="specialization", type="string", example="Hair Loss Treatment"),
+     *                     @OA\Property(property="years_of_experience", type="integer", example=5),
+     *                     @OA\Property(property="qualifications", type="string", example="MD, Dermatology"),
+     *                     @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *                     @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatment")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Unauthenticated")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation errors"),
+     *             @OA\Property(property="errors", type="object", example={"field": "The field is required."})
+     *         )
+     *     )
+     * )
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+
+            if ($user->role !== 'dermatologist') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Dermatologist role required.'
+                ], 403);
+            }
+
+            // Get the dermatologist profile to get the correct ID for unique validation
+            $dermatologistProfile = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+            $dermatologistProfileId = $dermatologistProfile ? $dermatologistProfile->id : null;
+
+            $updateData = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'email' => [
+                    'sometimes',
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($user->id),
+                ],
+                'phone' => 'sometimes|nullable|string|max:20',
+                'date_of_birth' => 'nullable|date|before:today',
+                'gender' => 'nullable|in:male,female,other',
+                // Professional fields
+                'license_number' => 'sometimes|nullable|string|max:255|unique:dermatologists,license_number,' . $dermatologistProfileId,
+                'specialization' => 'sometimes|nullable|string|max:255',
+                'years_of_experience' => 'sometimes|nullable|integer|min:0|max:50',
+                'qualifications' => 'sometimes|nullable|string',
+                'consultation_fee' => 'sometimes|nullable|numeric|min:0',
+                'bio' => 'nullable|string',
+            ]);
+
+            // Separate user and profile data
+            $userData = [];
+            $profileData = [];
+
+            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
+            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
+            if (isset($updateData['phone'])) $userData['phone'] = $updateData['phone'];
+            if (isset($updateData['date_of_birth'])) $userData['date_of_birth'] = $updateData['date_of_birth'];
+            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
+
+            // Profile fields - only update if values are provided and not empty
+            if (isset($updateData['license_number']) && !empty(trim($updateData['license_number']))) {
+                $profileData['license_number'] = $updateData['license_number'];
+            }
+            if (isset($updateData['specialization']) && !empty(trim($updateData['specialization']))) {
+                $profileData['specialization'] = $updateData['specialization'];
+            }
+            if (isset($updateData['years_of_experience']) && $updateData['years_of_experience'] !== null) {
+                $profileData['years_of_experience'] = $updateData['years_of_experience'];
+            }
+            if (isset($updateData['qualifications']) && !empty(trim($updateData['qualifications']))) {
+                $profileData['qualifications'] = $updateData['qualifications'];
+            }
+            if (isset($updateData['consultation_fee']) && $updateData['consultation_fee'] !== null) {
+                $profileData['consultation_fee'] = $updateData['consultation_fee'];
+            }
+            if (isset($updateData['bio'])) {
+                $profileData['bio'] = $updateData['bio'];
+            }
+
+            // Update user data
+            if (!empty($userData)) {
+                $user->update($userData);
+            }
+
+            // Update or create profile data
+            if (!empty($profileData)) {
+                $profile = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+                if ($profile) {
+                    $profile->update($profileData);
+                } else {
+                    $profileData['user_id'] = $user->id;
+                    \App\Models\Dermatologist::create($profileData);
+                }
+            }
+
+            // Reload user with profile
+            $user->load('dermatologistProfile');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'date_of_birth' => $user->date_of_birth,
+                    'gender' => $user->gender,
+                    'dermatologistProfile' => $user->dermatologistProfile
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update profile',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -65,6 +65,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Dermatologists
         Route::get('/dermatologists', [PatientController::class, 'getDermatologists']);
 
+        // Patient Profile Management
+        Route::get('/profile', [PatientController::class, 'getProfile']);
+        Route::put('/profile', [PatientController::class, 'updateProfile']);
+
         // Subscriptions
         Route::post('/subscription/create', [SubscriptionController::class, 'createSubscription']);
         Route::post('/subscription/verify', [SubscriptionController::class, 'verifyPayment']);
@@ -85,6 +89,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Appointment Chat (Dermatologist)
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
+
+        // Dermatologist Profile Management
+        Route::get('/profile', [DermatologistController::class, 'getProfile']);
+        Route::put('/profile', [DermatologistController::class, 'updateProfile']);
     });
 
     // Zoom video call routes (available to both patients and dermatologists)
