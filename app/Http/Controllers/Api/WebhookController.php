@@ -76,7 +76,8 @@ class WebhookController extends Controller
 
                 // Insert new cycle record
                 Subscription::create([
-                    'user_id' => $user_id,
+                   // 'user_id' => $user_id,
+                    'user_id' => 1,
                     'razorpay_subscription_id' => $subId,
                     'razorpay_payment_id' => $payment['id'] ?? null,
                     'plan_id' => $subscription['plan_id'],
@@ -104,7 +105,8 @@ class WebhookController extends Controller
 
                 // Insert new failed record
                 Subscription::create([
-                    'user_id' => $user_id,
+                    //'user_id' => $user_id,
+                    'user_id' => 1,
                     'razorpay_subscription_id' => $subId,
                     'razorpay_payment_id' => $payment['id'] ?? null,
                     'plan_id' => $payment['plan_id'] ?? null,
@@ -132,7 +134,8 @@ class WebhookController extends Controller
         
                 // Insert cancellation record
                 Subscription::create([
-                    'user_id' => $user_id,
+                    //'user_id' => $user_id,
+                    'user_id' => 1,
                     'razorpay_subscription_id' => $subId,
                     'razorpay_payment_id' => null,
                     'plan_id' => $subscription['plan_id'] ?? null,
