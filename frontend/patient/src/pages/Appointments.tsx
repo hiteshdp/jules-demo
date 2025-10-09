@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment,bookAppointment } from '../store/slices/appointmentSlice';
-import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col, Divider } from 'antd';
+import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
+import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col } from 'antd';
 import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
@@ -203,6 +203,7 @@ const Appointments: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
+        title="Appointments"
         extra={
           <Space>
             <Button
@@ -441,7 +442,7 @@ const Appointments: React.FC = () => {
                           <CalendarOutlined className="text-blue-500 text-lg flex-shrink-0" />
                           <div>
                             <Text className="text-sm font-medium text-gray-900">
-                              {appointment.formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
+                              {new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -449,7 +450,7 @@ const Appointments: React.FC = () => {
                               })}
                             </Text>
                             <Text className="text-sm text-gray-500">
-                              {appointment.formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
+                              {new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit'
                               })}
@@ -517,7 +518,6 @@ const Appointments: React.FC = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 
