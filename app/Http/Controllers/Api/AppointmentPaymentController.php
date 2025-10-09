@@ -3,13 +3,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Services\RazorpayService;
 use App\Models\Appointment;
-use App\Models\AppointmentPayment;
+use App\Models\AdminSetting;
+use Illuminate\Http\Request;
 use App\Models\Dermatologist;
+use App\Services\RazorpayService;
+use App\Models\AppointmentPayment;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Tag(
@@ -201,12 +202,25 @@ class AppointmentPaymentController extends Controller
             $order = $this->razorpay->getOrder($request->razorpay_order_id);
             $notes = $order['notes'] ?? [];
 
+			// Determine platform commission percentage (create default if missing)
+			$platformCommissionPercentage = AdminSetting::getValue('platform_commission_percentage');
+			if ($platformCommissionPercentage === null) {
+				AdminSetting::setValue('platform_commission_percentage', '0', 'number', 'Platform commission percentage for consultations');
+				$platformCommissionPercentage = 0;
+			}
+	
+			$consultationFee = (float) $appointmentPayment->amount;
+			$platformFeeAmount = round($consultationFee * ((float)$platformCommissionPercentage / 100), 2);
+			$dermatologistFeeAmount = round($consultationFee - $platformFeeAmount, 2);
+
             // Create appointment after successful payment
             $appointment = Appointment::create([
                 'patient_id' => $appointmentPayment->user_id,
                 'dermatologist_id' => $notes['dermatologist_id'],
                 'scheduled_at' => $notes['scheduled_at'],
                 'consultation_fee' => $appointmentPayment->amount,
+                'platform_fee' => $platformFeeAmount,
+                'dermatologist_fee' => $dermatologistFeeAmount,
                 'is_paid' => true,
             ]);
 

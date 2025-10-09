@@ -3,10 +3,10 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   HomeIcon,
   ClipboardDocumentListIcon,
-  LightBulbIcon,
+//   LightBulbIcon,
   CalendarDaysIcon,
-  ChatBubbleLeftRightIcon,
-  ShoppingBagIcon,
+//   ChatBubbleLeftRightIcon,
+//   ShoppingBagIcon,
   UserIcon,
   CreditCardIcon,
 } from '@heroicons/react/24/outline';
@@ -14,10 +14,10 @@ import {
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
   { name: 'Hair Loss Quiz', href: '/quiz', icon: ClipboardDocumentListIcon },
-  { name: 'Recommendations', href: '/recommendations', icon: LightBulbIcon },
+//   { name: 'Recommendations', href: '/recommendations', icon: LightBulbIcon },
   { name: 'Appointments', href: '/appointments', icon: CalendarDaysIcon },
-  { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
-  { name: 'Products', href: '/products', icon: ShoppingBagIcon },
+//   { name: 'Chat', href: '/chat', icon: ChatBubbleLeftRightIcon },
+//   { name: 'Products', href: '/products', icon: ShoppingBagIcon },
   { name: 'Subscription', href: '/subscription', icon: CreditCardIcon },
   { name: 'Profile', href: '/profile', icon: UserIcon },
 ];

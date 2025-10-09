@@ -25,7 +25,7 @@
       "date": "2025-10-09T11:30:00Z",
       "user_prompt": "in admin module , appintment section ,  the payment status should be a dropdown with all payment status showable and admin can change the payment status and it should reflect in the database also",
       "prompt_type": "user_request"
-    }
+    },
     {
       "id": "admin_dermatologists_view_modal_v1",
       "path": "prompts/admin_dermatologists_view_modal_v1.md",
@@ -1656,6 +1656,19 @@
       "author": "AI Assistant",
       "date": "2025-01-28T03:30:00Z",
       "user_prompt": "Remove Cancelled status on appointment Details",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "appointments_fee_breakdown_v1",
+      "path": "prompts/appointments_fee_breakdown_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_09_100000_add_fee_columns_to_appointments_table.php",
+        "app/Models/Appointment.php",
+        "app/Http/Controllers/Api/AppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-09T10:05:00Z",
+      "user_prompt": "I have consultation fees in appointments table in database. Now i need to add other fields related to the fee. Dermatologist_fee, platform fee. In general setting need to add new column called platform fee in (%) and and that fee will deduct from the consultation fees and remaing amount will be Dermatologist_fee and the (%) amount is platform fee. I need to store this fee when appointment is created. Also check if there is not setting for platform fee in admin side than add it",
       "prompt_type": "user_request"
     }
   ]

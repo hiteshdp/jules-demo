@@ -57,16 +57,16 @@ class DermatologistAppointmentController extends Controller
      *                     property="appointments",
      *                     type="array",
      *                     @OA\Items(
-                         @OA\Property(property="id", type="integer", example=1),
-                         @OA\Property(property="patient_id", type="integer", example=1),
-                         @OA\Property(property="dermatologist_id", type="integer", example=2),
-                         @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                         @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
-                         @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
-                         @OA\Property(property="notes", type="string", example="Follow-up consultation"),
-                         @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
-                         @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
-                     )
+     *                    		@OA\Property(property="id", type="integer", example=1),
+     *                    		@OA\Property(property="patient_id", type="integer", example=1),
+     *                    		@OA\Property(property="dermatologist_id", type="integer", example=2),
+     *                    		@OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
+     *                    		@OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
+     *                    		@OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *                    		@OA\Property(property="notes", type="string", example="Follow-up consultation"),
+     *                    		@OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+     *                    		@OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
+     *                    )
      *                 )
      *             )
      *         )
@@ -169,15 +169,15 @@ class DermatologistAppointmentController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="appointment", type="object",
-                     @OA\Property(property="id", type="integer", example=1),
-                     @OA\Property(property="patient_id", type="integer", example=1),
-                     @OA\Property(property="dermatologist_id", type="integer", example=2),
-                     @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
-                     @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
-                     @OA\Property(property="notes", type="string", example="Follow-up consultation"),
-                     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
-                     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
+	*                   @OA\Property(property="id", type="integer", example=1),
+	*                   @OA\Property(property="patient_id", type="integer", example=1),
+     *                     @OA\Property(property="dermatologist_id", type="integer", example=2),
+     *                     @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
+     *                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
+	*                   @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+	*                   @OA\Property(property="notes", type="string", example="Follow-up consultation"),
+	*                   @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+	*                   @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
      *             )
      *         )
      *     ),
@@ -270,15 +270,15 @@ class DermatologistAppointmentController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="appointment", type="object",
-                     @OA\Property(property="id", type="integer", example=1),
-                     @OA\Property(property="patient_id", type="integer", example=1),
-                     @OA\Property(property="dermatologist_id", type="integer", example=2),
-                     @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
-                     @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
-                     @OA\Property(property="notes", type="string", example="Follow-up consultation"),
-                     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
-                     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
+	*                   	@OA\Property(property="id", type="integer", example=1),
+	*                   	@OA\Property(property="patient_id", type="integer", example=1),
+	*                   @OA\Property(property="dermatologist_id", type="integer", example=2),
+	*                   @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
+	*                   @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
+	*                   	@OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+	*                   	@OA\Property(property="notes", type="string", example="Follow-up consultation"),
+	*                   	@OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+	*                   	@OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
      *             )
      *         )
      *     ),

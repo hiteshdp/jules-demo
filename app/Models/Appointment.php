@@ -25,6 +25,8 @@ class Appointment extends Model
         'zoom_link',
         'zoom_meeting_id',
         'consultation_fee',
+        'platform_fee',
+        'dermatologist_fee',
         'is_paid',
     ];
 
@@ -38,6 +40,8 @@ class Appointment extends Model
         return [
             'scheduled_at' => 'datetime',
             'consultation_fee' => 'decimal:2',
+            'platform_fee' => 'decimal:2',
+            'dermatologist_fee' => 'decimal:2',
             'is_paid' => 'boolean',
         ];
     }

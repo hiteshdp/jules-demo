@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
 import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined,FileTextOutlined } from '@ant-design/icons';
-import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col } from 'antd';
+import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Drawer } from 'antd';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
@@ -300,13 +300,13 @@ const Appointments: React.FC = () => {
         </Form>
       </Modal>
 
-      {/* Filter Modal */}
-      <Modal
+      {/* Filter Drawer */}
+      <Drawer
         title="Filter Appointments"
+        placement="right"
         open={showFilters}
-        onCancel={() => setShowFilters(false)}
-        footer={null}
-        width={600}
+        onClose={() => setShowFilters(false)}
+        width={420}
       >
         <Form
           key={`filter-form-${JSON.stringify(filters)}`}
@@ -320,57 +320,24 @@ const Appointments: React.FC = () => {
             status: filters.status || ''
           }}
         >
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="dermatologist_name"
-                label="Dermatologist Name"
-              >
-                <Input
-                  placeholder="Search by dermatologist name"
-                  prefix={<SearchOutlined />}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="status"
-                label="Status"
-              >
-                <Select placeholder="Select status" allowClear>
-                  <Select.Option value="scheduled">Scheduled</Select.Option>
-                  <Select.Option value="in_progress">In Progress</Select.Option>
-                  <Select.Option value="completed">Completed</Select.Option>
-                  <Select.Option value="cancelled">Cancelled</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="date_from"
-                label="From Date"
-              >
-                <DatePicker
-                  placeholder="Select start date"
-                  style={{ width: '100%' }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="date_to"
-                label="To Date"
-              >
-                <DatePicker
-                  placeholder="Select end date"
-                  style={{ width: '100%' }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-          <div className="flex justify-end space-x-2">
+          <Form.Item name="dermatologist_name" label="Dermatologist Name">
+            <Input placeholder="Search by dermatologist name" prefix={<SearchOutlined />} allowClear style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="status" label="Status">
+            <Select placeholder="Select status" allowClear style={{ width: '100%' }}>
+              <Select.Option value="scheduled">Scheduled</Select.Option>
+              <Select.Option value="in_progress">In Progress</Select.Option>
+              <Select.Option value="completed">Completed</Select.Option>
+              <Select.Option value="cancelled">Cancelled</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="date_from" label="From Date">
+            <DatePicker placeholder="Start date" style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="date_to" label="To Date">
+            <DatePicker placeholder="End date" style={{ width: '100%' }} />
+          </Form.Item>
+          <div className="flex items-center gap-2" style={{ marginTop: 4 }}>
             <Button onClick={handleClearFilters}>
               Clear Filters
             </Button>
@@ -379,7 +346,7 @@ const Appointments: React.FC = () => {
             </Button>
           </div>
         </Form>
-      </Modal>
+      </Drawer>
 
       {/* Appointments List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

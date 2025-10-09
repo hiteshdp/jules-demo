@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\AdminSetting;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -260,12 +261,25 @@ class AppointmentController extends Controller
             ], 404);
         }
 
+        // Determine platform commission percentage (create default if missing)
+        $platformCommissionPercentage = AdminSetting::getValue('platform_commission_percentage');
+        if ($platformCommissionPercentage === null) {
+            AdminSetting::setValue('platform_commission_percentage', '0', 'number', 'Platform commission percentage for consultations');
+            $platformCommissionPercentage = 0;
+        }
+
+        $consultationFee = (float) $dermatologist->consultation_fee;
+        $platformFeeAmount = round($consultationFee * ((float)$platformCommissionPercentage / 100), 2);
+        $dermatologistFeeAmount = round($consultationFee - $platformFeeAmount, 2);
+
         $appointment = Appointment::create([
             'patient_id' => $user->id,
             'dermatologist_id' => $validated['dermatologist_id'],
             'scheduled_at' => $validated['scheduled_at'],
             'notes' => $validated['notes'] ?? null,
-            'consultation_fee' => $dermatologist->consultation_fee,
+            'consultation_fee' => $consultationFee,
+            'platform_fee' => $platformFeeAmount,
+            'dermatologist_fee' => $dermatologistFeeAmount,
             'status' => 'scheduled',
         ]);
 
