@@ -407,7 +407,49 @@ class AdminController extends Controller
     }
 
     /**
-     * Get admin settings
+     * @OA\Get(
+     *     path="/admin/settings",
+     *     summary="Get admin settings",
+     *     tags={"Admin Settings"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Settings retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="platform_commission_percentage",
+     *                     type="object",
+     *                     @OA\Property(property="key", type="string", example="platform_commission_percentage"),
+     *                     @OA\Property(property="value", type="string", example="10"),
+     *                     @OA\Property(property="type", type="string", example="number"),
+     *                     @OA\Property(property="description", type="string", example="Platform commission percentage")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="smtp_host",
+     *                     type="object",
+     *                     @OA\Property(property="key", type="string", example="smtp_host"),
+     *                     @OA\Property(property="value", type="string", example="smtp.gmail.com"),
+     *                     @OA\Property(property="type", type="string", example="string"),
+     *                     @OA\Property(property="description", type="string", example="SMTP server host")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="razorpay_key_id",
+     *                     type="object",
+     *                     @OA\Property(property="key", type="string", example="razorpay_key_id"),
+     *                     @OA\Property(property="value", type="string", example="rzp_test_1234567890"),
+     *                     @OA\Property(property="type", type="string", example="string"),
+     *                     @OA\Property(property="description", type="string", example="Razorpay Key ID")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
     public function getSettings(Request $request)
     {
@@ -420,36 +462,112 @@ class AdminController extends Controller
     }
 
     /**
-     * Update admin settings
+     * @OA\Put(
+     *     path="/admin/settings",
+     *     summary="Update admin settings",
+     *     tags={"Admin Settings"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="settings",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="key", type="string", example="platform_commission_percentage"),
+     *                     @OA\Property(property="value", type="string", example="15"),
+     *                     @OA\Property(property="type", type="string", example="number", enum={"string","number","boolean","json"})
+     *                 ),
+     *                 example={
+     *                     {
+     *                         "key": "platform_commission_percentage",
+     *                         "value": "15",
+     *                         "type": "number"
+     *                     },
+     *                     {
+     *                         "key": "smtp_host",
+     *                         "value": "smtp.gmail.com",
+     *                         "type": "string"
+     *                     },
+     *                     {
+     *                         "key": "email_notifications_enabled",
+     *                         "value": "true",
+     *                         "type": "boolean"
+     *                     }
+     *                 }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Settings updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Settings updated successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation errors"),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="settings",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The settings field is required.")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="settings.0.key",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="The settings.0.key field is required.")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated", @OA\JsonContent(ref="#/components/schemas/ApiError")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
+     * )
      */
     public function updateSettings(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'settings' => 'required|array',
-            'settings.*.key' => 'required|string',
-            'settings.*.value' => 'required',
-            'settings.*.type' => 'sometimes|string|in:string,number,boolean,json',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'settings' => 'required|array',
+                'settings.*.key' => 'required|string',
+                'settings.*.value' => 'required',
+                'settings.*.type' => 'sometimes|string|in:string,number,boolean,json',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation errors',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            foreach ($request->settings as $setting) {
+                AdminSetting::setValue(
+                    $setting['key'],
+                    $setting['value'],
+                    $setting['type'] ?? 'string'
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Settings updated successfully'
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Failed to update settings',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        foreach ($request->settings as $setting) {
-            AdminSetting::setValue(
-                $setting['key'],
-                $setting['value'],
-                $setting['type'] ?? 'string'
-            );
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Settings updated successfully'
-        ]);
     }
 }

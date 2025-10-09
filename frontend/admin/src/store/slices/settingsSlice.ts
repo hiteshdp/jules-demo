@@ -54,7 +54,7 @@ const settingsSlice = createSlice({
       })
       .addCase(fetchSettings.fulfilled, (state: any, action: any) => {
         state.loading = false;
-        state.settings = action.payload;
+        state.settings = action.payload.data || action.payload;
       })
       .addCase(fetchSettings.rejected, (state: any, action: any) => {
         state.loading = false;

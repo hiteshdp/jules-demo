@@ -21,7 +21,16 @@ api.interceptors.request.use((config) => {
 export const settingsAPI = {
   getSettings: () =>
     api.get('/admin/settings'),
-  
-  updateSettings: (data: Record<string, any>) =>
-    api.put('/admin/settings', { settings: data }),
+
+  updateSettings: (data: Record<string, any>) => {
+    // Convert object to array format expected by backend
+    const settingsArray = Object.entries(data).map(([key, value]) => ({
+      key,
+      value: String(value),
+      type: typeof value === 'number' ? 'number' :
+        typeof value === 'boolean' ? 'boolean' : 'string'
+    }));
+
+    return api.put('/admin/settings', { settings: settingsArray });
+  },
 };
