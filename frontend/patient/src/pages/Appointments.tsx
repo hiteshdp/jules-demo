@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined } from '@ant-design/icons';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined,CreditCardOutlined,FileTextOutlined } from '@ant-design/icons';
 import { Card, Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Row, Col } from 'antd';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
@@ -13,6 +13,7 @@ const { Text } = Typography;
 
 const Appointments: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { appointments, dermatologists, loading, error } = useSelector((state: RootState) => state.appointment);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [form] = Form.useForm();
@@ -551,9 +552,7 @@ const Appointments: React.FC = () => {
         )}
         </div>
         </div>
-      </div>
-
-      {/* Notes Modal */}
+        {/* Notes Modal */}
       <Modal
         title="Consultation Notes"
         open={notesModal.visible}
@@ -571,8 +570,7 @@ const Appointments: React.FC = () => {
           </Text>
         </div>
       </Modal>
-    </>
-    </div>
+      </div>
   );
 };
 
