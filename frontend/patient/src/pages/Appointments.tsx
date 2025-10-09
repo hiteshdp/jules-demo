@@ -455,22 +455,18 @@ const Appointments: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                        <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg w-full">
                           <ClockCircleOutlined className="text-green-500 text-lg flex-shrink-0" />
-                          <div>
-                            <Text className="text-sm font-medium text-gray-900">
-                              Consultation Fee
-                            </Text>
-                            <Text className="text-lg font-bold text-green-600">
-                              ₹{appointment.consultation_fee ? Number(appointment.consultation_fee).toFixed(2) : '0.00'}
-                            </Text>
-                            {appointment.is_paid && (
-                              <div className="flex items-center space-x-1 mt-1">
-                                <CreditCardOutlined className="text-green-600 text-xs" />
-                                <Text className="text-xs text-green-600 font-medium">Paid</Text>
-                              </div>
-                            )}
-                          </div>
+                          <Text className="text-sm font-medium text-gray-900">Amount Paid</Text>
+                          {appointment.is_paid && (
+                            <div className="flex items-center space-x-1">
+                              <CreditCardOutlined className="text-green-600 text-xs" />
+                              <Text className="text-xs text-green-600 font-medium">Paid</Text>
+                            </div>
+                          )}
+                          <Text className="ml-auto text-base font-bold text-green-600">
+                            ₹{Number(appointment.consultation_fee || 0).toFixed(2)}
+                          </Text>
                         </div>
                       </div>
 
