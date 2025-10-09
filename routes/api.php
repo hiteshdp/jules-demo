@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\DermatologistController;
 use App\Http\Controllers\Api\DermatologistAuthController;
 use App\Http\Controllers\Api\DermatologistAppointmentController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\AppointmentPaymentController;
 use App\Http\Controllers\Api\WebhookController;
 // use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\AdminController;
@@ -69,6 +70,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/subscription/verify', [SubscriptionController::class, 'verifyPayment']);
         Route::get('/subscription/status', [SubscriptionController::class, 'status']);
         Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel']);
+
+        // Appointment Payments
+        Route::post('/appointment/payment/create', [AppointmentPaymentController::class, 'createPayment']);
+        Route::post('/appointment/payment/verify', [AppointmentPaymentController::class, 'verifyPayment']);
     });
 
     // Dermatologist routes

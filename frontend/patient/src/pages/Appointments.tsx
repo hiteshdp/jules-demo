@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchAppointments, fetchDermatologists, bookAppointment } from '../store/slices/appointmentSlice';
-import { Card, List, Avatar, Typography, Space, Button, Form } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, PhoneOutlined } from '@ant-design/icons';
+import { fetchAppointments, fetchDermatologists, createAppointmentPayment, verifyAppointmentPayment } from '../store/slices/appointmentSlice';
+import { Card, Avatar, Typography, Button, Form } from 'antd';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, PlusOutlined, MessageOutlined, EyeOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, EmptyState, StatusTag, Modal, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 
@@ -28,25 +28,72 @@ const Appointments: React.FC = () => {
   }, [dermatologists]);
 
   const handleBookingSubmit = (values: any) => {
-    dispatch(bookAppointment({
+    // Create payment order first
+    dispatch(createAppointmentPayment({
       dermatologist_id: parseInt(values.dermatologist_id),
       scheduled_at: values.scheduled_at,
     }))
       .unwrap()
-      .then(() => {
-        setShowBookingForm(false);
-        form.resetFields();
-        toast.success('Appointment booked successfully!');
-        dispatch(fetchAppointments());
+      .then((paymentData) => {
+        console.log('Payment data received:', paymentData);
+        // Initialize Razorpay payment
+        const options = {
+          key: paymentData.key,
+          amount: paymentData.amount,
+          currency: paymentData.currency,
+          name: 'Hair & Skin Health',
+          description: 'Appointment Booking Payment',
+          order_id: paymentData.order_id,
+          handler: async (response: any) => {
+            // Verify payment on backend
+            dispatch(verifyAppointmentPayment({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              payment_id: paymentData.payment_id,
+            }))
+              .unwrap()
+              .then(() => {
+                setShowBookingForm(false);
+                form.resetFields();
+                toast.success('Payment successful! Appointmachhaent booked.');
+                dispatch(fetchAppointments());
+              })
+              .catch((error) => {
+                toast.error(error || 'Payment verification failed');
+              });
+          },
+          prefill: {
+            name: 'Patient',
+            email: 'patient@example.com',
+            contact: '9999999999'
+          },
+          notes: {
+            address: 'Hair & Skin Health Platform'
+          },
+          theme: {
+            color: '#3399cc'
+          }
+        };
+
+        // Check if Razorpay is loaded
+        if (typeof window !== 'undefined' && window.Razorpay) {
+          console.log('Razorpay loaded, opening payment modal...');
+          const razorpay = new window.Razorpay(options);
+          razorpay.on('payment.failed', () => {
+            toast.error('Payment failed. Please try again.');
+          });
+          razorpay.open();
+        } else {
+          console.error('Razorpay not loaded');
+          toast.error('Payment gateway not loaded. Please refresh the page and try again.');
+        }
       })
       .catch((error) => {
-        toast.error(error || 'Failed to book appointment');
+        toast.error(error || 'Failed to create payment order');
       });
   };
 
-  const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString();
-  };
 
 
   return (
@@ -71,7 +118,7 @@ const Appointments: React.FC = () => {
         open={showBookingForm}
         onCancel={() => setShowBookingForm(false)}
         onOk={() => form.submit()}
-        okText="Book Appointment"
+        okText="Proceed to Payment"
         loading={loading}
         width={600}
       >
@@ -213,6 +260,12 @@ const Appointments: React.FC = () => {
                             <Text className="text-lg font-bold text-green-600">
                               ₹{appointment.consultation_fee}
                             </Text>
+                            {appointment.is_paid && (
+                              <div className="flex items-center space-x-1 mt-1">
+                                <CreditCardOutlined className="text-green-600 text-xs" />
+                                <Text className="text-xs text-green-600 font-medium">Paid</Text>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

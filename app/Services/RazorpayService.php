@@ -90,6 +90,43 @@ class RazorpayService
             return null;
         }
     }
+
+    public function createOrder(int $amount, string $currency, array $options = [])
+    {
+        try {
+            $orderData = [
+                'amount' => $amount,
+                'currency' => $currency,
+                'receipt' => $options['receipt'] ?? 'order_' . time(),
+            ];
+
+            if (isset($options['notes'])) {
+                $orderData['notes'] = $options['notes'];
+            }
+
+            return $this->api->order->create($orderData);
+        } catch (\Throwable $e) {
+            Log::error('Failed to create Razorpay order', [
+                'amount' => $amount,
+                'currency' => $currency,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    public function getOrder(string $orderId)
+    {
+        try {
+            return $this->api->order->fetch($orderId);
+        } catch (\Throwable $e) {
+            Log::error('Failed to fetch Razorpay order', [
+                'order_id' => $orderId,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
 }
 
 

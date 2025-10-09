@@ -1290,6 +1290,24 @@
       "date": "2025-10-08T14:00:00Z",
       "user_prompt": "After payment done then show success or failed pages base on response currently show sample success and faild message but i want to add in dynamic",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "appointment_payment_integration_v1",
+      "path": "prompts/appointment_payment_integration_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_09_082920_create_appointments_payment_table.php",
+        "app/Models/AppointmentPayment.php",
+        "app/Models/Appointment.php",
+        "app/Http/Controllers/Api/AppointmentPaymentController.php",
+        "routes/api.php",
+        "frontend/patient/src/store/api/appointmentAPI.ts",
+        "frontend/patient/src/store/slices/appointmentSlice.ts",
+        "frontend/patient/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-09T08:30:00Z",
+      "user_prompt": "now i want to add functionality like when click on booking appointment button then first one time payment in razor pay once payment is done then store payment information with create new table sppointments_payment and store all the payment information",
+      "prompt_type": "user_request"
     }
   ]
 }
