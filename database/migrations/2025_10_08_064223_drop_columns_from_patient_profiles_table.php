@@ -13,15 +13,34 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('patient_profiles', function (Blueprint $table) {
-            $table->dropColumn([
-                'medical_history',
-                'lifestyle',
-                'dietary_habits',
-                'stress_level',
-                'sleep_pattern',
-                'hair_care_routine',
-                'family_history'
-            ]);
+            // Drop columns only if they exist
+            $columnsToDrop = [];
+            
+            if (Schema::hasColumn('patient_profiles', 'medical_history')) {
+                $columnsToDrop[] = 'medical_history';
+            }
+            if (Schema::hasColumn('patient_profiles', 'lifestyle')) {
+                $columnsToDrop[] = 'lifestyle';
+            }
+            if (Schema::hasColumn('patient_profiles', 'dietary_habits')) {
+                $columnsToDrop[] = 'dietary_habits';
+            }
+            if (Schema::hasColumn('patient_profiles', 'stress_level')) {
+                $columnsToDrop[] = 'stress_level';
+            }
+            if (Schema::hasColumn('patient_profiles', 'sleep_pattern')) {
+                $columnsToDrop[] = 'sleep_pattern';
+            }
+            if (Schema::hasColumn('patient_profiles', 'hair_care_routine')) {
+                $columnsToDrop[] = 'hair_care_routine';
+            }
+            if (Schema::hasColumn('patient_profiles', 'family_history')) {
+                $columnsToDrop[] = 'family_history';
+            }
+            
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 
@@ -31,13 +50,28 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('patient_profiles', function (Blueprint $table) {
-            $table->text('medical_history')->nullable();
-            $table->enum('lifestyle', ['sedentary', 'moderate', 'active', 'very_active'])->nullable();
-            $table->text('dietary_habits')->nullable();
-            $table->text('stress_level')->nullable();
-            $table->text('sleep_pattern')->nullable();
-            $table->text('hair_care_routine')->nullable();
-            $table->text('family_history')->nullable();
+            // Add columns only if they don't exist
+            if (!Schema::hasColumn('patient_profiles', 'medical_history')) {
+                $table->text('medical_history')->nullable();
+            }
+            if (!Schema::hasColumn('patient_profiles', 'lifestyle')) {
+                $table->enum('lifestyle', ['sedentary', 'moderate', 'active', 'very_active'])->nullable();
+            }
+            if (!Schema::hasColumn('patient_profiles', 'dietary_habits')) {
+                $table->text('dietary_habits')->nullable();
+            }
+            if (!Schema::hasColumn('patient_profiles', 'stress_level')) {
+                $table->text('stress_level')->nullable();
+            }
+            if (!Schema::hasColumn('patient_profiles', 'sleep_pattern')) {
+                $table->text('sleep_pattern')->nullable();
+            }
+            if (!Schema::hasColumn('patient_profiles', 'hair_care_routine')) {
+                $table->text('hair_care_routine')->nullable();
+            }
+            if (!Schema::hasColumn('patient_profiles', 'family_history')) {
+                $table->text('family_history')->nullable();
+            }
         });
     }
 };

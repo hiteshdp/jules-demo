@@ -6,7 +6,7 @@ build_laravel:
   tags:
     - PHP_PROJECTS
   script:
-    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/
+    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/* ubuntu@3.109.28.118:/var/www/html/hair-skin-health/
     - |
       ssh -o StrictHostKeyChecking=no -p 22 ubuntu@3.109.28.118 << 'EOF'
         cd /var/www/html/hair-skin-health
@@ -20,17 +20,6 @@ build_laravel:
       EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "stage"'
-      changes:
-        - app/**
-        - bootstrap/**
-        - config/**
-        - database/**
-        - public/**
-        - resources/**
-        - routes/**
-        - composer.json
-        - composer.lock
-        - artisan
   allow_failure: false
 
 build_admin:
@@ -50,6 +39,7 @@ build_admin:
   - changes:
       - frontend/admin/**
     if: '$CI_COMMIT_BRANCH == "stage"'
+  - if: '$CI_COMMIT_BRANCH == "stage"'
   allow_failure: false
 
 build_dermatologist:
@@ -69,6 +59,7 @@ build_dermatologist:
   - changes:
       - frontend/dermatologist/**
     if: '$CI_COMMIT_BRANCH == "stage"'
+  - if: '$CI_COMMIT_BRANCH == "stage"'  
   allow_failure: false
 
 build_patient:
@@ -88,4 +79,5 @@ build_patient:
   - changes:
       - frontend/patient/**
     if: '$CI_COMMIT_BRANCH == "stage"'
+  - if: '$CI_COMMIT_BRANCH == "stage"'  
   allow_failure: false
