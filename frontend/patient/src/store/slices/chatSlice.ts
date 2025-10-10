@@ -34,11 +34,11 @@ export const fetchChatMessages = createAsyncThunk(
 export const sendChatMessage = createAsyncThunk(
   'chat/sendMessage',
   async (
-    { appointmentId, message }: { appointmentId: number; message: string },
+    { appointmentId, message, file }: { appointmentId: number; message: string; file?: File },
     { rejectWithValue }
   ) => {
     try {
-      const response = await chatAPI.sendMessage(appointmentId, { message });
+      const response = await chatAPI.sendMessage(appointmentId, { message, file });
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to send message');
