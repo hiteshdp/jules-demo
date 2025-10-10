@@ -92,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments', [DermatologistAppointmentController::class, 'index']);
         Route::get('/appointments/{id}', [DermatologistAppointmentController::class, 'show']);
         Route::put('/appointments/{id}/status', [DermatologistAppointmentController::class, 'updateStatus']);
+        Route::put('/appointments/{id}/reschedule', [DermatologistAppointmentController::class, 'reschedule']);
 
         // Appointment Chat (Dermatologist)
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);

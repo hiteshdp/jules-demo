@@ -322,7 +322,8 @@ class DermatologistAppointmentController extends Controller
 
         $request->validate([
             'status' => 'required|in:scheduled,in_progress,completed',
-            'notes' => 'nullable|string|max:1000'
+            'notes' => 'nullable|string|max:1000',
+            'scheduled_at' => 'nullable|date|after:now'
         ]);
 
         $appointment = Appointment::where('id', $id)
@@ -336,16 +337,74 @@ class DermatologistAppointmentController extends Controller
             ], 404);
         }
 
-        $appointment->update([
+        $payload = [
             'status' => $request->status,
-            'notes' => $request->notes ?? $appointment->notes
-        ]);
+            'notes' => $request->notes ?? $appointment->notes,
+        ];
+        if ($request->filled('scheduled_at')) {
+            $payload['scheduled_at'] = $request->scheduled_at;
+        }
+        $appointment->update($payload);
 
         $appointment->load(['patient', 'dermatologist.user']);
 
         return response()->json([
             'success' => true,
             'message' => 'Appointment status updated successfully',
+            'data' => [
+                'appointment' => $appointment
+            ]
+        ]);
+    }
+
+    /**
+     * Reschedule appointment date/time (dermatologist)
+     */
+    public function reschedule(Request $request, $id)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
+        if (!$dermatologist) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied. Dermatologist profile not found.'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'scheduled_at' => 'required|date|after:now',
+        ]);
+
+        $appointment = Appointment::where('id', $id)
+            ->where('dermatologist_id', $dermatologist->id)
+            ->first();
+
+        if (!$appointment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Appointment not found'
+            ], 404);
+        }
+
+        // Interpret incoming datetime in app timezone (local), store accordingly
+        $dt = \Carbon\Carbon::parse($validated['scheduled_at']); // respects incoming offset if present
+        // Normalize to app timezone before saving (so UI formatting is consistent)
+        $appointment->scheduled_at = $dt->setTimezone(config('app.timezone'));
+        // keep status as is unless previously cancelled (not used)
+        $appointment->save();
+
+        $appointment->load(['patient', 'dermatologist.user']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Appointment rescheduled successfully',
             'data' => [
                 'appointment' => $appointment
             ]
@@ -385,19 +444,23 @@ class DermatologistAppointmentController extends Controller
                 'Patient Name',
                 'Scheduled Date & Time',
                 'Status',
-                'Consultation Fee',
+                'Payout Amount',
                 'Payment Status',
                 'Notes'
             ]);
 
             // CSV data
             foreach ($appointments as $appointment) {
+                $sharePercent = (float) env('DERMATOLOGIST_SHARE_PERCENT', 70);
+                $payout = isset($appointment->dermatologist_fee)
+                    ? (float) $appointment->dermatologist_fee
+                    : ((float) $appointment->consultation_fee) * $sharePercent / 100.0;
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',
                     $appointment->scheduled_at->format('d M Y, h:i A'),
                     $appointment->status,
-                    '₹' . number_format($appointment->consultation_fee, 2),
+                    '₹' . number_format($payout, 2),
                     $appointment->is_paid ? 'Paid' : 'Unpaid',
                     $appointment->notes ?? 'N/A'
                 ]);
@@ -433,19 +496,23 @@ class DermatologistAppointmentController extends Controller
                 'Patient Name',
                 'Scheduled Date & Time',
                 'Status',
-                'Consultation Fee',
+                'Payout Amount',
                 'Payment Status',
                 'Notes'
             ]);
 
             // Excel data
             foreach ($appointments as $appointment) {
+                $sharePercent = (float) env('DERMATOLOGIST_SHARE_PERCENT', 70);
+                $payout = isset($appointment->dermatologist_fee)
+                    ? (float) $appointment->dermatologist_fee
+                    : ((float) $appointment->consultation_fee) * $sharePercent / 100.0;
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',
                     $appointment->scheduled_at->format('d M Y, h:i A'),
                     $appointment->status,
-                    '₹' . number_format($appointment->consultation_fee, 2),
+                    '₹' . number_format($payout, 2),
                     $appointment->is_paid ? 'Paid' : 'Unpaid',
                     $appointment->notes ?? 'N/A'
                 ]);

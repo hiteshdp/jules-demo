@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchAppointments } from '../store/slices/appointmentSlice';
-import { Card, Avatar, Typography, Button, Tabs, Input, DatePicker, Select, Space, Drawer, Form, Modal } from 'antd';
-import { CalendarOutlined, ClockCircleOutlined, UserOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined, FileTextOutlined } from '@ant-design/icons';
-import { PageHeader, LoadingSpinner, EmptyState, StatusTag } from '../components/common';
+import { fetchAppointments, updateAppointmentStatus, rescheduleAppointment } from '../store/slices/appointmentSlice';
+import { Avatar, Typography, Button, Tabs, Input, DatePicker, Select, Space, Drawer, Form, Modal, Tooltip, Dropdown, Tag, Divider } from 'antd';
+import { CalendarOutlined, ClockCircleOutlined, UserOutlined, MessageOutlined, EyeOutlined, SearchOutlined, DownloadOutlined, FilterOutlined, FileTextOutlined, CreditCardOutlined } from '@ant-design/icons';
+import { PageHeader, LoadingSpinner, EmptyState } from '../components/common';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
 
@@ -28,6 +28,11 @@ const Appointments: React.FC = () => {
     visible: false,
     notes: '',
     appointmentId: null as number | null
+  });
+  const [rescheduleModal, setRescheduleModal] = useState({
+    visible: false,
+    appointmentId: null as number | null,
+    value: null as any
   });
 
   useEffect(() => {
@@ -151,6 +156,28 @@ const Appointments: React.FC = () => {
     }
   };
 
+  const handleStatusChange = async (appointmentId: number, newStatus: string) => {
+    try {
+      await dispatch(updateAppointmentStatus({ appointmentId, status: newStatus })).unwrap();
+      toast.success('Status updated');
+    } catch (error: any) {
+      console.error('Status update failed:', error);
+      toast.error(typeof error === 'string' ? error : 'Failed to update status');
+    }
+  };
+
+  const handleReschedule = async (appointmentId: number, scheduled_at: string) => {
+    try {
+      await dispatch(rescheduleAppointment({ appointmentId, scheduled_at })).unwrap();
+      // Optimistic UI: update local list time without page refresh
+      dispatch(fetchAppointments());
+      toast.success('Appointment rescheduled');
+    } catch (error: any) {
+      console.error('Reschedule failed:', error);
+      toast.error(typeof error === 'string' ? error : 'Failed to reschedule');
+    }
+  };
+
   const handleAppointmentClick = (appointmentId: number) => {
     navigate(`/appointments/${appointmentId}`);
   };
@@ -248,7 +275,7 @@ const Appointments: React.FC = () => {
 
       {/* Appointments List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-semibold text-gray-900">Patient Appointments</h3>
@@ -257,7 +284,7 @@ const Appointments: React.FC = () => {
               </p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-gray-900">
                 {filteredAppointments.length}
               </div>
               <div className="text-sm text-gray-500">
@@ -294,112 +321,124 @@ const Appointments: React.FC = () => {
               onAction={Array.isArray(appointments) && appointments.length > 0 ? handleClearFilters : undefined}
             />
           ) : (
-            <div className="space-y-4">
-              {filteredAppointments.map((appointment) => (
-                <Card
-                  key={appointment.id}
-                  className="hover:shadow-lg transition-all duration-300 border-0 shadow-sm hover:shadow-md"
-                  bodyStyle={{ padding: '20px' }}
-                >
-                  <div className="flex items-center justify-between">
-                    {/* Left Side - Patient Info */}
-                    <div className="flex items-start space-x-4 flex-1">
-                      <Avatar 
-                        size={56} 
-                        icon={<UserOutlined />} 
-                        className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <Text strong className="text-lg text-gray-900">
-                            {appointment.patient?.name || 'Unknown Patient'}
-                          </Text>
-                          <StatusTag status={appointment.status} />
-                        </div>
-                        <div className="text-sm text-gray-500 mb-3">
-                          Patient
-                        </div>
-                        
-                        {/* Appointment Details */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                            <CalendarOutlined className="text-blue-500 text-lg flex-shrink-0" />
-                            <div>
-                              <Text className="text-sm font-medium text-gray-900">
-                                {(appointment as any).formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', {
-                                  weekday: 'long',
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}
-                              </Text>
-                              <Text className="text-sm text-gray-500">
-                                {(appointment as any).formatted_date_time ? '' : new Date(appointment.scheduled_at).toLocaleTimeString('en-US', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </Text>
+            <div className="space-y-2">
+              {filteredAppointments.map((appointment, idx) => {
+                const statusColor = appointment.status === 'completed' ? 'green' : appointment.status === 'in_progress' ? 'blue' : 'default';
+                const totalPaid = Number(appointment.consultation_fee || 0);
+                const doctorSharePercent = Number((import.meta as any).env?.VITE_DERMATOLOGIST_SHARE_PERCENT || 70);
+                const doctorAmount = (totalPaid * doctorSharePercent) / 100;
+
+                return (
+                  <div key={appointment.id} className="px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between gap-4">
+                      {/* Left - Identity and meta */}
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <Avatar size={48} icon={<UserOutlined />} className="bg-blue-500/90 text-white" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Text strong className="text-base text-gray-900 truncate">
+                              {appointment.patient?.name || 'Unknown Patient'}
+                            </Text>
+                            <Tag color={statusColor} style={{ marginInlineStart: 0 }}>
+                              {appointment.status.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                            </Tag>
+                            {appointment.is_paid && (
+                              <Tag color="success" icon={<CreditCardOutlined />}>Paid</Tag>
+                            )}
+                          </div>
+                          <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="flex items-center gap-2 text-gray-700">
+                              <CalendarOutlined className="text-blue-500" />
+                              <span className="text-sm">
+                                {(appointment as any).formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-700">
+                              <ClockCircleOutlined className="text-green-500" />
+                              <span className="text-sm font-semibold text-green-700">₹{doctorAmount.toFixed(2)}</span>
+                              <span className="text-xs text-gray-500">your payout</span>
                             </div>
                           </div>
-
-                          {(() => {
-                            const totalPaid = Number(appointment.consultation_fee || 0);
-                            const doctorSharePercent = Number((import.meta as any).env?.VITE_DERMATOLOGIST_SHARE_PERCENT || 70);
-                            const doctorAmount = (totalPaid * doctorSharePercent) / 100;
-                            return (
-                              <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg w-full">
-                                <ClockCircleOutlined className="text-green-500 text-lg flex-shrink-0" />
-                                <Text className="text-sm font-medium text-gray-900">Amount Paid</Text>
-                                <Text className="ml-auto text-base font-bold text-green-600">₹{doctorAmount.toFixed(2)}</Text>
-                              </div>
-                            );
-                          })()}
                         </div>
+                      </div>
 
+                      {/* Right - Actions */}
+                      <div className="flex items-center gap-8 ml-4">
+                        {/* Status menu */}
+                        <Dropdown
+                          trigger={["click"]}
+                          menu={{
+                            items: [
+                              { key: 'scheduled', label: 'Scheduled', onClick: () => handleStatusChange(appointment.id, 'scheduled') },
+                              { key: 'in_progress', label: 'In Progress', onClick: () => handleStatusChange(appointment.id, 'in_progress') },
+                              { key: 'completed', label: 'Completed', onClick: () => handleStatusChange(appointment.id, 'completed') },
+                            ]
+                          }}
+                        >
+                          <Button onClick={(e) => e.stopPropagation()} size="small">
+                            Change Status
+                          </Button>
+                        </Dropdown>
+
+                        <Button
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          // Seed with DB-local time (avoid timezone shift): treat as local by inserting 'T'
+                          let seed: any;
+                          if (typeof appointment.scheduled_at === 'string') {
+                            const s = appointment.scheduled_at as any;
+                            if (String(s).endsWith('Z')) {
+                              const d = dayjs(s);
+                              seed = d.subtract(d.utcOffset(), 'minute');
+                            } else {
+                              seed = dayjs(String(s).includes(' ') ? String(s).replace(' ', 'T') : s);
+                            }
+                          } else {
+                            seed = dayjs(new Date(appointment.scheduled_at));
+                          }
+                          setRescheduleModal({ visible: true, appointmentId: appointment.id, value: seed });
+                          }}
+                        >
+                          Reschedule
+                        </Button>
+
+                        <Space size="small">
+                          <Tooltip title="Chat">
+                            <Button
+                              type="primary"
+                              shape="circle"
+                              icon={<MessageOutlined />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/chat?appointmentId=${appointment.id}`);
+                              }}
+                            />
+                          </Tooltip>
+                          <Tooltip title="Details">
+                            <Button
+                              shape="circle"
+                              icon={<EyeOutlined />}
+                              onClick={() => handleAppointmentClick(appointment.id)}
+                            />
+                          </Tooltip>
+                          <Tooltip title="Notes">
+                            <Button
+                              shape="circle"
+                              icon={<FileTextOutlined />}
+                              onClick={() => handleShowNotes(appointment)}
+                            />
+                          </Tooltip>
+                        </Space>
                       </div>
                     </div>
 
-                    {/* Right Side - Actions */}
-                    <div className="flex flex-col space-y-3 ml-4 min-w-[140px]">
-                      {/* Chat Button */}
-                      <Button
-                        type="primary"
-                        icon={<MessageOutlined />}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/chat?appointmentId=${appointment.id}`);
-                        }}
-                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                        size="middle"
-                      >
-                        <span className="font-medium">Start Chat</span>
-                      </Button>
-                      
-                      {/* View Details Button */}
-                      <Button
-                        type="default"
-                        icon={<EyeOutlined />}
-                        onClick={() => handleAppointmentClick(appointment.id)}
-                        className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 text-gray-700 hover:text-gray-900"
-                        size="middle"
-                      >
-                        <span className="font-medium">View Details</span>
-                      </Button>
-                      
-                      {/* Notes Button */}
-                      <Button
-                        type="default"
-                        icon={<FileTextOutlined />}
-                        onClick={() => handleShowNotes(appointment)}
-                        className="bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 text-gray-700 hover:text-gray-900"
-                        size="middle"
-                      >
-                        <span className="font-medium">Notes</span>
-                      </Button>
-                    </div>
+                    {idx < filteredAppointments.length - 1 && (
+                      <Divider className="!my-3" />
+                    )}
                   </div>
-                </Card>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -422,6 +461,29 @@ const Appointments: React.FC = () => {
             {notesModal.notes}
           </Text>
         </div>
+      </Modal>
+
+      {/* Reschedule Modal */}
+      <Modal
+        title="Reschedule Appointment"
+        open={rescheduleModal.visible}
+        onCancel={() => setRescheduleModal({ visible: false, appointmentId: null, value: null })}
+        onOk={async () => {
+          if (!rescheduleModal.value || !rescheduleModal.appointmentId) return;
+          // Send formatted local datetime as Y-m-d H:i:s to avoid timezone shifts
+          // Send as local wall time without timezone to match DB (stores 24)
+          const localString = dayjs(rescheduleModal.value as any).format('YYYY-MM-DD HH:mm:ss');
+          await handleReschedule(rescheduleModal.appointmentId!, localString);
+          setRescheduleModal({ visible: false, appointmentId: null, value: null });
+        }}
+        okText="Continue"
+      >
+        <DatePicker
+          showTime
+          style={{ width: '100%' }}
+          value={rescheduleModal.value}
+          onChange={(v) => setRescheduleModal({ ...rescheduleModal, value: v })}
+        />
       </Modal>
     </div>
   );
