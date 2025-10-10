@@ -1670,6 +1670,17 @@
       "date": "2025-10-09T10:05:00Z",
       "user_prompt": "I have consultation fees in appointments table in database. Now i need to add other fields related to the fee. Dermatologist_fee, platform fee. In general setting need to add new column called platform fee in (%) and and that fee will deduct from the consultation fees and remaing amount will be Dermatologist_fee and the (%) amount is platform fee. I need to store this fee when appointment is created. Also check if there is not setting for platform fee in admin side than add it",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "admin_appointment_fee_columns_v1",
+      "path": "prompts/admin_appointment_fee_columns_v1.md",
+      "used_in": [
+        "frontend/admin/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-27T12:00:00Z",
+      "user_prompt": "In the Admin → Appointment section, update the **appointment listing** so that three new columns are displayed **before the \"Payment Status\"** column. These values already exist in the database (`appointments` table). | Display Label | Database Column | |----------------|----------------| | Consultation Fee | consultation_fee | | Dermatologist Payout | dermatologist_fee | | Platform Commission | platform_fee | make sure you handle the frontend and backend both and make it working properly",
+      "prompt_type": "user_request"
     }
   ]
 }
