@@ -20,17 +20,6 @@ build_laravel:
       EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "stage"'
-      changes:
-        - app/**
-        - bootstrap/**
-        - config/**
-        - database/**
-        - public/**
-        - resources/**
-        - routes/**
-        - composer.json
-        - composer.lock
-        - artisan
   allow_failure: false
 
 build_admin:
