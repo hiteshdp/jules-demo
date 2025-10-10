@@ -15,7 +15,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter basename="/admin">
         <App />
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       </BrowserRouter>
