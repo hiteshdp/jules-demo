@@ -21,7 +21,7 @@ const navigation = [
   { key: '/dermatologists', label: 'Dermatologists', icon: <UserOutlined /> },
   { key: '/appointments', label: 'Appointments', icon: <CalendarOutlined /> },
   { key: '/products', label: 'Products', icon: <ShoppingOutlined /> },
-  { key: '/payments', label: 'Payments', icon: <DollarOutlined /> },
+  { key: '/subscriptions', label: 'Subscriptions', icon: <DollarOutlined /> },
   { key: '/settings', label: 'Settings', icon: <SettingOutlined /> },
 ];
 
