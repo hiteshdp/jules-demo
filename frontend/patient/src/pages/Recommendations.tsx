@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { RootState } from '../store/store';
 import { Card, Row, Col, Typography, Button, Space, Alert } from 'antd';
 import { BulbOutlined, ShoppingCartOutlined, CalendarOutlined } from '@ant-design/icons';
@@ -16,6 +17,7 @@ interface Recommendation {
 const { Title, Text } = Typography;
 
 const Recommendations: React.FC = () => {
+  const navigate = useNavigate();
   const { isSubmitted } = useSelector((state: RootState) => state.quiz);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +93,7 @@ const Recommendations: React.FC = () => {
         title="No recommendations yet"
         description="Complete the hair loss quiz to get personalized recommendations."
         actionText="Take Quiz"
-        onAction={() => window.location.href = '/quiz'}
+        onAction={() => navigate('/quiz')}
       />
     );
   }
@@ -158,13 +160,13 @@ const Recommendations: React.FC = () => {
           <Space>
             <Button
               type="link"
-              onClick={() => window.location.href = '/appointments'}
+              onClick={() => navigate('/appointments')}
             >
               Book Appointment
             </Button>
             <Button
               type="link"
-              onClick={() => window.location.href = '/products'}
+              onClick={() => navigate('/products')}
             >
               Browse Products
             </Button>

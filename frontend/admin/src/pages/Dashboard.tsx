@@ -1,5 +1,6 @@
 // Generated via prompt: prompts/antd_admin_full_conversion_v1.md
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Card, 
   Row, 
@@ -28,6 +29,7 @@ const { Title, Text } = Typography;
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { data, loading, error } = useSelector((state: RootState) => state.dashboard);
 
   useEffect(() => {
@@ -188,7 +190,7 @@ const Dashboard: React.FC = () => {
             <Card 
               hoverable
               style={{ textAlign: 'center' }}
-              onClick={() => window.location.href = '/patients'}
+              onClick={() => navigate('/patients')}
             >
               <TeamOutlined style={{ fontSize: 32, color: '#1890ff', marginBottom: 16 }} />
               <Title level={4}>Manage Patients</Title>
@@ -202,7 +204,7 @@ const Dashboard: React.FC = () => {
             <Card 
               hoverable
               style={{ textAlign: 'center' }}
-              onClick={() => window.location.href = '/dermatologists'}
+              onClick={() => navigate('/dermatologists')}
             >
               <UserOutlined style={{ fontSize: 32, color: '#52c41a', marginBottom: 16 }} />
               <Title level={4}>Manage Dermatologists</Title>
@@ -216,7 +218,7 @@ const Dashboard: React.FC = () => {
             <Card 
               hoverable
               style={{ textAlign: 'center' }}
-              onClick={() => window.location.href = '/appointments'}
+              onClick={() => navigate('/appointments')}
             >
               <CalendarOutlined style={{ fontSize: 32, color: '#722ed1', marginBottom: 16 }} />
               <Title level={4}>View Appointments</Title>
@@ -230,7 +232,7 @@ const Dashboard: React.FC = () => {
             <Card 
               hoverable
               style={{ textAlign: 'center' }}
-              onClick={() => window.location.href = '/settings'}
+              onClick={() => navigate('/settings')}
             >
               <SettingOutlined style={{ fontSize: 32, color: '#8c8c8c', marginBottom: 16 }} />
               <Title level={4}>System Settings</Title>

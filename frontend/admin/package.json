@@ -2,6 +2,7 @@
   "name": "hair-skin-health-admin",
   "version": "1.0.0",
   "description": "Hair Loss Diagnosis & Treatment Platform - Admin Panel",
+  "homepage": "/admin/",
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^6.1.0",

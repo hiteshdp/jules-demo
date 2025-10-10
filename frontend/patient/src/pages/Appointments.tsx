@@ -479,7 +479,7 @@ const Appointments: React.FC = () => {
                     <Button
                       type="primary"
                       icon={<MessageOutlined />}
-                      onClick={() => window.location.href = `/chat?appointmentId=${appointment.id}`}
+                      onClick={() => navigate(`/chat?appointmentId=${appointment.id}`)}
                       className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="middle"
                     >

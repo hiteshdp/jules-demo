@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { updateAppointmentStatus } from '../store/slices/appointmentSlice';
@@ -20,6 +20,7 @@ const { TextArea } = Input;
 
 const AppointmentDetail: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { appointments } = useSelector((state: RootState) => state.appointment);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -186,7 +187,7 @@ const AppointmentDetail: React.FC = () => {
                   type="primary" 
                   icon={<MessageOutlined />}
                   className="w-full"
-                  onClick={() => window.location.href = `/chat?appointmentId=${appointment.id}`}
+                  onClick={() => navigate(`/chat?appointmentId=${appointment.id}`)}
                 >
                   Start Chat
                 </Button>

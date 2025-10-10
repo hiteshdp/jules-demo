@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Hair Loss Diagnosis & Treatment Platform - Patient App",
   "private": true,
+  "homepage": "/patient/",
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@headlessui/react": "^2.1.0",

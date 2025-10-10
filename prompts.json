@@ -1672,6 +1672,31 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "navigation_basename_fix_v1",
+      "path": "prompts/navigation_basename_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/AppointmentDetail.tsx",
+        "frontend/patient/src/pages/Dashboard.tsx",
+        "frontend/patient/src/pages/Recommendations.tsx",
+        "frontend/patient/src/components/common/ErrorBoundary.tsx",
+        "frontend/patient/src/store/api/apiClient.ts",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/components/common/ErrorBoundary.tsx",
+        "frontend/dermatologist/src/store/api/apiClient.ts",
+        "frontend/admin/src/pages/Dashboard.tsx",
+        "frontend/admin/src/components/common/ErrorBoundary.tsx",
+        "frontend/admin/src/store/api/dashboardAPI.ts",
+        "frontend/admin/src/store/api/dermatologistAPI.ts",
+        "frontend/admin/src/store/api/patientAPI.ts",
+        "frontend/admin/src/store/api/authAPI.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T12:00:00Z",
+      "user_prompt": "BrowserRouter basename=\"/dermatologist\" I have added this please fixed all the plave navigation based on that for patient we use basename=\"/patient\" please fixed everywhere",
+    },
+    {
       "id": "admin_appointment_fee_columns_v1",
       "path": "prompts/admin_appointment_fee_columns_v1.md",
       "used_in": [
