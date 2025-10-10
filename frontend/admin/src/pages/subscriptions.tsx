@@ -42,7 +42,6 @@ import {
   EyeOutlined,
   FilterOutlined,
   ReloadOutlined,
-  MoreOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
