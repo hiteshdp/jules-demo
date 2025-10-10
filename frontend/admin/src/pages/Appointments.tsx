@@ -336,24 +336,35 @@ const Appointments: React.FC = () => {
     {
       title: 'Payment Status',
       key: 'payment',
-      width: 130,
-      render: (_, record) => (
-        <Select
-          size="small"
-          value={record.is_paid ? 'completed' : 'pending'}
-          style={{ width: 120 }}
-          onChange={(value) => {
-            dispatch(updateAppointmentPaymentStatus({ id: record.id, status: value }));
-          }}
-          options={[
-            { label: 'Pending', value: 'pending' },
-            { label: 'Completed', value: 'completed' },
-            { label: 'Failed', value: 'failed' },
-            { label: 'Refunded', value: 'refunded' },
-            { label: 'Cancelled', value: 'cancelled' },
-          ]}
-        />
-      ),
+      width: 180,
+      render: (_, record) => {
+        const latestPayment = record.payments && record.payments.length > 0 
+          ? record.payments[record.payments.length - 1] 
+          : null;
+        const paidAt = latestPayment?.paid_at;
+        
+        return (
+          <div>
+            <Select
+              size="small"
+              value={record.is_paid ? 'completed' : 'pending'}
+              style={{ width: 120 }}
+              onChange={(value) => {
+                dispatch(updateAppointmentPaymentStatus({ id: record.id, status: value }));
+              }}
+              options={[
+                { label: 'Pending', value: 'pending' },
+                { label: 'Completed', value: 'completed' },
+              ]}
+            />
+            {record.is_paid && paidAt && (
+              <div style={{ marginTop: 4, fontSize: '11px', color: '#666' }}>
+                Paid: {formatDateTime(paidAt)}
+              </div>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: 'Actions',
