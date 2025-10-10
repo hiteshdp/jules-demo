@@ -76,7 +76,7 @@ class Appointment extends Model
      */
     public function dermatologist()
     {
-        return $this->belongsTo(Dermatologist::class, 'dermatologist_id', 'user_id');
+        return $this->belongsTo(User::class, 'dermatologist_id');
     }
 
     /**

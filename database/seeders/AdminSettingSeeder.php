@@ -93,12 +93,6 @@ class AdminSettingSeeder extends Seeder
                 'description' => 'OpenAI API Key for AI recommendations',
             ],
             [
-                'key' => 'appointment_reminder_hours',
-                'value' => '24',
-                'type' => 'number',
-                'description' => 'Hours before appointment to send reminder',
-            ],
-            [
                 'key' => 'max_file_upload_size',
                 'value' => '10485760',
                 'type' => 'number',
