@@ -19,6 +19,8 @@ const Chat: React.FC = () => {
   
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [isSwitchingAppointment, setIsSwitchingAppointment] = useState(false);
+  const [isManualSelection, setIsManualSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
@@ -31,30 +33,46 @@ const Chat: React.FC = () => {
   const queryAppointmentId = useMemo(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get('appointmentId');
-    return id ? parseInt(id, 10) : null;
+    const parsedId = id ? parseInt(id, 10) : null;
+    return parsedId;
   }, [location.search]);
 
+  // Initialize from URL on first load only
   useEffect(() => {
-    if (queryAppointmentId && queryAppointmentId !== selectedAppointmentId) {
+    // Only set from URL on initial load (when selectedAppointmentId is null)
+    if (queryAppointmentId && !selectedAppointmentId && !isManualSelection) {
       setSelectedAppointmentId(queryAppointmentId);
     }
-  }, [queryAppointmentId, selectedAppointmentId]);
+  }, [queryAppointmentId, selectedAppointmentId, isManualSelection]);
 
   useEffect(() => {
     if (selectedAppointmentId) {
       dispatch(clearMessages()); // Clear previous messages
-      dispatch(fetchChatMessages(selectedAppointmentId));
+      dispatch(fetchChatMessages(selectedAppointmentId))
+        .catch((error) => {
+          // Handle error silently to prevent chat reversion
+          console.warn('Failed to fetch messages for appointment:', selectedAppointmentId, error);
+        });
     }
   }, [selectedAppointmentId, dispatch]);
 
   // Polling: refetch messages every 5s
   useEffect(() => {
     if (!selectedAppointmentId) return;
+    
     const interval = setInterval(() => {
-      dispatch(fetchChatMessages(selectedAppointmentId));
-    }, 1000);
+      // Only poll if we're not currently switching appointments
+      if (!isSwitchingAppointment) {
+        dispatch(fetchChatMessages(selectedAppointmentId))
+          .catch((error) => {
+            // Handle polling errors silently
+            console.warn('Polling error for appointment:', selectedAppointmentId, error);
+          });
+      }
+    }, 5000);
+    
     return () => clearInterval(interval);
-  }, [selectedAppointmentId, dispatch]);
+  }, [selectedAppointmentId, dispatch, isSwitchingAppointment]);
 
   // Track whether user is near bottom
   const handleScroll = () => {
@@ -76,6 +94,27 @@ const Chat: React.FC = () => {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
   }, [currentMessages, selectedAppointmentId, isNearBottom]);
+
+  const handleAppointmentClick = (appointmentId: number) => {
+    // Don't change if already selected or currently switching
+    if (selectedAppointmentId === appointmentId || isSwitchingAppointment) {
+      return;
+    }
+    
+    setIsManualSelection(true); // Mark as manual selection
+    setIsSwitchingAppointment(true);
+    setSelectedAppointmentId(appointmentId);
+    
+    // Update URL query param to keep UI in sync
+    const params = new URLSearchParams(location.search);
+    params.set('appointmentId', String(appointmentId));
+    window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+    
+    // Reset switching state after a delay
+    setTimeout(() => {
+      setIsSwitchingAppointment(false);
+    }, 1000);
+  };
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,21 +177,30 @@ const Chat: React.FC = () => {
                     key={appointment.id}
                     size="small"
                     hoverable
-                    onClick={() => setSelectedAppointmentId(appointment.id)}
-                    className={`cursor-pointer transition-colors ${
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAppointmentClick(appointment.id);
+                    }}
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                       selectedAppointmentId === appointment.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : isSwitchingAppointment
+                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-25'
                     }`}
                     bodyStyle={{ padding: '12px' }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <Typography.Text strong className="text-sm">
-                        {appointment.dermatologist?.user?.name || 'Unknown Doctor'}
+                        {appointment.dermatologist?.name || 'Unknown Doctor'}
                       </Typography.Text>
-                      <Tag color={appointment.status === 'scheduled' ? 'blue' : appointment.status === 'completed' ? 'green' : 'default'}>
-                        {appointment.status}
-                      </Tag>
+                      <div className="flex items-center space-x-2">
+                        <Tag color={appointment.status === 'scheduled' ? 'blue' : appointment.status === 'completed' ? 'green' : 'default'}>
+                          {appointment.status}
+                        </Tag>
+                        <div className="text-xs text-gray-400">Click to chat</div>
+                      </div>
                     </div>
                     <div className="flex items-center text-xs text-gray-500">
                       <CalendarOutlined className="mr-1" />
@@ -176,6 +224,7 @@ const Chat: React.FC = () => {
         {/* Chat Area */}
         <Col xs={24} lg={16}>
           <Card 
+            key={selectedAppointmentId}
             className="h-[600px] flex flex-col"
             bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
           >
@@ -191,15 +240,11 @@ const Chat: React.FC = () => {
                     />
                     <div className="flex-1">
                       <Typography.Title level={4} className="!mb-0">
-                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.user?.name || 'Dermatologist'}
+                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.name || 'Dermatologist'}
                       </Typography.Title>
                       <Typography.Text type="secondary" className="text-sm">
                         {appointments.find(a => a.id === selectedAppointmentId)?.status || 'Appointment'}
                       </Typography.Text>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <Typography.Text type="secondary" className="text-xs">Online</Typography.Text>
                     </div>
                   </div>
                 </div>

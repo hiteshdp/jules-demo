@@ -99,19 +99,23 @@ const chatSlice = createSlice({
       })
       .addCase(fetchChatMessages.fulfilled, (state, action: PayloadAction<ChatMessage[]>) => {
         state.loading = false;
+        
+        // If no existing messages, replace with new messages (initial load)
         if (state.messages.length === 0) {
           state.messages = action.payload;
-          return;
-        }
-        const existingIds = new Set(state.messages.map(m => m.id));
-        const newOnes = action.payload.filter(m => !existingIds.has(m.id));
-        if (newOnes.length > 0) {
-          state.messages = [...state.messages, ...newOnes];
+        } else {
+          // If we have existing messages, append only new ones (polling)
+          const existingIds = new Set(state.messages.map(m => m.id));
+          const newMessages = action.payload.filter(m => !existingIds.has(m.id));
+          if (newMessages.length > 0) {
+            state.messages = [...state.messages, ...newMessages];
+          }
         }
       })
       .addCase(fetchChatMessages.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
+        // Don't clear messages on error - keep current state
       })
       // Send Message
       .addCase(sendMessage.pending, (state) => {

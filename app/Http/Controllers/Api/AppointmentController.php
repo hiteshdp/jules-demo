@@ -108,7 +108,7 @@ class AppointmentController extends Controller
         $user = $request->user();
 
         $query = Appointment::where('patient_id', $user->id)
-            ->with(['dermatologist.user']);
+            ->with(['dermatologist']);
 
         // Apply filters
         if ($request->has('dermatologist_name')) {
