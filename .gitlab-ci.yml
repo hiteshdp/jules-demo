@@ -50,6 +50,7 @@ build_admin:
   - changes:
       - frontend/admin/**
     if: '$CI_COMMIT_BRANCH == "stage"'
+  - if: '$CI_COMMIT_BRANCH == "stage"'
   allow_failure: false
 
 build_dermatologist:
@@ -69,6 +70,7 @@ build_dermatologist:
   - changes:
       - frontend/dermatologist/**
     if: '$CI_COMMIT_BRANCH == "stage"'
+  - if: '$CI_COMMIT_BRANCH == "stage"'  
   allow_failure: false
 
 build_patient:
@@ -88,4 +90,5 @@ build_patient:
   - changes:
       - frontend/patient/**
     if: '$CI_COMMIT_BRANCH == "stage"'
+  - if: '$CI_COMMIT_BRANCH == "stage"'  
   allow_failure: false
