@@ -7,9 +7,9 @@ import Patients from './pages/Patients';
 import Dermatologists from './pages/Dermatologists';
 import Appointments from './pages/Appointments';
 import Products from './pages/Products';
-import Payments from './pages/Payments';
 import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
+import Subscriptions from './pages/subscriptions';
 
 function App() {
 
@@ -31,7 +31,7 @@ function App() {
             <Route path="dermatologists" element={<Dermatologists />} />
             <Route path="appointments" element={<Appointments />} />
             <Route path="products" element={<Products />} />
-            <Route path="payments" element={<Payments />} />
+            <Route path="subscriptions" element={<Subscriptions />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
