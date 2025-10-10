@@ -54,7 +54,10 @@ const ZoomMeetingButton: React.FC<ZoomMeetingButtonProps> = ({
           }
         }
       } catch (error) {
-        console.error('Error checking meeting status:', error);
+        // Silently handle error - don't show console errors for zoom status
+        // This prevents zoom errors from interfering with chat functionality
+        setStatus('not_created');
+        setMeetingData(null);
       }
     };
 

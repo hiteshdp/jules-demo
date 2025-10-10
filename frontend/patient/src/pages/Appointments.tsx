@@ -41,7 +41,7 @@ const Appointments: React.FC = () => {
     if (!Array.isArray(appointments)) return [];
     
     return appointments.filter(appointment => {
-      if (filters.dermatologist_name && !appointment.dermatologist?.user?.name?.toLowerCase().includes(filters.dermatologist_name.toLowerCase())) {
+      if (filters.dermatologist_name && !appointment.dermatologist?.name?.toLowerCase().includes(filters.dermatologist_name.toLowerCase())) {
         return false;
       }
       if (filters.status && appointment.status !== filters.status) {
@@ -420,7 +420,7 @@ const Appointments: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Text strong className="text-base text-gray-900 truncate">
-                            {appointment.dermatologist?.user?.name || 'Unknown Doctor'}
+                            {appointment.dermatologist?.name || 'Unknown Doctor'}
                           </Text>
                           <Tag color={statusColor} style={{ marginInlineStart: 0 }}>
                             {appointment.status.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}

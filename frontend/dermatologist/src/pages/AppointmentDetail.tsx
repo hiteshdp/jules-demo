@@ -138,14 +138,12 @@ const AppointmentDetail: React.FC = () => {
                 </Space>
               </Descriptions.Item>
               {(() => {
-                const total = Number(appointment.consultation_fee || 0);
-                const sharePercent = Number((import.meta as any).env?.VITE_DERMATOLOGIST_SHARE_PERCENT || 70);
-                const dermatologistPayout = (appointment as any).dermatologist_fee ?? (total * sharePercent) / 100;
+                const dermatologistPayout = Number((appointment as any).dermatologist_fee || 0);
                 return (
                   <Descriptions.Item label="Your Payout">
                     <Space>
                       <DollarOutlined />
-                      <Text strong>₹{Number(dermatologistPayout).toFixed(2)}</Text>
+                      <Text strong>₹{dermatologistPayout.toFixed(2)}</Text>
                     </Space>
                   </Descriptions.Item>
                 );

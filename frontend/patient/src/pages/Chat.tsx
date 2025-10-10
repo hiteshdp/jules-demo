@@ -6,9 +6,10 @@ import { fetchChatMessages, sendChatMessage, clearMessages } from '../store/slic
 import { fetchAppointments } from '../store/slices/appointmentSlice';
 import { useLocation } from 'react-router-dom';
 import { Card, Typography, Avatar, Button, Input, Space, Row, Col, Alert, Tag } from 'antd';
-import { MessageOutlined, UserOutlined, CalendarOutlined, SendOutlined } from '@ant-design/icons';
+import { MessageOutlined, UserOutlined, CalendarOutlined, SendOutlined, PaperClipOutlined } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 import ZoomMeetingButton from '../components/ZoomMeetingButton';
+import MessageAttachment from '../components/MessageAttachment';
 
 const Chat: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,6 +20,9 @@ const Chat: React.FC = () => {
   
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSwitchingAppointment, setIsSwitchingAppointment] = useState(false);
+  const [isManualSelection, setIsManualSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
@@ -31,30 +35,46 @@ const Chat: React.FC = () => {
   const queryAppointmentId = useMemo(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get('appointmentId');
-    return id ? parseInt(id, 10) : null;
+    const parsedId = id ? parseInt(id, 10) : null;
+    return parsedId;
   }, [location.search]);
 
+  // Initialize from URL on first load only
   useEffect(() => {
-    if (queryAppointmentId && queryAppointmentId !== selectedAppointmentId) {
+    // Only set from URL on initial load (when selectedAppointmentId is null)
+    if (queryAppointmentId && !selectedAppointmentId && !isManualSelection) {
       setSelectedAppointmentId(queryAppointmentId);
     }
-  }, [queryAppointmentId, selectedAppointmentId]);
+  }, [queryAppointmentId, selectedAppointmentId, isManualSelection]);
 
   useEffect(() => {
     if (selectedAppointmentId) {
       dispatch(clearMessages()); // Clear previous messages
-      dispatch(fetchChatMessages(selectedAppointmentId));
+      dispatch(fetchChatMessages(selectedAppointmentId))
+        .catch((error) => {
+          // Handle error silently to prevent chat reversion
+          console.warn('Failed to fetch messages for appointment:', selectedAppointmentId, error);
+        });
     }
   }, [selectedAppointmentId, dispatch]);
 
   // Polling: refetch messages every 5s
   useEffect(() => {
     if (!selectedAppointmentId) return;
+    
     const interval = setInterval(() => {
-      dispatch(fetchChatMessages(selectedAppointmentId));
-    }, 1000);
+      // Only poll if we're not currently switching appointments
+      if (!isSwitchingAppointment) {
+        dispatch(fetchChatMessages(selectedAppointmentId))
+          .catch((error) => {
+            // Handle polling errors silently
+            console.warn('Polling error for appointment:', selectedAppointmentId, error);
+          });
+      }
+    }, 5000);
+    
     return () => clearInterval(interval);
-  }, [selectedAppointmentId, dispatch]);
+  }, [selectedAppointmentId, dispatch, isSwitchingAppointment]);
 
   // Track whether user is near bottom
   const handleScroll = () => {
@@ -77,16 +97,42 @@ const Chat: React.FC = () => {
     }
   }, [currentMessages, selectedAppointmentId, isNearBottom]);
 
+  const handleAppointmentClick = (appointmentId: number) => {
+    // Don't change if already selected or currently switching
+    if (selectedAppointmentId === appointmentId || isSwitchingAppointment) {
+      return;
+    }
+    
+    setIsManualSelection(true); // Mark as manual selection
+    setIsSwitchingAppointment(true);
+    setSelectedAppointmentId(appointmentId);
+    
+    // Update URL query param to keep UI in sync
+    const params = new URLSearchParams(location.search);
+    params.set('appointmentId', String(appointmentId));
+    window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+    
+    // Reset switching state after a delay
+    setTimeout(() => {
+      setIsSwitchingAppointment(false);
+    }, 1000);
+  };
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedAppointmentId || !newMessage.trim()) return;
+    if (!selectedAppointmentId || (!newMessage.trim() && !selectedFile)) return;
 
     const messageToSend = newMessage.trim();
-    setNewMessage(''); // Clear input immediately for better UX
+    const fileToSend = selectedFile;
+    
+    // Clear inputs immediately for better UX
+    setNewMessage('');
+    setSelectedFile(null);
 
     dispatch(sendChatMessage({ 
       appointmentId: selectedAppointmentId, 
-      message: messageToSend 
+      message: messageToSend, // Send the actual message (empty string if no text)
+      file: fileToSend || undefined
     }))
       .unwrap()
       .then(() => {
@@ -94,9 +140,14 @@ const Chat: React.FC = () => {
       })
       .catch((err) => {
         toast.error(err || 'Failed to send message');
-        // Restore message on error
+        // Restore inputs on error
         setNewMessage(messageToSend);
+        setSelectedFile(fileToSend);
       });
+  };
+
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
   };
 
   const formatDateTime = (dateTime: string) => {
@@ -138,21 +189,30 @@ const Chat: React.FC = () => {
                     key={appointment.id}
                     size="small"
                     hoverable
-                    onClick={() => setSelectedAppointmentId(appointment.id)}
-                    className={`cursor-pointer transition-colors ${
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleAppointmentClick(appointment.id);
+                    }}
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                       selectedAppointmentId === appointment.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : isSwitchingAppointment
+                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-25'
                     }`}
                     bodyStyle={{ padding: '12px' }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <Typography.Text strong className="text-sm">
-                        {appointment.dermatologist?.user?.name || 'Unknown Doctor'}
+                        {appointment.dermatologist?.name || 'Unknown Doctor'}
                       </Typography.Text>
-                      <Tag color={appointment.status === 'scheduled' ? 'blue' : appointment.status === 'completed' ? 'green' : 'default'}>
-                        {appointment.status}
-                      </Tag>
+                      <div className="flex items-center space-x-2">
+                        <Tag color={appointment.status === 'scheduled' ? 'blue' : appointment.status === 'completed' ? 'green' : 'default'}>
+                          {appointment.status}
+                        </Tag>
+                        <div className="text-xs text-gray-400">Click to chat</div>
+                      </div>
                     </div>
                     <div className="flex items-center text-xs text-gray-500">
                       <CalendarOutlined className="mr-1" />
@@ -176,6 +236,7 @@ const Chat: React.FC = () => {
         {/* Chat Area */}
         <Col xs={24} lg={16}>
           <Card 
+            key={selectedAppointmentId}
             className="h-[600px] flex flex-col"
             bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
           >
@@ -191,15 +252,11 @@ const Chat: React.FC = () => {
                     />
                     <div className="flex-1">
                       <Typography.Title level={4} className="!mb-0">
-                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.user?.name || 'Dermatologist'}
+                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.name || 'Dermatologist'}
                       </Typography.Title>
                       <Typography.Text type="secondary" className="text-sm">
                         {appointments.find(a => a.id === selectedAppointmentId)?.status || 'Appointment'}
                       </Typography.Text>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <Typography.Text type="secondary" className="text-xs">Online</Typography.Text>
                     </div>
                   </div>
                 </div>
@@ -259,21 +316,52 @@ const Chat: React.FC = () => {
                           key={message.id}
                           className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} ${isConsecutive ? 'mt-1' : 'mt-3'}`}
                         >
-                          <div className={`max-w-[70%] ${isOwnMessage ? 'order-2' : 'order-1'}`}>
-                            <div className={`px-3 py-2 rounded-2xl transition-all duration-200 hover:shadow-md ${
-                              isOwnMessage
-                                ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
-                                : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm'
-                            } ${isConsecutive ? (isOwnMessage ? 'rounded-tr-md' : 'rounded-tl-md') : ''}`}
-                            style={{
-                              boxShadow: isOwnMessage 
-                                ? '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)' 
-                                : '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12)'
-                            }}>
-                              <Typography.Text className={`text-sm leading-relaxed break-words ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
-                                {message.message}
-                              </Typography.Text>
-                            </div>
+                          <div className={`${message.attachment && message.type === 'image' ? 'max-w-[85%]' : 'max-w-[70%]'} ${isOwnMessage ? 'order-2' : 'order-1'}`}>
+                            {message.attachment && message.type === 'image' && !message.message ? (
+                              // Image-only message - no bubble background
+                              <MessageAttachment
+                                attachment={{
+                                  path: message.attachment,
+                                  type: message.type,
+                                  originalName: message.attachment.split('/').pop()
+                                }}
+                                messageId={message.id}
+                                appointmentId={selectedAppointmentId!}
+                                isOwnMessage={isOwnMessage}
+                              />
+                            ) : (
+                              // Text message or mixed content - with bubble background
+                              <div className={`px-3 py-2 rounded-2xl transition-all duration-200 hover:shadow-md ${
+                                isOwnMessage
+                                  ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
+                                  : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm'
+                              } ${isConsecutive ? (isOwnMessage ? 'rounded-tr-md' : 'rounded-tl-md') : ''}`}
+                              style={{
+                                boxShadow: isOwnMessage 
+                                  ? '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)' 
+                                  : '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12)'
+                              }}>
+                                {message.attachment && (
+                                  <div className="mb-2">
+                                    <MessageAttachment
+                                      attachment={{
+                                        path: message.attachment,
+                                        type: message.type,
+                                        originalName: message.attachment.split('/').pop()
+                                      }}
+                                      messageId={message.id}
+                                      appointmentId={selectedAppointmentId!}
+                                      isOwnMessage={isOwnMessage}
+                                    />
+                                  </div>
+                                )}
+                                {message.message && (
+                                  <Typography.Text className={`text-sm leading-relaxed break-words ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
+                                    {message.message}
+                                  </Typography.Text>
+                                )}
+                              </div>
+                            )}
                             {showTime && (
                               <div className={`flex items-center mt-1 space-x-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                                 <Typography.Text className={`text-[10px] text-gray-500 ${isOwnMessage ? 'text-right' : 'text-left'}`}>
@@ -289,9 +377,79 @@ const Chat: React.FC = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message Input - WhatsApp Style with Ant Design */}
+                {/* Message Input - WhatsApp Style */}
                 <div className="bg-white border-t border-gray-200 p-3">
-                  <div className="flex items-center space-x-2">
+                  {/* File Upload Preview */}
+                  {selectedFile && (
+                    <div className="mb-3 p-2 bg-gray-50 rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="text-green-500">
+                            {selectedFile.type.startsWith('image/') ? '🖼️' : '📎'}
+                          </div>
+                          <span className="text-sm text-gray-700 truncate max-w-xs">
+                            {selectedFile.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({(selectedFile.size / 1024 / 1024).toFixed(1)}MB)
+                          </span>
+                        </div>
+                        <Button
+                          type="text"
+                          size="small"
+                          onClick={() => setSelectedFile(null)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-end space-x-2 bg-gray-100 rounded-2xl px-3 py-2">
+                    {/* Attachment Button */}
+                    <Button
+                      type="text"
+                      icon={<PaperClipOutlined />}
+                      onClick={() => document.getElementById('file-input')?.click()}
+                      disabled={loading}
+                      className="text-gray-500 hover:text-gray-700 p-2 h-8 w-8 flex items-center justify-center"
+                      style={{ border: 'none', boxShadow: 'none' }}
+                    />
+                    
+                    {/* Hidden File Input */}
+                    <input
+                      id="file-input"
+                      type="file"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          // Validate file size (10MB max)
+                          if (file.size > 10 * 1024 * 1024) {
+                            toast.error('File size must be less than 10MB');
+                            return;
+                          }
+                          // Validate file type
+                          const allowedTypes = [
+                            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+                            'application/pdf', 'text/plain', 'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            'video/mp4', 'video/avi', 'video/mov',
+                            'audio/mp3', 'audio/wav', 'audio/ogg',
+                            'application/zip', 'application/x-rar-compressed'
+                          ];
+                          if (!allowedTypes.includes(file.type)) {
+                            toast.error('File type not supported');
+                            return;
+                          }
+                          handleFileSelect(file);
+                        }
+                      }}
+                      accept="image/*,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,video/mp4,video/avi,video/mov,audio/mp3,audio/wav,audio/ogg,application/zip,application/x-rar-compressed"
+                      style={{ display: 'none' }}
+                    />
+                    
+                    {/* Text Input */}
                     <Input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
@@ -304,59 +462,31 @@ const Chat: React.FC = () => {
                         }
                       }}
                       style={{
-                        borderRadius: '20px',
-                        border: '1px solid #d9d9d9',
-                        backgroundColor: '#f5f5f5',
+                        border: 'none',
+                        backgroundColor: 'transparent',
                         fontSize: '14px',
-                        padding: '8px 16px',
-                        height: '40px',
-                        transition: 'all 0.2s ease',
+                        padding: '8px 12px',
+                        height: '36px',
                         boxShadow: 'none',
                         flex: 1
                       }}
                       onFocus={(e) => {
-                        e.target.style.borderColor = '#1890ff';
-                        e.target.style.backgroundColor = '#ffffff';
-                        e.target.style.boxShadow = '0 0 0 2px rgba(24, 144, 255, 0.2)';
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = '#d9d9d9';
-                        e.target.style.backgroundColor = '#f5f5f5';
-                        e.target.style.boxShadow = 'none';
+                        e.target.style.outline = 'none';
                       }}
                     />
+                    
+                    {/* Send Button */}
                     <Button
                       type="primary"
                       icon={<SendOutlined />}
                       onClick={handleSendMessage}
-                      disabled={!newMessage.trim() || loading}
+                      disabled={(!newMessage.trim() && !selectedFile) || loading}
+                      className="h-8 w-8 p-0 flex items-center justify-center"
                       style={{
                         borderRadius: '50%',
-                        height: '40px',
-                        width: '40px',
-                        minWidth: '40px',
-                        padding: '0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
-                        borderColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
-                        transition: 'all 0.2s ease',
+                        backgroundColor: (newMessage.trim() || selectedFile) ? '#25D366' : '#d9d9d9',
+                        borderColor: (newMessage.trim() || selectedFile) ? '#25D366' : '#d9d9d9',
                         boxShadow: 'none'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (newMessage.trim()) {
-                          e.currentTarget.style.backgroundColor = '#128C7E';
-                          e.currentTarget.style.borderColor = '#128C7E';
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (newMessage.trim()) {
-                          e.currentTarget.style.backgroundColor = '#3B82F6';
-                          e.currentTarget.style.borderColor = '#3B82F6';
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }
                       }}
                     />
                   </div>

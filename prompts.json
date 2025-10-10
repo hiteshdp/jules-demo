@@ -1709,6 +1709,41 @@
       "user_prompt": "BrowserRouter basename=\"/dermatologist\" I have added this please fixed all the plave navigation based on that for patient we use basename=\"/patient\" please fixed everywhere",
     },
     {
+      "id": "dermatologist_fee_source_update_v1",
+      "path": "prompts/dermatologist_fee_source_update_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/Appointments.tsx",
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-10T00:00:00Z",
+      "user_prompt": "dermatologist side price should be take from appointment table field shuold be dermatologist_fee from everywhere on appointment list details and export too",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_export_401_fix_v1",
+      "path": "prompts/dermatologist_export_401_fix_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-10T00:05:00Z",
+      "user_prompt": "why export give 401 please fix it",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_export_url_normalization_v1",
+      "path": "prompts/dermatologist_export_url_normalization_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Appointments.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-10T00:10:00Z",
+      "user_prompt": "@http://127.0.0.1:8000/api//dermatologist/appointments?export=excel  here double // pass thet why gives 404 please check",
+      "prompt_type": "user_request"
+    },
+    {
       "id": "admin_appointment_fee_columns_v1",
       "path": "prompts/admin_appointment_fee_columns_v1.md",
       "used_in": [

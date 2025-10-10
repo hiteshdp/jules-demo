@@ -19,6 +19,11 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'ZOOM_ACCOUNT_ID' => env('ZOOM_ACCOUNT_ID'),
+    'ZOOM_CLIENT_ID' => env('ZOOM_CLIENT_ID'),
+    'ZOOM_CLIENT_SECRET' => env('ZOOM_CLIENT_SECRET'),
+    'ZOOM_API_BASE' => env('ZOOM_API_BASE'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

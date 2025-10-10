@@ -68,7 +68,6 @@ const Settings: React.FC = () => {
       title: 'Platform Settings',
       settings: [
         { key: 'platform_commission_percentage', label: 'Platform Commission (%)', type: 'number' },
-        { key: 'appointment_reminder_hours', label: 'Appointment Reminder (hours)', type: 'number' },
         { key: 'max_file_upload_size', label: 'Max File Upload Size (bytes)', type: 'number' },
       ]
     },

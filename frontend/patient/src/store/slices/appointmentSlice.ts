@@ -26,6 +26,7 @@ interface Appointment {
     id: number;
     user_id: number;
     license_number: string;
+    name?: string;
     specialization?: string;
     years_of_experience: number;
     qualifications: string;

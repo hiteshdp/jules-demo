@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
-import { fetchChatMessages, sendMessage } from '../store/slices/chatSlice';
+import { fetchChatMessages, sendMessage, clearMessages } from '../store/slices/chatSlice';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
 import { 
   ChatBubbleLeftRightIcon, 
@@ -23,6 +23,8 @@ const Chat: React.FC = () => {
   
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [isSwitchingAppointment, setIsSwitchingAppointment] = useState(false);
+  const [isManualSelection, setIsManualSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
@@ -35,29 +37,46 @@ const Chat: React.FC = () => {
   const queryAppointmentId = useMemo(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get('appointmentId');
-    return id ? parseInt(id, 10) : null;
+    const parsedId = id ? parseInt(id, 10) : null;
+    return parsedId;
   }, [location.search]);
 
+  // Initialize from URL on first load only
   useEffect(() => {
-    if (queryAppointmentId && queryAppointmentId !== selectedAppointmentId) {
+    // Only set from URL on initial load (when selectedAppointmentId is null)
+    if (queryAppointmentId && !selectedAppointmentId && !isManualSelection) {
       setSelectedAppointmentId(queryAppointmentId);
     }
-  }, [queryAppointmentId, selectedAppointmentId]);
+  }, [queryAppointmentId, selectedAppointmentId, isManualSelection]);
 
   useEffect(() => {
     if (selectedAppointmentId) {
-      dispatch(fetchChatMessages(selectedAppointmentId));
+      dispatch(clearMessages()); // Clear previous messages when switching appointments
+      dispatch(fetchChatMessages(selectedAppointmentId))
+        .catch((error) => {
+          // Handle error silently to prevent chat reversion
+          console.warn('Failed to fetch messages for appointment:', selectedAppointmentId, error);
+        });
     }
   }, [selectedAppointmentId, dispatch]);
 
   // Polling: refetch messages every 5s
   useEffect(() => {
     if (!selectedAppointmentId) return;
+    
     const interval = setInterval(() => {
-      dispatch(fetchChatMessages(selectedAppointmentId));
-    }, 1000);
+      // Only poll if we're not currently switching appointments
+      if (!isSwitchingAppointment) {
+        dispatch(fetchChatMessages(selectedAppointmentId))
+          .catch((error) => {
+            // Handle polling errors silently
+            console.warn('Polling error for appointment:', selectedAppointmentId, error);
+          });
+      }
+    }, 5000);
+    
     return () => clearInterval(interval);
-  }, [selectedAppointmentId, dispatch]);
+  }, [selectedAppointmentId, dispatch, isSwitchingAppointment]);
 
   // Track whether user is near bottom
   const handleScroll = () => {
@@ -67,6 +86,10 @@ const Chat: React.FC = () => {
     setIsNearBottom(distanceFromBottom < 120);
   };
 
+  // Filter messages for the selected appointment
+  const currentMessages = selectedAppointmentId ? messages.filter(m => m.appointment_id === selectedAppointmentId) : [];
+  
+
   // Auto-scroll only if near bottom
   useEffect(() => {
     const el = messagesContainerRef.current;
@@ -74,7 +97,7 @@ const Chat: React.FC = () => {
     if (isNearBottom) {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
-  }, [messages, selectedAppointmentId, isNearBottom]);
+  }, [currentMessages, selectedAppointmentId, isNearBottom]);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +111,6 @@ const Chat: React.FC = () => {
       .unwrap()
       .then(() => {
         setNewMessage('');
-        //toast.success('Message sent successfully!');
       })
       .catch((err: any) => {
         toast.error(err || 'Failed to send message');
@@ -112,6 +134,27 @@ const Chat: React.FC = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleAppointmentClick = (appointmentId: number) => {
+    // Don't change if already selected or currently switching
+    if (selectedAppointmentId === appointmentId || isSwitchingAppointment) {
+      return;
+    }
+    
+    setIsManualSelection(true); // Mark as manual selection
+    setIsSwitchingAppointment(true);
+    setSelectedAppointmentId(appointmentId);
+    
+    // Update URL query param to keep UI in sync
+    const params = new URLSearchParams(location.search);
+    params.set('appointmentId', String(appointmentId));
+    window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+    
+    // Reset switching state after a delay
+    setTimeout(() => {
+      setIsSwitchingAppointment(false);
+    }, 1000);
   };
 
   return (
@@ -144,20 +187,25 @@ const Chat: React.FC = () => {
                   {appointments.map((appointment) => (
                     <div
                       key={appointment.id}
-                      onClick={() => setSelectedAppointmentId(appointment.id)}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                      onClick={() => handleAppointmentClick(appointment.id)}
+                      className={`p-3 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md ${
                         selectedAppointmentId === appointment.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : isSwitchingAppointment
+                          ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
+                          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-25'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-medium text-gray-900">
                           {appointment.patient?.name || 'Unknown Patient'}
                         </p>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
-                          {appointment.status}
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(appointment.status)}`}>
+                            {appointment.status}
+                          </span>
+                          <div className="text-xs text-gray-400">Click to chat</div>
+                        </div>
                       </div>
                       <div className="flex items-center text-xs text-gray-500">
                         <CalendarDaysIcon className="h-3 w-3 mr-1" />
@@ -181,7 +229,7 @@ const Chat: React.FC = () => {
 
         {/* Chat Area */}
         <div className="lg:col-span-2">
-          <div className="bg-white shadow-lg rounded-lg h-[600px] flex flex-col border border-gray-200">
+          <div key={selectedAppointmentId} className="bg-white shadow-lg rounded-lg h-[600px] flex flex-col border border-gray-200">
             {selectedAppointmentId ? (
               <>
                 {/* Chat Header */}
@@ -198,13 +246,8 @@ const Chat: React.FC = () => {
                         {appointments.find((a: any) => a.id === selectedAppointmentId)?.status || 'Appointment'}
                       </p>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <span className="text-xs text-gray-600">Online</span>
-                    </div>
                   </div>
                 </div>
-
 
                 {/* Messages Area */}
                 <div
@@ -229,7 +272,7 @@ const Chat: React.FC = () => {
                         Try Again
                       </button>
                     </div>
-                  ) : messages.length === 0 ? (
+                  ) : currentMessages.length === 0 ? (
                     <div className="text-center text-gray-500 h-full flex items-center justify-center">
                       <div>
                         <ChatBubbleLeftRightIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -237,11 +280,11 @@ const Chat: React.FC = () => {
                       </div>
                     </div>
                   ) : (
-                    messages.map((message: any, index: number) => {
+                    currentMessages.map((message: any, index: number) => {
                       const isOwnMessage = message.sender_id === user?.id;
-                      const prevMessage = index > 0 ? messages[index - 1] : null;
+                      const prevMessage = index > 0 ? currentMessages[index - 1] : null;
                       const isConsecutive = prevMessage && prevMessage.sender_id === message.sender_id;
-                      const showTime = !isConsecutive || index === messages.length - 1;
+                      const showTime = !isConsecutive || index === currentMessages.length - 1;
                       
                       return (
                         <div
@@ -269,7 +312,7 @@ const Chat: React.FC = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message Input - WhatsApp Style with Ant Design */}
+                {/* Message Input */}
                 <div className="bg-white border-t border-gray-200 p-3">
                   <div className="flex items-center space-x-2">
                     <input
@@ -283,66 +326,19 @@ const Chat: React.FC = () => {
                           handleSendMessage(e);
                         }
                       }}
-                      style={{
-                        borderRadius: '20px',
-                        border: '1px solid #d9d9d9',
-                        backgroundColor: '#f5f5f5',
-                        fontSize: '14px',
-                        padding: '8px 16px',
-                        height: '40px',
-                        transition: 'all 0.2s ease',
-                        boxShadow: 'none',
-                        flex: 1,
-                        outline: 'none'
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = '#1890ff';
-                        e.target.style.backgroundColor = '#ffffff';
-                        e.target.style.boxShadow = '0 0 0 2px rgba(24, 144, 255, 0.2)';
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = '#d9d9d9';
-                        e.target.style.backgroundColor = '#f5f5f5';
-                        e.target.style.boxShadow = 'none';
-                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                     <button
                       type="button"
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim() || sending}
-                      style={{
-                        borderRadius: '50%',
-                        height: '40px',
-                        width: '40px',
-                        minWidth: '40px',
-                        padding: '0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
-                        borderColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
-                        transition: 'all 0.2s ease',
-                        boxShadow: 'none',
-                        border: 'none',
-                        cursor: newMessage.trim() && !sending ? 'pointer' : 'not-allowed',
-                        opacity: (!newMessage.trim() || sending) ? 0.5 : 1
-                      }}
-                      onMouseEnter={(e) => {
-                        if (newMessage.trim()) {
-                          e.currentTarget.style.backgroundColor = '#2563EB';
-                          e.currentTarget.style.borderColor = '#2563EB';
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (newMessage.trim()) {
-                          e.currentTarget.style.backgroundColor = '#3B82F6';
-                          e.currentTarget.style.borderColor = '#3B82F6';
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }
-                      }}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+                        newMessage.trim() && !sending
+                          ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
                     >
-                      <PaperAirplaneIcon className="h-5 w-5 text-white" />
+                      <PaperAirplaneIcon className="h-5 w-5" />
                     </button>
                   </div>
                   

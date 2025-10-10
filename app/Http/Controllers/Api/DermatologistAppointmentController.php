@@ -103,7 +103,7 @@ class DermatologistAppointmentController extends Controller
         }
 
         $query = Appointment::with(['patient', 'dermatologist'])
-            ->where('dermatologist_id', $dermatologist->id);
+            ->where('dermatologist_id', $dermatologist->user_id);
 
         // Apply filters
         if ($request->has('patient_name')) {
@@ -219,9 +219,9 @@ class DermatologistAppointmentController extends Controller
             ], 403);
         }
 
-        $appointment = Appointment::with(['patient', 'dermatologist.user'])
+        $appointment = Appointment::with(['patient', 'dermatologist'])
             ->where('id', $id)
-            ->where('dermatologist_id', $dermatologist->id)
+            ->where('dermatologist_id', $dermatologist->user_id)
             ->first();
 
         if (!$appointment) {
@@ -327,7 +327,7 @@ class DermatologistAppointmentController extends Controller
         ]);
 
         $appointment = Appointment::where('id', $id)
-            ->where('dermatologist_id', $dermatologist->id)
+            ->where('dermatologist_id', $dermatologist->user_id)
             ->first();
 
         if (!$appointment) {
@@ -346,7 +346,7 @@ class DermatologistAppointmentController extends Controller
         }
         $appointment->update($payload);
 
-        $appointment->load(['patient', 'dermatologist.user']);
+        $appointment->load(['patient', 'dermatologist']);
 
         return response()->json([
             'success' => true,
@@ -451,10 +451,7 @@ class DermatologistAppointmentController extends Controller
 
             // CSV data
             foreach ($appointments as $appointment) {
-                $sharePercent = (float) env('DERMATOLOGIST_SHARE_PERCENT', 70);
-                $payout = isset($appointment->dermatologist_fee)
-                    ? (float) $appointment->dermatologist_fee
-                    : ((float) $appointment->consultation_fee) * $sharePercent / 100.0;
+                $payout = (float) ($appointment->dermatologist_fee ?? 0);
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',
@@ -503,10 +500,7 @@ class DermatologistAppointmentController extends Controller
 
             // Excel data
             foreach ($appointments as $appointment) {
-                $sharePercent = (float) env('DERMATOLOGIST_SHARE_PERCENT', 70);
-                $payout = isset($appointment->dermatologist_fee)
-                    ? (float) $appointment->dermatologist_fee
-                    : ((float) $appointment->consultation_fee) * $sharePercent / 100.0;
+                $payout = (float) ($appointment->dermatologist_fee ?? 0);
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',
