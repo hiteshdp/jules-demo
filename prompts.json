@@ -1734,6 +1734,60 @@
       "date": "2025-01-28T15:00:00Z",
       "user_prompt": "In admin module , subscription section , i need To track and manage all active and past subscriptions, including payment statuses and related appointments. Displays complete subscription records linked to patients. · Allows Admin to mark payments as received or pending. · Subscription List View: o Columns: Subscription ID, Patient Name, Plan Name, Start Date, Status (Active / Cancelled / Expired), Payment Status. o Filters: By Status, Date Range, or Patient Name. · Subscription Details: o Linked products or bundles. o Renewal date and payment history. o Button to manually pause, cancel, or resume subscription. · Payment Tracking: o Admin can change status from Pending → Paid after reconciliation.",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "homepage_creation_v1",
+      "path": "prompts/homepage_creation_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Home.tsx",
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/public/assets/hero.svg"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T16:00:00Z",
+      "user_prompt": "I want to create a beautiful and responsive homepage for the Hair & Skin Health Platform. This homepage should act as the **entry point** for both Patients and Dermatologists — before they log in. Goals: Serve as the unified landing page at `/` inside the Patient React app. Showcase the platform's purpose: AI-powered dermatology and personalized care. Offer clear call-to-actions: \"Continue as Patient\" → redirects to `/login\", \"Continue as Dermatologist\" → redirects to `/dermatologist-login\". Should visually represent both audiences with balance (patients and dermatologists).",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "routing_public_protected_fix_v1",
+      "path": "prompts/routing_public_protected_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/App.tsx",
+        "frontend/patient/src/components/Layout.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T16:30:00Z",
+      "user_prompt": "My new Home page component (Home.tsx) exists, but when I try to access: http://localhost:3000/ OR http://localhost:3000/patient/ it automatically redirects me to /patient/login. I want to fix this so that the Home page is publicly accessible, while keeping other routes (like Dashboard, Appointments, Profile, etc.) protected behind login.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "homepage_ui_ux_enhancement_v1",
+      "path": "prompts/homepage_ui_ux_enhancement_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Home.tsx",
+        "frontend/patient/public/assets/hero-illustration.svg"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T17:00:00Z",
+      "user_prompt": "I already have a `Home.tsx` landing page for the Hair & Skin Health Platform (in the Patient React app). The structure is mostly good, but I need a **UI/UX upgrade** and **hero section fix**. Current Issue: The top hero image (logo/banner) appears **broken or misaligned** on large screens. The top section feels **empty and unbalanced**, needs visual appeal. The rest of the page (features, call-to-action, footer) is fine but can be slightly refined for spacing and consistency.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "public_area_enhancement_v1",
+      "path": "prompts/public_area_enhancement_v1.md",
+      "used_in": [
+        "frontend/patient/src/components/PublicHeader.tsx",
+        "frontend/patient/src/pages/About.tsx",
+        "frontend/patient/src/pages/Contact.tsx",
+        "frontend/patient/src/pages/PrivacyPolicy.tsx",
+        "frontend/patient/src/pages/Terms.tsx",
+        "frontend/patient/src/pages/Home.tsx",
+        "frontend/patient/src/App.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T17:30:00Z",
+      "user_prompt": "The Hair & Skin Health Patient app currently has a working Home page, but I need several improvements for a professional, public-facing experience. Current Problems: 1. The top hero image is broken — the app runs under `basename=\"/patient\"`, so images like `/assets/hero-illustration.svg` are loading from `/patient/assets/...` and failing. 2. The header/navigation bar is too basic. I want a clean, modern top navigation with logo and key links. 3. I also want to add a few standard informational pages (About Us, Contact Us, Privacy Policy, Terms).",
+      "prompt_type": "user_request"
     }
   ]
 }
