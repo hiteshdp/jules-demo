@@ -81,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/appointment/payment/verify', [AppointmentPaymentController::class, 'verifyPayment']);
     });
 
+    
     // Dermatologist routes
     Route::prefix('dermatologist')->group(function () {
         // Authentication

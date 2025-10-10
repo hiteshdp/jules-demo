@@ -47,9 +47,9 @@ build_admin:
     - npm run build
     - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/admin/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/admin/
   rules:
-    - if: '$CI_COMMIT_BRANCH == "stage"'
-      changes:
-        - frontend/admin/**
+  - changes:
+      - frontend/admin/**
+    if: '$CI_COMMIT_BRANCH == "stage"'
   allow_failure: false
 
 build_dermatologist:
@@ -66,9 +66,9 @@ build_dermatologist:
     - npm run build
     - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/dermatologist/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/dermatologist/
   rules:
-    - if: '$CI_COMMIT_BRANCH == "stage"'
-      changes:
-        - frontend/dermatologist/**
+  - changes:
+      - frontend/dermatologist/**
+    if: '$CI_COMMIT_BRANCH == "stage"'
   allow_failure: false
 
 build_patient:
@@ -85,7 +85,7 @@ build_patient:
     - npm run build
     - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
   rules:
-    - if: '$CI_COMMIT_BRANCH == "stage"'
-      changes:
-        - frontend/patient/**
+  - changes:
+      - frontend/patient/**
+    if: '$CI_COMMIT_BRANCH == "stage"'
   allow_failure: false
