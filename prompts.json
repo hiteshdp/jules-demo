@@ -1672,26 +1672,14 @@
       "prompt_type": "user_request"
     },
     {
-      "id": "dermatologist_seeder_idempotent_fix_v1",
-      "path": "prompts/dermatologist_seeder_idempotent_fix_v1.md",
+      "id": "admin_appointment_fee_columns_v1",
+      "path": "prompts/admin_appointment_fee_columns_v1.md",
       "used_in": [
-        "database/seeders/DermatologistSeeder.php"
+        "frontend/admin/src/pages/Appointments.tsx"
       ],
       "author": "AI Assistant",
-      "date": "2025-01-28T03:45:00Z",
-      "user_prompt": "I'm getting this Laravel seeder error during `php artisan db:seed`: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'dermatologist@hairskinhealth.com' for key 'users_email_unique'. It occurs in `Database\\Seeders\\DermatologistSeeder` when inserting sample dermatologist users. I need you to fix it properly so the seeder becomes **idempotent** and can be safely re-run multiple times without causing duplicate email or unique key violations.",
-      "prompt_type": "user_request"
-    },
-    {
-      "id": "migration_idempotent_fix_v1",
-      "path": "prompts/migration_idempotent_fix_v1.md",
-      "used_in": [
-        "database/migrations/2025_10_09_083520_drop_columns_from_products_table.php",
-        "database/migrations/2025_10_08_064223_drop_columns_from_patient_profiles_table.php"
-      ],
-      "author": "AI Assistant",
-      "date": "2025-01-28T04:00:00Z",
-      "user_prompt": "I'm getting this migration error: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'brand' File: 2025_10_09_083520_drop_columns_from_products_table. This means the migration is trying to add a column (`brand`) that already exists in the `products` table. Please fix this migration file — and any other migrations that modify existing tables — to make them **idempotent** (safe to re-run multiple times) by adding schema existence checks.",
+      "date": "2025-01-27T12:00:00Z",
+      "user_prompt": "In the Admin → Appointment section, update the **appointment listing** so that three new columns are displayed **before the \"Payment Status\"** column. These values already exist in the database (`appointments` table). | Display Label | Database Column | |----------------|----------------| | Consultation Fee | consultation_fee | | Dermatologist Payout | dermatologist_fee | | Platform Commission | platform_fee | make sure you handle the frontend and backend both and make it working properly",
       "prompt_type": "user_request"
     }
   ]
