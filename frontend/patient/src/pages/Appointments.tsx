@@ -425,7 +425,7 @@ const Appointments: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
                         <Text strong className="text-lg text-gray-900">
-                          {appointment.dermatologist?.user?.name || 'Unknown Doctor'}
+                          {appointment.dermatologist?.name || 'Unknown Doctor'}
                         </Text>
                         <StatusTag status={appointment.status} />
                       </div>

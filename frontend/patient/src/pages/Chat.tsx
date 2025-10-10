@@ -31,7 +31,8 @@ const Chat: React.FC = () => {
   const queryAppointmentId = useMemo(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get('appointmentId');
-    return id ? parseInt(id, 10) : null;
+    const parsedId = id ? parseInt(id, 10) : null;
+    return parsedId;
   }, [location.search]);
 
   useEffect(() => {
@@ -138,21 +139,32 @@ const Chat: React.FC = () => {
                     key={appointment.id}
                     size="small"
                     hoverable
-                    onClick={() => setSelectedAppointmentId(appointment.id)}
-                    className={`cursor-pointer transition-colors ${
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedAppointmentId(appointment.id);
+                      // Update URL query param to keep UI in sync
+                      const params = new URLSearchParams(location.search);
+                      params.set('appointmentId', String(appointment.id));
+                      window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+                    }}
+                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                       selectedAppointmentId === appointment.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-blue-25'
                     }`}
                     bodyStyle={{ padding: '12px' }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <Typography.Text strong className="text-sm">
-                        {appointment.dermatologist?.user?.name || 'Unknown Doctor'}
+                        {appointment.dermatologist?.name || 'Unknown Doctor'}
                       </Typography.Text>
-                      <Tag color={appointment.status === 'scheduled' ? 'blue' : appointment.status === 'completed' ? 'green' : 'default'}>
-                        {appointment.status}
-                      </Tag>
+                      <div className="flex items-center space-x-2">
+                        <Tag color={appointment.status === 'scheduled' ? 'blue' : appointment.status === 'completed' ? 'green' : 'default'}>
+                          {appointment.status}
+                        </Tag>
+                        <div className="text-xs text-gray-400">Click to chat</div>
+                      </div>
                     </div>
                     <div className="flex items-center text-xs text-gray-500">
                       <CalendarOutlined className="mr-1" />
@@ -191,15 +203,11 @@ const Chat: React.FC = () => {
                     />
                     <div className="flex-1">
                       <Typography.Title level={4} className="!mb-0">
-                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.user?.name || 'Dermatologist'}
+                        {appointments.find(a => a.id === selectedAppointmentId)?.dermatologist?.name || 'Dermatologist'}
                       </Typography.Title>
                       <Typography.Text type="secondary" className="text-sm">
                         {appointments.find(a => a.id === selectedAppointmentId)?.status || 'Appointment'}
                       </Typography.Text>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <Typography.Text type="secondary" className="text-xs">Online</Typography.Text>
                     </div>
                   </div>
                 </div>

@@ -103,7 +103,7 @@ class DermatologistAppointmentController extends Controller
         }
 
         $query = Appointment::with(['patient', 'dermatologist'])
-            ->where('dermatologist_id', $dermatologist->id);
+            ->where('dermatologist_id', $dermatologist->user_id);
 
         // Apply filters
         if ($request->has('patient_name')) {
@@ -219,9 +219,9 @@ class DermatologistAppointmentController extends Controller
             ], 403);
         }
 
-        $appointment = Appointment::with(['patient', 'dermatologist.user'])
+        $appointment = Appointment::with(['patient', 'dermatologist'])
             ->where('id', $id)
-            ->where('dermatologist_id', $dermatologist->id)
+            ->where('dermatologist_id', $dermatologist->user_id)
             ->first();
 
         if (!$appointment) {
@@ -326,7 +326,7 @@ class DermatologistAppointmentController extends Controller
         ]);
 
         $appointment = Appointment::where('id', $id)
-            ->where('dermatologist_id', $dermatologist->id)
+            ->where('dermatologist_id', $dermatologist->user_id)
             ->first();
 
         if (!$appointment) {
@@ -341,7 +341,7 @@ class DermatologistAppointmentController extends Controller
             'notes' => $request->notes ?? $appointment->notes
         ]);
 
-        $appointment->load(['patient', 'dermatologist.user']);
+        $appointment->load(['patient', 'dermatologist']);
 
         return response()->json([
             'success' => true,
