@@ -68,6 +68,8 @@ interface Appointment {
   zoom_link?: string;
   zoom_meeting_id?: string;
   consultation_fee: number;
+  dermatologist_fee: number;
+  platform_fee: number;
   is_paid: boolean;
   patient?: {
     id: number;
@@ -249,11 +251,12 @@ const Appointments: React.FC = () => {
     {
       title: 'Patient',
       key: 'patient',
+      width: 180,
       render: (_, record) => (
         <Space>
           <Avatar icon={<TeamOutlined />} />
           <div>
-            <div style={{ fontWeight: 500 }}>{record.patient?.name}</div>
+            <div style={{ fontWeight: 500, fontSize: '14px' }}>{record.patient?.name}</div>
             <Text type="secondary" style={{ fontSize: '12px' }}>
               {record.patient?.email}
             </Text>
@@ -264,9 +267,10 @@ const Appointments: React.FC = () => {
     {
       title: 'Dermatologist',
       key: 'dermatologist',
+      width: 200,
       render: (_, record) => (
         <div>
-          <div style={{ fontWeight: 500 }}>{record.dermatologist?.user?.name}</div>
+          <div style={{ fontWeight: 500, fontSize: '14px' }}>{record.dermatologist?.user?.name}</div>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {record.dermatologist?.specialization}
           </Text>
@@ -277,69 +281,122 @@ const Appointments: React.FC = () => {
       title: 'Appointment Date',
       dataIndex: 'scheduled_at',
       key: 'scheduled_at',
-      render: (dateTime) => formatDateTime(dateTime),
+      width: 160,
+      render: (dateTime) => (
+        <Text style={{ fontSize: '13px' }}>{formatDateTime(dateTime)}</Text>
+      ),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      width: 120,
       render: (status) => (
-        <Tag color={getStatusColor(status)}>
+        <Tag color={getStatusColor(status)} style={{ fontSize: '12px' }}>
           {getStatusText(status)}
         </Tag>
       ),
     },
     {
+      title: 'Consultation Fee',
+      dataIndex: 'consultation_fee',
+      key: 'consultation_fee',
+      width: 130,
+      align: 'right',
+      render: (fee) => (
+        <Text strong style={{ color: '#1890ff', fontSize: '14px' }}>
+          ₹{Number(fee || 0).toFixed(2)}
+        </Text>
+      ),
+    },
+    {
+      title: 'Dermatologist Payout',
+      dataIndex: 'dermatologist_fee',
+      key: 'dermatologist_fee',
+      width: 140,
+      align: 'right',
+      render: (fee) => (
+        <Text strong style={{ color: '#52c41a', fontSize: '14px' }}>
+          ₹{Number(fee || 0).toFixed(2)}
+        </Text>
+      ),
+    },
+    {
+      title: 'Platform Commission',
+      dataIndex: 'platform_fee',
+      key: 'platform_fee',
+      width: 140,
+      align: 'right',
+      render: (fee) => (
+        <Text strong style={{ color: '#fa8c16', fontSize: '14px' }}>
+          ₹{Number(fee || 0).toFixed(2)}
+        </Text>
+      ),
+    },
+    {
       title: 'Payment Status',
       key: 'payment',
-      render: (_, record) => (
-        <Select
-          size="small"
-          value={record.is_paid ? 'completed' : 'pending'}
-          style={{ width: 140 }}
-          onChange={(value) => {
-            dispatch(updateAppointmentPaymentStatus({ id: record.id, status: value }));
-          }}
-          options={[
-            { label: 'Pending', value: 'pending' },
-            { label: 'Completed', value: 'completed' },
-            { label: 'Failed', value: 'failed' },
-            { label: 'Refunded', value: 'refunded' },
-            { label: 'Cancelled', value: 'cancelled' },
-          ]}
-        />
-      ),
+      width: 180,
+      render: (_, record) => {
+        const latestPayment = record.payments && record.payments.length > 0 
+          ? record.payments[record.payments.length - 1] 
+          : null;
+        const paidAt = latestPayment?.paid_at;
+        
+        return (
+          <div>
+            <Select
+              size="small"
+              value={record.is_paid ? 'completed' : 'pending'}
+              style={{ width: 120 }}
+              onChange={(value) => {
+                dispatch(updateAppointmentPaymentStatus({ id: record.id, status: value }));
+              }}
+              options={[
+                { label: 'Pending', value: 'pending' },
+                { label: 'Completed', value: 'completed' },
+              ]}
+            />
+            {record.is_paid && paidAt && (
+              <div style={{ marginTop: 4, fontSize: '11px', color: '#666' }}>
+                Paid: {formatDateTime(paidAt)}
+              </div>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 200,
+      width: 140,
+      fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space size={2}>
           <Button 
             type="link" 
             icon={<EyeOutlined />} 
             onClick={() => handleViewDetails(record.id)}
             size="small"
-          >
-           
-          </Button>
+            style={{ padding: '4px 6px' }}
+            title="View Details"
+          />
           <Button 
             type="link" 
             icon={<CommentOutlined />} 
             onClick={() => handleViewComments(record.id)}
             size="small"
-          >
-           
-          </Button>
+            style={{ padding: '4px 6px' }}
+            title="View Comments"
+          />
           <Button 
             type="link" 
             icon={<MessageOutlined />} 
             onClick={() => handleViewChat(record.id)}
             size="small"
-          >
-            
-          </Button>
+            style={{ padding: '4px 6px' }}
+            title="View Chat"
+          />
           <Button 
             type="link" 
             icon={<VideoCameraOutlined />} 
@@ -351,8 +408,9 @@ const Appointments: React.FC = () => {
               confirmOpenZoom(record.zoom_link);
             }}
             size="small"
-          >
-          </Button>
+            style={{ padding: '4px 6px' }}
+            title="Join Meeting"
+          />
         </Space>
       ),
     },
@@ -408,7 +466,12 @@ const Appointments: React.FC = () => {
               showTotal: (total, range) => 
                 `${range[0]}-${range[1]} of ${total} appointments`,
             }}
-            scroll={{ x: 1200 }}
+            scroll={{ x: 1400 }}
+            size="small"
+            bordered={false}
+            style={{ 
+              fontSize: '13px'
+            }}
           />
         )}
       </Card>
@@ -522,10 +585,7 @@ const Appointments: React.FC = () => {
                 <Descriptions.Item label="Scheduled Date" span={2}>
                   {formatDateTime(selectedAppointment.scheduled_at)}
                 </Descriptions.Item>
-                <Descriptions.Item label="Consultation Fee" span={1}>
-                  ₹{selectedAppointment.consultation_fee}
-                </Descriptions.Item>
-                <Descriptions.Item label="Payment Status" span={1}>
+                <Descriptions.Item label="Payment Status" span={2}>
                   <Tag color={selectedAppointment.is_paid ? 'green' : 'red'}>
                     {selectedAppointment.is_paid ? 'Paid' : 'Pending'}
                   </Tag>
@@ -567,6 +627,27 @@ const Appointments: React.FC = () => {
                   </Descriptions>
                 </Col>
               </Row>
+
+              <Divider />
+              
+              <Title level={4}>Payment Details</Title>
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label="Consultation Fee">
+                  <Text strong style={{ color: '#1890ff' }}>
+                    ₹{selectedAppointment.consultation_fee}
+                  </Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Dermatologist Payout">
+                  <Text strong style={{ color: '#52c41a' }}>
+                    ₹{selectedAppointment.dermatologist_fee || 0}
+                  </Text>
+                </Descriptions.Item>
+                <Descriptions.Item label="Platform Commission">
+                  <Text strong style={{ color: '#fa8c16' }}>
+                    ₹{selectedAppointment.platform_fee || 0}
+                  </Text>
+                </Descriptions.Item>
+              </Descriptions>
 
               {selectedAppointment.notes && (
                 <>

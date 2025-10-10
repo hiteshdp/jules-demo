@@ -11,6 +11,11 @@
 /storage/framework/sessions/*
 /storage/framework/views/*
 /bootstrap/cache/*
+/public/.htaccess
+
+/frontend/admin/.env
+/frontend/patient/.env
+/frontend/dermatologist/.env
 
 # Ignore compiled assets
 /public/hot

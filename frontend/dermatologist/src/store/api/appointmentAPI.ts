@@ -43,6 +43,8 @@ export const appointmentAPI = {
   
   updateAppointmentStatus: (appointmentId: number, data: any) =>
     api.put(`/dermatologist/appointments/${appointmentId}/status`, data),
+  reschedule: (appointmentId: number, scheduled_at: string) =>
+    api.put(`/dermatologist/appointments/${appointmentId}/reschedule`, { scheduled_at }),
   
   sendMessage: (appointmentId: number, data: any) =>
     api.post(`/dermatologist/appointments/${appointmentId}/messages`, data),

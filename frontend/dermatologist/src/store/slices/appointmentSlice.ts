@@ -85,6 +85,18 @@ export const updateAppointmentStatus = createAsyncThunk(
   }
 );
 
+export const rescheduleAppointment = createAsyncThunk(
+  'appointment/reschedule',
+  async ({ appointmentId, scheduled_at }: { appointmentId: number; scheduled_at: string }, { rejectWithValue }) => {
+    try {
+      const response = await appointmentAPI.reschedule(appointmentId, scheduled_at);
+      return response.data.data.appointment;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to reschedule appointment');
+    }
+  }
+);
+
 const appointmentSlice = createSlice({
   name: 'appointment',
   initialState,
@@ -141,6 +153,24 @@ const appointmentSlice = createSlice({
         }
       })
       .addCase(updateAppointmentStatus.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Reschedule Appointment
+      .addCase(rescheduleAppointment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(rescheduleAppointment.fulfilled, (state, action: PayloadAction<Appointment>) => {
+        state.loading = false;
+        const updated = action.payload;
+        const idx = state.appointments.findIndex(a => a.id === updated.id);
+        if (idx !== -1) state.appointments[idx] = updated;
+        if (state.currentAppointment?.id === updated.id) {
+          state.currentAppointment = updated;
+        }
+      })
+      .addCase(rescheduleAppointment.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });

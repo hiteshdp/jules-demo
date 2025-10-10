@@ -394,7 +394,7 @@ class AdminController extends Controller
     public function updateAppointmentPaymentStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,completed,failed,refunded,cancelled',
+            'status' => 'required|in:pending,completed',
         ]);
 
         $appointment = Appointment::with('payments')->findOrFail($id);

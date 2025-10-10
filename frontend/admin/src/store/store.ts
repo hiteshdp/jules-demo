@@ -7,6 +7,7 @@ import productReducer from './slices/productSlice';
 import paymentReducer from './slices/paymentSlice';
 import settingsReducer from './slices/settingsSlice';
 import dashboardReducer from './slices/dashboardSlice';
+import subscriptionReducer from './slices/subscriptionSlice';
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     payment: paymentReducer,
     settings: settingsReducer,
     dashboard: dashboardReducer,
+    subscription: subscriptionReducer,
   },
 });
 

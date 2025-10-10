@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Hair Loss Diagnosis & Treatment Platform - Dermatologist App",
   "private": true,
+  "homepage": "/dermatologist/",
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@headlessui/react": "^2.1.0",

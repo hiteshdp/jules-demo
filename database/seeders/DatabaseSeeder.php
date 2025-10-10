@@ -22,12 +22,12 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-		$this->call([
+        $this->call([
             DermatologistSeeder::class,
-			AdminSettingSeeder::class,
-			UserSeeder::class,
-			ProductSeeder::class,
-			HairLossQuizQuestionSeeder::class,
-		]);
+            AdminSettingSeeder::class,
+            UserSeeder::class,
+            ProductSeeder::class,
+            HairLossQuizQuestionSeeder::class,
+        ]);
     }
 }

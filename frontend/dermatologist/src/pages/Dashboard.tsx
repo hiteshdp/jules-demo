@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
 import { Card, Row, Col, Statistic, Typography, Space, List, Avatar } from 'antd';
@@ -17,6 +18,7 @@ const { Title, Text } = Typography;
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const { appointments, loading, error } = useSelector((state: RootState) => state.appointment);
 
@@ -120,7 +122,7 @@ const Dashboard: React.FC = () => {
             <Card 
               hoverable
               className="h-full"
-              onClick={() => window.location.href = '/appointments'}
+              onClick={() => navigate('/appointments')}
             >
               <Space direction="vertical" size="middle" className="w-full">
                 <div className="text-center">
@@ -142,7 +144,7 @@ const Dashboard: React.FC = () => {
             <Card 
               hoverable
               className="h-full"
-              onClick={() => window.location.href = '/chat'}
+              onClick={() => navigate('/chat')}
             >
               <Space direction="vertical" size="middle" className="w-full">
                 <div className="text-center">
@@ -164,7 +166,7 @@ const Dashboard: React.FC = () => {
             <Card 
               hoverable
               className="h-full"
-              onClick={() => window.location.href = '/profile'}
+              onClick={() => navigate('/profile')}
             >
               <Space direction="vertical" size="middle" className="w-full">
                 <div className="text-center">
