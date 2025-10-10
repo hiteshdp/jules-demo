@@ -451,10 +451,7 @@ class DermatologistAppointmentController extends Controller
 
             // CSV data
             foreach ($appointments as $appointment) {
-                $sharePercent = (float) env('DERMATOLOGIST_SHARE_PERCENT', 70);
-                $payout = isset($appointment->dermatologist_fee)
-                    ? (float) $appointment->dermatologist_fee
-                    : ((float) $appointment->consultation_fee) * $sharePercent / 100.0;
+                $payout = (float) ($appointment->dermatologist_fee ?? 0);
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',
@@ -503,10 +500,7 @@ class DermatologistAppointmentController extends Controller
 
             // Excel data
             foreach ($appointments as $appointment) {
-                $sharePercent = (float) env('DERMATOLOGIST_SHARE_PERCENT', 70);
-                $payout = isset($appointment->dermatologist_fee)
-                    ? (float) $appointment->dermatologist_fee
-                    : ((float) $appointment->consultation_fee) * $sharePercent / 100.0;
+                $payout = (float) ($appointment->dermatologist_fee ?? 0);
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',

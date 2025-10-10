@@ -21,9 +21,9 @@ class ZoomService
     protected function getAccessToken(): string
     {
         try {
-            $clientId = env('ZOOM_CLIENT_ID');
-            $clientSecret = env('ZOOM_CLIENT_SECRET');
-            $accountId = env('ZOOM_ACCOUNT_ID');
+            $clientId = config('app.ZOOM_CLIENT_ID');
+            $clientSecret = config('app.ZOOM_CLIENT_SECRET');
+            $accountId = config('app.ZOOM_ACCOUNT_ID');
             
             // Remove quotes if they exist
             $accountId = trim($accountId, '"\'');
