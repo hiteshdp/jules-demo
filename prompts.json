@@ -1670,6 +1670,29 @@
       "date": "2025-10-09T10:05:00Z",
       "user_prompt": "I have consultation fees in appointments table in database. Now i need to add other fields related to the fee. Dermatologist_fee, platform fee. In general setting need to add new column called platform fee in (%) and and that fee will deduct from the consultation fees and remaing amount will be Dermatologist_fee and the (%) amount is platform fee. I need to store this fee when appointment is created. Also check if there is not setting for platform fee in admin side than add it",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_seeder_idempotent_fix_v1",
+      "path": "prompts/dermatologist_seeder_idempotent_fix_v1.md",
+      "used_in": [
+        "database/seeders/DermatologistSeeder.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T03:45:00Z",
+      "user_prompt": "I'm getting this Laravel seeder error during `php artisan db:seed`: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'dermatologist@hairskinhealth.com' for key 'users_email_unique'. It occurs in `Database\\Seeders\\DermatologistSeeder` when inserting sample dermatologist users. I need you to fix it properly so the seeder becomes **idempotent** and can be safely re-run multiple times without causing duplicate email or unique key violations.",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "migration_idempotent_fix_v1",
+      "path": "prompts/migration_idempotent_fix_v1.md",
+      "used_in": [
+        "database/migrations/2025_10_09_083520_drop_columns_from_products_table.php",
+        "database/migrations/2025_10_08_064223_drop_columns_from_patient_profiles_table.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T04:00:00Z",
+      "user_prompt": "I'm getting this migration error: SQLSTATE[42S21]: Column already exists: 1060 Duplicate column name 'brand' File: 2025_10_09_083520_drop_columns_from_products_table. This means the migration is trying to add a column (`brand`) that already exists in the `products` table. Please fix this migration file — and any other migrations that modify existing tables — to make them **idempotent** (safe to re-run multiple times) by adding schema existence checks.",
+      "prompt_type": "user_request"
     }
   ]
 }
