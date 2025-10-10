@@ -12,6 +12,18 @@
       "prompt_type": "user_request"
     },
     {
+      "id": "appointment_detail_layout_update_v1",
+      "path": "prompts/appointment_detail_layout_update_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-10-10T00:00:00Z",
+      "user_prompt": "For appointments details page for both patient and Dermatologist make single section for Appointment Information and Patient/Dermatologist details remove Update Status from details it should work from appointment list and note section move on right side on above note section should show start chat button.",
+      "prompt_type": "user_request"
+    },
+    {
       "id": "appointments_payment_status_update_v1",
       "path": "prompts/appointments_payment_status_update_v1.md",
       "used_in": [
