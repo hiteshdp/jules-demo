@@ -1670,6 +1670,32 @@
       "date": "2025-10-09T10:05:00Z",
       "user_prompt": "I have consultation fees in appointments table in database. Now i need to add other fields related to the fee. Dermatologist_fee, platform fee. In general setting need to add new column called platform fee in (%) and and that fee will deduct from the consultation fees and remaing amount will be Dermatologist_fee and the (%) amount is platform fee. I need to store this fee when appointment is created. Also check if there is not setting for platform fee in admin side than add it",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "navigation_basename_fix_v1",
+      "path": "prompts/navigation_basename_fix_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Appointments.tsx",
+        "frontend/patient/src/pages/AppointmentDetail.tsx",
+        "frontend/patient/src/pages/Dashboard.tsx",
+        "frontend/patient/src/pages/Recommendations.tsx",
+        "frontend/patient/src/components/common/ErrorBoundary.tsx",
+        "frontend/patient/src/store/api/apiClient.ts",
+        "frontend/dermatologist/src/pages/AppointmentDetail.tsx",
+        "frontend/dermatologist/src/pages/Dashboard.tsx",
+        "frontend/dermatologist/src/components/common/ErrorBoundary.tsx",
+        "frontend/dermatologist/src/store/api/apiClient.ts",
+        "frontend/admin/src/pages/Dashboard.tsx",
+        "frontend/admin/src/components/common/ErrorBoundary.tsx",
+        "frontend/admin/src/store/api/dashboardAPI.ts",
+        "frontend/admin/src/store/api/dermatologistAPI.ts",
+        "frontend/admin/src/store/api/patientAPI.ts",
+        "frontend/admin/src/store/api/authAPI.ts"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T12:00:00Z",
+      "user_prompt": "BrowserRouter basename=\"/dermatologist\" I have added this please fixed all the plave navigation based on that for patient we use basename=\"/patient\" please fixed everywhere",
+      "prompt_type": "user_request"
     }
   ]
 }

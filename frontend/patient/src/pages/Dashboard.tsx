@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
 import { fetchQuestions } from '../store/slices/quizSlice';
@@ -16,6 +17,7 @@ const { Title, Text } = Typography;
 
 const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const { appointments } = useSelector((state: RootState) => state.appointment);
   const { isSubmitted } = useSelector((state: RootState) => state.quiz);
@@ -83,7 +85,7 @@ const Dashboard = () => {
             <Card 
               hoverable
               className="h-full"
-              onClick={() => window.location.href = '/quiz'}
+              onClick={() => navigate('/quiz')}
             >
               <Space direction="vertical" size="middle" className="w-full">
                 <div className="text-center">
@@ -105,7 +107,7 @@ const Dashboard = () => {
             <Card 
               hoverable
               className="h-full"
-              onClick={() => window.location.href = '/recommendations'}
+              onClick={() => navigate('/recommendations')}
             >
               <Space direction="vertical" size="middle" className="w-full">
                 <div className="text-center">
@@ -127,7 +129,7 @@ const Dashboard = () => {
             <Card 
               hoverable
               className="h-full"
-              onClick={() => window.location.href = '/appointments'}
+              onClick={() => navigate('/appointments')}
             >
               <Space direction="vertical" size="middle" className="w-full">
                 <div className="text-center">

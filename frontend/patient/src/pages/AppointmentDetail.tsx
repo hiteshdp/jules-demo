@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
@@ -17,6 +17,7 @@ const { Text } = Typography;
 
 const AppointmentDetail: React.FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { appointments } = useSelector((state: RootState) => state.appointment);
 
@@ -108,7 +109,7 @@ const AppointmentDetail: React.FC = () => {
                   type="primary" 
                   icon={<MessageOutlined />}
                   className="w-full"
-                  onClick={() => window.location.href = `/chat?appointmentId=${appointment.id}`}
+                  onClick={() => navigate(`/chat?appointmentId=${appointment.id}`)}
                 >
                   Start Chat
                 </Button>

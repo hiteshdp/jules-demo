@@ -11,6 +11,7 @@
 /storage/framework/sessions/*
 /storage/framework/views/*
 /bootstrap/cache/*
+/public/.htaccess
 
 # Ignore compiled assets
 /public/hot
