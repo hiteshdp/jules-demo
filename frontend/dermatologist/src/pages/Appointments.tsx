@@ -118,6 +118,12 @@ const Appointments: React.FC = () => {
   const handleExport = async (format: 'excel' | 'csv') => {
     try {
       const token = localStorage.getItem('dermatologist_token') || localStorage.getItem('token');
+      if (!token) {
+        toast.error('You are not authenticated. Please login again.');
+        return;
+      }
+      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '/api';
+      const API_BASE = String(API_BASE_URL).replace(/\/+$/, '');
       const queryParams = new URLSearchParams();
       
       // Apply current filters to export
@@ -127,11 +133,14 @@ const Appointments: React.FC = () => {
       if (filters.status) queryParams.append('status', filters.status);
       queryParams.append('export', format);
 
-      const response = await fetch(`/api/dermatologist/appointments?${queryParams.toString()}`, {
+      const response = await fetch(`${API_BASE}/dermatologist/appointments?${queryParams.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv'
-        }
+          // Avoid overriding Accept; let server decide correct content-type for stream
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        method: 'GET',
+        mode: 'cors'
       });
 
       if (response.ok) {
@@ -324,9 +333,7 @@ const Appointments: React.FC = () => {
             <div className="space-y-2">
               {filteredAppointments.map((appointment, idx) => {
                 const statusColor = appointment.status === 'completed' ? 'green' : appointment.status === 'in_progress' ? 'blue' : 'default';
-                const totalPaid = Number(appointment.consultation_fee || 0);
-                const doctorSharePercent = Number((import.meta as any).env?.VITE_DERMATOLOGIST_SHARE_PERCENT || 70);
-                const doctorAmount = (totalPaid * doctorSharePercent) / 100;
+                const doctorAmount = Number((appointment as any).dermatologist_fee || 0);
 
                 return (
                   <div key={appointment.id} className="px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors">
