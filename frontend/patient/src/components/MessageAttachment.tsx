@@ -4,7 +4,6 @@ import { Button, Image, Modal, Typography, Space, Tag, message } from 'antd';
 import { 
   FileImageOutlined, 
   FilePdfOutlined, 
-  FileTextOutlined, 
   FileOutlined,
   DownloadOutlined,
   EyeOutlined,
@@ -107,99 +106,123 @@ const MessageAttachment: React.FC<MessageAttachmentProps> = ({
   const isAudio = attachment.type === 'audio';
 
   return (
-    <div className={`max-w-xs ${isOwnMessage ? 'ml-auto' : 'mr-auto'}`}>
-      <div className={`bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm ${
-        isOwnMessage ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
-      }`}>
-        {/* File Header */}
-        <div className="p-3 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="text-lg">
-                {getFileIcon(attachment.type)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <Text className="text-sm font-medium text-gray-900 block truncate">
-                  {attachment.originalName || 'Attachment'}
-                </Text>
-                <Tag color={getFileTypeColor(attachment.type)} size="small">
-                  {attachment.type.toUpperCase()}
-                </Tag>
+    <div className={`${isImage ? 'max-w-sm' : 'max-w-xs'} ${isOwnMessage ? 'ml-auto' : 'mr-auto'}`}>
+      {isImage ? (
+        // Image Preview - WhatsApp Style
+        <div className="relative group">
+          <div className="relative overflow-hidden rounded-2xl shadow-lg">
+            <Image
+              src={getAttachmentUrl()}
+              alt={attachment.originalName || 'Image'}
+              className="w-full h-64 object-cover cursor-pointer transition-transform duration-200 group-hover:scale-105"
+              onClick={() => setPreviewVisible(true)}
+              preview={false}
+            />
+            {/* Overlay with action buttons */}
+            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-3">
+                <Button
+                  type="primary"
+                  size="middle"
+                  icon={<EyeOutlined />}
+                  onClick={() => setPreviewVisible(true)}
+                  className="bg-white text-gray-800 hover:bg-gray-100 shadow-lg"
+                />
+                <Button
+                  type="primary"
+                  size="middle"
+                  icon={<DownloadOutlined />}
+                  onClick={handleDownload}
+                  loading={loading}
+                  className="bg-white text-gray-800 hover:bg-gray-100 shadow-lg"
+                />
               </div>
             </div>
-            <Space>
-              {isImage && (
+            {/* Image type indicator */}
+            <div className="absolute top-2 right-2">
+              <Tag color="green" className="text-xs font-medium">
+                IMAGE
+              </Tag>
+            </div>
+          </div>
+          {/* Image filename below */}
+          <div className="mt-2 px-1">
+            <Text className="text-xs text-gray-600 truncate block font-medium">
+              {attachment.originalName || 'Image'}
+            </Text>
+          </div>
+        </div>
+      ) : (
+        // Non-image files - Document Style
+        <div className={`bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm ${
+          isOwnMessage ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
+        }`}>
+          {/* File Header */}
+          <div className="p-3 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="text-lg">
+                  {getFileIcon(attachment.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Text className="text-sm font-medium text-gray-900 block truncate">
+                    {attachment.originalName || 'Attachment'}
+                  </Text>
+                  <Tag color={getFileTypeColor(attachment.type)} className="text-xs">
+                    {attachment.type.toUpperCase()}
+                  </Tag>
+                </div>
+              </div>
+              <Space>
                 <Button
                   type="text"
                   size="small"
-                  icon={<EyeOutlined />}
-                  onClick={() => setPreviewVisible(true)}
-                  className="text-blue-500 hover:text-blue-700"
+                  icon={<DownloadOutlined />}
+                  onClick={handleDownload}
+                  loading={loading}
+                  className="text-green-500 hover:text-green-700"
                 />
-              )}
-              <Button
-                type="text"
-                size="small"
-                icon={<DownloadOutlined />}
-                onClick={handleDownload}
-                loading={loading}
-                className="text-green-500 hover:text-green-700"
-              />
-            </Space>
+              </Space>
+            </div>
+          </div>
+
+          {/* File Content */}
+          <div className="p-2">
+            {isVideo && (
+              <div className="relative">
+                <video
+                  src={getAttachmentUrl()}
+                  className="w-full h-32 object-cover rounded"
+                  controls
+                  preload="metadata"
+                />
+              </div>
+            )}
+
+            {isAudio && (
+              <div className="p-4">
+                <audio
+                  src={getAttachmentUrl()}
+                  controls
+                  className="w-full"
+                  preload="metadata"
+                />
+              </div>
+            )}
+
+            {!isVideo && !isAudio && (
+              <div className="p-4 text-center">
+                <div className="text-4xl mb-2">
+                  {getFileIcon(attachment.type)}
+                </div>
+                <Text className="text-gray-500 text-sm">
+                  Click download to view file
+                </Text>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* File Content */}
-        <div className="p-2">
-          {isImage && (
-            <div className="relative">
-              <Image
-                src={getAttachmentUrl()}
-                alt={attachment.originalName || 'Image'}
-                className="w-full h-32 object-cover rounded cursor-pointer"
-                onClick={() => setPreviewVisible(true)}
-                preview={false}
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 rounded flex items-center justify-center">
-                <EyeOutlined className="text-white text-2xl opacity-0 hover:opacity-100 transition-opacity duration-200" />
-              </div>
-            </div>
-          )}
-
-          {isVideo && (
-            <div className="relative">
-              <video
-                src={getAttachmentUrl()}
-                className="w-full h-32 object-cover rounded"
-                controls
-                preload="metadata"
-              />
-            </div>
-          )}
-
-          {isAudio && (
-            <div className="p-4">
-              <audio
-                src={getAttachmentUrl()}
-                controls
-                className="w-full"
-                preload="metadata"
-              />
-            </div>
-          )}
-
-          {!isImage && !isVideo && !isAudio && (
-            <div className="p-4 text-center">
-              <div className="text-4xl mb-2">
-                {getFileIcon(attachment.type)}
-              </div>
-              <Text className="text-gray-500 text-sm">
-                Click download to view file
-              </Text>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Image Preview Modal */}
       {isImage && (

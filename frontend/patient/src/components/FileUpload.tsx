@@ -1,13 +1,12 @@
 // Generated via prompt: prompts/chat_file_upload_feature_v1.md
 import React, { useRef, useState } from 'react';
-import { Button, Upload, message, Modal, Image, Typography, Space, Tag } from 'antd';
+import { Button, message, Modal, Image, Typography, Space } from 'antd';
 import { 
   PaperClipOutlined, 
   FileImageOutlined, 
   FilePdfOutlined, 
   FileTextOutlined, 
   FileOutlined,
-  DownloadOutlined,
   EyeOutlined,
   DeleteOutlined
 } from '@ant-design/icons';

@@ -152,3 +152,41 @@ Now users can send files without any text message, just like WhatsApp! 📎✨
 - **File-Only Support**: Successfully handles attachments without text messages
 
 The validation error is now completely resolved! Users can send files without any text message. 🎉📎
+
+## UI/UX Improvements (v1.4)
+
+### **Enhanced Image Preview**:
+- **WhatsApp-Style Images**: Large, rounded image previews without message bubbles
+- **Hover Effects**: Smooth scale animation and overlay with action buttons
+- **Better Sizing**: Larger max width for image messages (85% vs 70%)
+- **Visual Indicators**: Green "IMAGE" tag in top-right corner
+- **Action Buttons**: Preview and download buttons appear on hover
+
+### **Improved Message Layout**:
+- **Image-Only Messages**: No background bubble for cleaner look
+- **Mixed Content**: Text + attachment still uses message bubble
+- **Better Spacing**: Optimized padding and margins for different content types
+- **Responsive Design**: Adapts to different screen sizes
+
+### **Visual Enhancements**:
+- **Rounded Corners**: Modern 2xl border radius for images
+- **Shadow Effects**: Subtle shadows for depth and visual hierarchy
+- **Smooth Transitions**: Hover animations and state changes
+- **Color Consistency**: Maintains project color scheme
+
+The image preview now looks exactly like WhatsApp with proper thumbnails, hover effects, and clean styling! 📸✨
+
+## TypeScript Fixes (v1.5)
+
+### **Fixed Build Errors**:
+- **Removed Unused Imports**: Cleaned up unused `Upload`, `Tag`, `DownloadOutlined`, and `FileTextOutlined` imports
+- **Fixed Tag Component**: Removed invalid `size` prop and used `className` for styling
+- **Build Success**: All TypeScript errors resolved, build now passes
+- **Clean Code**: No linting errors or warnings
+
+### **Technical Details**:
+- **Import Cleanup**: Removed unused Ant Design components and icons
+- **Props Fix**: Replaced `size="small"` with `className="text-xs"` for Tag component
+- **Type Safety**: All TypeScript errors resolved for production build
+
+The codebase is now clean and ready for production! 🚀✨

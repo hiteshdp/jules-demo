@@ -316,37 +316,52 @@ const Chat: React.FC = () => {
                           key={message.id}
                           className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} ${isConsecutive ? 'mt-1' : 'mt-3'}`}
                         >
-                          <div className={`max-w-[70%] ${isOwnMessage ? 'order-2' : 'order-1'}`}>
-                            <div className={`px-3 py-2 rounded-2xl transition-all duration-200 hover:shadow-md ${
-                              isOwnMessage
-                                ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
-                                : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm'
-                            } ${isConsecutive ? (isOwnMessage ? 'rounded-tr-md' : 'rounded-tl-md') : ''}`}
-                            style={{
-                              boxShadow: isOwnMessage 
-                                ? '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)' 
-                                : '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12)'
-                            }}>
-                              {message.attachment && (
-                                <div className="mb-2">
-                                  <MessageAttachment
-                                    attachment={{
-                                      path: message.attachment,
-                                      type: message.type,
-                                      originalName: message.attachment.split('/').pop()
-                                    }}
-                                    messageId={message.id}
-                                    appointmentId={selectedAppointmentId!}
-                                    isOwnMessage={isOwnMessage}
-                                  />
-                                </div>
-                              )}
-                              {message.message && (
-                                <Typography.Text className={`text-sm leading-relaxed break-words ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
-                                  {message.message}
-                                </Typography.Text>
-                              )}
-                            </div>
+                          <div className={`${message.attachment && message.type === 'image' ? 'max-w-[85%]' : 'max-w-[70%]'} ${isOwnMessage ? 'order-2' : 'order-1'}`}>
+                            {message.attachment && message.type === 'image' && !message.message ? (
+                              // Image-only message - no bubble background
+                              <MessageAttachment
+                                attachment={{
+                                  path: message.attachment,
+                                  type: message.type,
+                                  originalName: message.attachment.split('/').pop()
+                                }}
+                                messageId={message.id}
+                                appointmentId={selectedAppointmentId!}
+                                isOwnMessage={isOwnMessage}
+                              />
+                            ) : (
+                              // Text message or mixed content - with bubble background
+                              <div className={`px-3 py-2 rounded-2xl transition-all duration-200 hover:shadow-md ${
+                                isOwnMessage
+                                  ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
+                                  : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm'
+                              } ${isConsecutive ? (isOwnMessage ? 'rounded-tr-md' : 'rounded-tl-md') : ''}`}
+                              style={{
+                                boxShadow: isOwnMessage 
+                                  ? '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)' 
+                                  : '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12)'
+                              }}>
+                                {message.attachment && (
+                                  <div className="mb-2">
+                                    <MessageAttachment
+                                      attachment={{
+                                        path: message.attachment,
+                                        type: message.type,
+                                        originalName: message.attachment.split('/').pop()
+                                      }}
+                                      messageId={message.id}
+                                      appointmentId={selectedAppointmentId!}
+                                      isOwnMessage={isOwnMessage}
+                                    />
+                                  </div>
+                                )}
+                                {message.message && (
+                                  <Typography.Text className={`text-sm leading-relaxed break-words ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
+                                    {message.message}
+                                  </Typography.Text>
+                                )}
+                              </div>
+                            )}
                             {showTime && (
                               <div className={`flex items-center mt-1 space-x-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                                 <Typography.Text className={`text-[10px] text-gray-500 ${isOwnMessage ? 'text-right' : 'text-left'}`}>
