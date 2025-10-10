@@ -6,7 +6,7 @@ build_laravel:
   tags:
     - PHP_PROJECTS
   script:
-    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/
+    - rsync -avz -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/* ubuntu@3.109.28.118:/var/www/html/hair-skin-health/
     - |
       ssh -o StrictHostKeyChecking=no -p 22 ubuntu@3.109.28.118 << 'EOF'
         cd /var/www/html/hair-skin-health
