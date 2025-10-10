@@ -15,6 +15,24 @@ interface Dermatologist {
   specialization: string;
 }
 
+interface Payment {
+  id: number;
+  user_id: number;
+  payable_type: string;
+  payable_id: number;
+  type: string;
+  amount: string;
+  currency: string;
+  razorpay_payment_id?: string;
+  razorpay_order_id?: string;
+  status: string;
+  failure_reason?: string;
+  razorpay_response?: any;
+  paid_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface Appointment {
   id: number;
   patient_id: number;
@@ -28,6 +46,7 @@ interface Appointment {
   is_paid: boolean;
   patient?: Patient;
   dermatologist?: Dermatologist;
+  payments?: Payment[];
 }
 
 interface AppointmentState {
@@ -132,7 +151,12 @@ export const updateAppointmentPaymentStatus = createAsyncThunk(
   ) => {
     try {
       const response = await appointmentAPI.updatePaymentStatus(id, status);
-      return { id, status, data: response.data };
+      return {
+        id,
+        status,
+        is_paid: response.data.data.is_paid,
+        payment: response.data.data.payment
+      };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update payment status');
     }
@@ -217,6 +241,24 @@ const appointmentSlice = createSlice({
         const appt = state.appointments.find((a) => a.id === id);
         if (appt) {
           appt.is_paid = status === 'completed';
+        }
+      })
+      .addCase(updateAppointmentPaymentStatus.fulfilled, (state: AppointmentState, action: any) => {
+        const { id, is_paid, payment } = action.payload;
+        const appt = state.appointments.find((a) => a.id === id);
+        if (appt) {
+          appt.is_paid = is_paid;
+          // Update or add the payment record
+          if (payment) {
+            if (appt.payments && appt.payments.length > 0) {
+              // Update the latest payment
+              const latestPaymentIndex = appt.payments.length - 1;
+              appt.payments[latestPaymentIndex] = payment;
+            } else {
+              // Add new payment if none exists
+              appt.payments = [payment];
+            }
+          }
         }
       })
       .addCase(updateAppointmentPaymentStatus.rejected, (state: AppointmentState, action: any) => {
