@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Appointment Chat
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
+        Route::get('/appointments/{id}/chat/{messageId}/download', [AppointmentChatController::class, 'downloadAttachment']);
 
         // Quiz
         Route::get('/quiz/questions', [QuizController::class, 'questions']);
@@ -97,6 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Appointment Chat (Dermatologist)
         Route::get('/appointments/{id}/chat', [AppointmentChatController::class, 'index']);
         Route::post('/appointments/{id}/chat', [AppointmentChatController::class, 'store']);
+        Route::get('/appointments/{id}/chat/{messageId}/download', [AppointmentChatController::class, 'downloadAttachment']);
 
         // Dermatologist Profile Management
         Route::get('/profile', [DermatologistController::class, 'getProfile']);
@@ -163,3 +165,4 @@ Route::get('/test/appointments', function () {
         'data' => $appointments
     ]);
 });
+

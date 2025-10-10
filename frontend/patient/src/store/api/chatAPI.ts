@@ -6,7 +6,8 @@ export interface ChatMessage {
   appointment_id: number;
   sender_id: number;
   message: string;
-  type: 'text' | 'image' | 'file';
+  attachment?: string;
+  type: 'text' | 'image' | 'file' | 'video' | 'audio' | 'document';
   is_read: boolean;
   created_at: string;
   sender?: {
@@ -20,8 +21,28 @@ export const chatAPI = {
   getMessages: (appointmentId: number, afterId?: number) =>
     apiClient.get<{ success: boolean; data: ChatMessage[] }>(`/patient/appointments/${appointmentId}/chat${afterId ? `?after_id=${afterId}` : ''}`),
 
-  sendMessage: (appointmentId: number, payload: { message: string; type?: 'text' | 'image' | 'file' }) =>
-    apiClient.post<{ success: boolean; data: ChatMessage }>(`/patient/appointments/${appointmentId}/chat`, payload),
+  sendMessage: (appointmentId: number, payload: { message: string; file?: File; type?: 'text' | 'image' | 'file' | 'video' | 'audio' | 'document' }) => {
+    const formData = new FormData();
+    
+    // Only append message if it's not empty
+    if (payload.message && payload.message.trim()) {
+      formData.append('message', payload.message);
+    }
+    
+    if (payload.file) {
+      formData.append('attachment', payload.file);
+    }
+    
+    if (payload.type) {
+      formData.append('type', payload.type);
+    }
+
+    return apiClient.post<{ success: boolean; data: ChatMessage }>(`/patient/appointments/${appointmentId}/chat`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
 };
 
 
