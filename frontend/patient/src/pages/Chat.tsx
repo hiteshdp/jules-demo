@@ -19,6 +19,8 @@ const Chat: React.FC = () => {
   
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
+  const [isSwitchingAppointment, setIsSwitchingAppointment] = useState(false);
+  const [isManualSelection, setIsManualSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
@@ -35,27 +37,42 @@ const Chat: React.FC = () => {
     return parsedId;
   }, [location.search]);
 
+  // Initialize from URL on first load only
   useEffect(() => {
-    if (queryAppointmentId && queryAppointmentId !== selectedAppointmentId) {
+    // Only set from URL on initial load (when selectedAppointmentId is null)
+    if (queryAppointmentId && !selectedAppointmentId && !isManualSelection) {
       setSelectedAppointmentId(queryAppointmentId);
     }
-  }, [queryAppointmentId, selectedAppointmentId]);
+  }, [queryAppointmentId, selectedAppointmentId, isManualSelection]);
 
   useEffect(() => {
     if (selectedAppointmentId) {
       dispatch(clearMessages()); // Clear previous messages
-      dispatch(fetchChatMessages(selectedAppointmentId));
+      dispatch(fetchChatMessages(selectedAppointmentId))
+        .catch((error) => {
+          // Handle error silently to prevent chat reversion
+          console.warn('Failed to fetch messages for appointment:', selectedAppointmentId, error);
+        });
     }
   }, [selectedAppointmentId, dispatch]);
 
   // Polling: refetch messages every 5s
   useEffect(() => {
     if (!selectedAppointmentId) return;
+    
     const interval = setInterval(() => {
-      dispatch(fetchChatMessages(selectedAppointmentId));
-    }, 1000);
+      // Only poll if we're not currently switching appointments
+      if (!isSwitchingAppointment) {
+        dispatch(fetchChatMessages(selectedAppointmentId))
+          .catch((error) => {
+            // Handle polling errors silently
+            console.warn('Polling error for appointment:', selectedAppointmentId, error);
+          });
+      }
+    }, 5000);
+    
     return () => clearInterval(interval);
-  }, [selectedAppointmentId, dispatch]);
+  }, [selectedAppointmentId, dispatch, isSwitchingAppointment]);
 
   // Track whether user is near bottom
   const handleScroll = () => {
@@ -77,6 +94,27 @@ const Chat: React.FC = () => {
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
   }, [currentMessages, selectedAppointmentId, isNearBottom]);
+
+  const handleAppointmentClick = (appointmentId: number) => {
+    // Don't change if already selected or currently switching
+    if (selectedAppointmentId === appointmentId || isSwitchingAppointment) {
+      return;
+    }
+    
+    setIsManualSelection(true); // Mark as manual selection
+    setIsSwitchingAppointment(true);
+    setSelectedAppointmentId(appointmentId);
+    
+    // Update URL query param to keep UI in sync
+    const params = new URLSearchParams(location.search);
+    params.set('appointmentId', String(appointmentId));
+    window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+    
+    // Reset switching state after a delay
+    setTimeout(() => {
+      setIsSwitchingAppointment(false);
+    }, 1000);
+  };
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,15 +180,13 @@ const Chat: React.FC = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setSelectedAppointmentId(appointment.id);
-                      // Update URL query param to keep UI in sync
-                      const params = new URLSearchParams(location.search);
-                      params.set('appointmentId', String(appointment.id));
-                      window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+                      handleAppointmentClick(appointment.id);
                     }}
                     className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                       selectedAppointmentId === appointment.id
                         ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : isSwitchingAppointment
+                        ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
                         : 'border-gray-200 hover:border-blue-300 hover:bg-blue-25'
                     }`}
                     bodyStyle={{ padding: '12px' }}
@@ -188,6 +224,7 @@ const Chat: React.FC = () => {
         {/* Chat Area */}
         <Col xs={24} lg={16}>
           <Card 
+            key={selectedAppointmentId}
             className="h-[600px] flex flex-col"
             bodyStyle={{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }}
           >
