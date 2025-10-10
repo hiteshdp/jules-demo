@@ -17,6 +17,7 @@ build_laravel:
         php artisan migrate --force
         php artisan l5-swagger:generate
         php artisan up
+        sudo chmod -R 777 storage
       EOF
   rules:
     - if: '$CI_COMMIT_BRANCH == "stage"'
