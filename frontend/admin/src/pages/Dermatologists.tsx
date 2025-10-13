@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchDermatologists, createDermatologist, updateDermatologist, deleteDermatologist } from '../store/slices/dermatologistSlice';
+import dayjs from 'dayjs';
 import { 
   Card, 
   Table, 
@@ -153,7 +154,7 @@ const Dermatologists: React.FC = () => {
       title: 'DOB',
       dataIndex: 'dob',
       key: 'dob',
-      render: (dob) => dob || '–',
+      render: (dob) => dob ? dayjs(dob).format('DD/MM/YYYY') : '–',
     },
     {
       title: 'Gender',
@@ -325,7 +326,7 @@ const Dermatologists: React.FC = () => {
             <Card title="Profile">
               <Descriptions column={1} bordered size="middle">
                 <Descriptions.Item label="Phone">{viewData.phone_no || 'N/A'}</Descriptions.Item>
-                <Descriptions.Item label="Date of Birth">{viewData.dob || '–'}</Descriptions.Item>
+                <Descriptions.Item label="Date of Birth">{viewData.dob ? dayjs(viewData.dob).format('DD/MM/YYYY') : '–'}</Descriptions.Item>
                 <Descriptions.Item label="Gender">{viewData.gender || '–'}</Descriptions.Item>
                 <Descriptions.Item label="Active">{viewData.is_active ? 'Yes' : 'No'}</Descriptions.Item>
               </Descriptions>

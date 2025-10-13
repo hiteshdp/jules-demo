@@ -12,6 +12,7 @@ import {
   TeamOutlined
 } from '@ant-design/icons';
 import { PageHeader, StatusTag } from '../components/common';
+import { formatDateTimeWithAmPm } from '../utils/dateUtils';
 
 const { Title, Text } = Typography;
 
@@ -166,8 +167,7 @@ const Dashboard = () => {
                       {appointment.dermatologist?.user?.name}
                     </Text>
                     <Text type="secondary" className="text-sm">
-                      {new Date(appointment.scheduled_at).toLocaleDateString()} at{' '}
-                      {new Date(appointment.scheduled_at).toLocaleTimeString()}
+                      {formatDateTimeWithAmPm(appointment.scheduled_at)}
                     </Text>
                   </div>
                 </div>

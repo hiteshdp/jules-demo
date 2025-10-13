@@ -1753,6 +1753,19 @@
       "date": "2025-01-27T12:00:00Z",
       "user_prompt": "In the Admin → Appointment section, update the **appointment listing** so that three new columns are displayed **before the \"Payment Status\"** column. These values already exist in the database (`appointments` table). | Display Label | Database Column | |----------------|----------------| | Consultation Fee | consultation_fee | | Dermatologist Payout | dermatologist_fee | | Platform Commission | platform_fee | make sure you handle the frontend and backend both and make it working properly",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "complete_dd_mm_yyyy_standardization_v1",
+      "path": "prompts/complete_dd_mm_yyyy_standardization_v1.md",
+      "used_in": [
+        "app/Http/Controllers/Api/AppointmentController.php",
+        "app/Http/Controllers/Api/DermatologistAppointmentController.php",
+        "routes/web.php"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T12:30:00Z",
+      "user_prompt": "Please use DD/MM/YYYY formate in overall project",
+      "prompt_type": "user_request"
     }
   ]
 }

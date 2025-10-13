@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\AppointmentPaymentController;
 use App\Http\Controllers\Api\WebhookController;
 // use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\Admin\AdminSubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,7 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/appointment/payment/verify', [AppointmentPaymentController::class, 'verifyPayment']);
     });
 
-    
+
     // Dermatologist routes
     Route::prefix('dermatologist')->group(function () {
         // Authentication
@@ -139,10 +140,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments/filters/dermatologists', [AdminController::class, 'getDermatologistsForFilter']);
         Route::get('/appointments/filters/patients', [AdminController::class, 'getPatientsForFilter']);
         Route::put('/appointments/{id}/payment-status', [AdminController::class, 'updateAppointmentPaymentStatus']);
+
+        // Subscription management
+        Route::get('/subscriptions', [AdminSubscriptionController::class, 'index']);
+        Route::get('/subscriptions/{id}', [AdminSubscriptionController::class, 'show']);
+        Route::get('/subscriptions/statistics', [AdminSubscriptionController::class, 'statistics']);
     });
 });
 
 // Razorpay webhook (public)
+
 Route::post('/razorpay/webhook', [WebhookController::class, 'handle']);
 
 // Test route for appointments (temporary - remove in production)
@@ -159,4 +166,3 @@ Route::get('/test/appointments', function () {
         'data' => $appointments
     ]);
 });
-
