@@ -1766,6 +1766,28 @@
       "date": "2025-01-28T12:30:00Z",
       "user_prompt": "Please use DD/MM/YYYY formate in overall project",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_dashboard_cards_update_v1",
+      "path": "prompts/patient_dashboard_cards_update_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T13:00:00Z",
+      "user_prompt": "in patient module , dashboard section , here i need only - Total appointments and Upcoming appointments. Move Total Appointments at first then show Upcoming Appointments",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_quick_actions_cleanup_v1",
+      "path": "prompts/patient_quick_actions_cleanup_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T13:15:00Z",
+      "user_prompt": "in patient module , dashboard section , here i need only Take hair loss quiz and Book appointmnet only remove view recommandations",
+      "prompt_type": "user_request"
     }
   ]
 }

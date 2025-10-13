@@ -8,7 +8,6 @@ import { Card, Row, Col, Statistic, Typography, Space } from 'antd';
 import { 
   CalendarOutlined, 
   FileTextOutlined, 
-  BulbOutlined,
   TeamOutlined
 } from '@ant-design/icons';
 import { PageHeader, StatusTag } from '../components/common';
@@ -21,7 +20,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const { appointments } = useSelector((state: RootState) => state.appointment);
-  const { isSubmitted } = useSelector((state: RootState) => state.quiz);
 
   useEffect(() => {
     // Only fetch data if user is authenticated
@@ -37,22 +35,16 @@ const Dashboard = () => {
 
   const stats = [
     {
-      title: 'Upcoming Appointments',
-      value: upcomingAppointments.length,
-      icon: <CalendarOutlined className="text-blue-600" />,
-      color: '#1890ff',
-    },
-    {
-      title: 'Quiz Completed',
-      value: isSubmitted ? 'Yes' : 'No',
-      icon: <FileTextOutlined className="text-green-600" />,
-      color: '#52c41a',
-    },
-    {
       title: 'Total Appointments',
       value: Array.isArray(appointments) ? appointments.length : 0,
       icon: <TeamOutlined className="text-purple-600" />,
       color: '#722ed1',
+    },
+    {
+      title: 'Upcoming Appointments',
+      value: upcomingAppointments.length,
+      icon: <CalendarOutlined className="text-blue-600" />,
+      color: '#1890ff',
     },
   ];
 
@@ -66,7 +58,7 @@ const Dashboard = () => {
       {/* Stats */}
       <Row gutter={[16, 16]}>
         {stats.map((stat, index) => (
-          <Col xs={24} sm={12} lg={8} key={index}>
+          <Col xs={24} sm={12} lg={12} key={index}>
             <Card>
               <Statistic
                 title={stat.title}
@@ -82,7 +74,7 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <Card title="Quick Actions">
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} lg={8}>
+          <Col xs={24} sm={12} lg={12}>
             <Card 
               hoverable
               className="h-full"
@@ -104,29 +96,7 @@ const Dashboard = () => {
             </Card>
           </Col>
 
-          <Col xs={24} sm={12} lg={8}>
-            <Card 
-              hoverable
-              className="h-full"
-              onClick={() => navigate('/recommendations')}
-            >
-              <Space direction="vertical" size="middle" className="w-full">
-                <div className="text-center">
-                  <div className="inline-flex p-3 bg-green-50 text-green-700 rounded-lg">
-                    <BulbOutlined className="text-2xl" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <Title level={4} className="!mb-2">View Recommendations</Title>
-                  <Text type="secondary">
-                    See personalized product and lifestyle recommendations.
-                  </Text>
-                </div>
-              </Space>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={8}>
+          <Col xs={24} sm={12} lg={12}>
             <Card 
               hoverable
               className="h-full"
