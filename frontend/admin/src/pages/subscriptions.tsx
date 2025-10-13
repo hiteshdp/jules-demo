@@ -45,6 +45,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
+import { formatDateTime } from '../utils/dateUtils';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -111,9 +112,7 @@ const Subscriptions: React.FC = () => {
   };
 
 
-  const formatDateTime = (dateTime: string) => {
-    return dayjs(dateTime).format('DD MMM YYYY, HH:mm');
-  };
+  // Using standardized formatDateTime from dateUtils
 
   const formatCurrency = (amount: number) => {
     return `₹${amount.toLocaleString()}`;

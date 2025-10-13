@@ -50,6 +50,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
+import { formatDateTime } from '../utils/dateUtils';
 import { useRef } from 'react';
 
 const { Title, Text } = Typography;
@@ -129,16 +130,14 @@ const Appointments: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'scheduled':
+      case 'pending_review':
         return 'blue';
+      case 'confirmed':
+        return 'cyan';
       case 'in_progress':
         return 'orange';
       case 'completed':
         return 'green';
-      case 'cancelled':
-        return 'red';
-      case 'no_show':
-        return 'default';
       default:
         return 'default';
     }
@@ -146,24 +145,20 @@ const Appointments: React.FC = () => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'scheduled':
+      case 'pending_review':
         return 'Pending Review';
+      case 'confirmed':
+        return 'Confirmed';
       case 'in_progress':
         return 'In Progress';
       case 'completed':
         return 'Completed';
-      case 'cancelled':
-        return 'Cancelled';
-      case 'no_show':
-        return 'No Show';
       default:
         return status;
     }
   };
 
-  const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString();
-  };
+  // Using standardized formatDateTime from dateUtils
 
   const handleViewDetails = async (appointmentId: number) => {
     try {
@@ -492,11 +487,10 @@ const Appointments: React.FC = () => {
               onChange={(value) => handleFilterChange('status', value)}
               allowClear
             >
-              <Option value="scheduled">Pending Review</Option>
+              <Option value="pending_review">Pending Review</Option>
+              <Option value="confirmed">Confirmed</Option>
               <Option value="in_progress">In Progress</Option>
               <Option value="completed">Completed</Option>
-              <Option value="cancelled">Cancelled</Option>
-              <Option value="no_show">No Show</Option>
             </Select>
           </Form.Item>
 

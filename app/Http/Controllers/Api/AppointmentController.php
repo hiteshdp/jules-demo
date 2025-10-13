@@ -112,7 +112,7 @@ class AppointmentController extends Controller
 
         // Apply filters
         if ($request->has('dermatologist_name')) {
-            $query->whereHas('dermatologist.user', function($q) use ($request) {
+            $query->whereHas('dermatologist.user', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->dermatologist_name . '%');
             });
         }
@@ -133,7 +133,7 @@ class AppointmentController extends Controller
 
         // Add formatted date time and ensure consultation_fee is included
         $appointments->transform(function ($appointment) {
-            $appointment->formatted_date_time = $appointment->scheduled_at->format('d M Y, h:i A');
+            $appointment->formatted_date_time = $appointment->scheduled_at->format('d/m/Y, h:i A');
             return $appointment;
         });
 
@@ -298,7 +298,7 @@ class AppointmentController extends Controller
     private function exportAppointments($appointments, $format)
     {
         $filename = 'appointments_' . date('Y-m-d_H-i-s') . '.' . $format;
-        
+
         if ($format === 'csv') {
             return $this->exportToCsv($appointments, $filename);
         } else {
@@ -316,9 +316,9 @@ class AppointmentController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function() use ($appointments) {
+        $callback = function () use ($appointments) {
             $file = fopen('php://output', 'w');
-            
+
             // CSV headers
             fputcsv($file, [
                 'ID',
@@ -335,7 +335,7 @@ class AppointmentController extends Controller
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->dermatologist->user->name ?? 'N/A',
-                    $appointment->scheduled_at->format('d M Y, h:i A'),
+                    $appointment->scheduled_at->format('d/m/Y, h:i A'),
                     $appointment->status,
                     '₹' . number_format($appointment->consultation_fee, 2),
                     $appointment->is_paid ? 'Paid' : 'Unpaid',
@@ -361,12 +361,12 @@ class AppointmentController extends Controller
             'Cache-Control' => 'max-age=0',
         ];
 
-        $callback = function() use ($appointments) {
+        $callback = function () use ($appointments) {
             // Add UTF-8 BOM for Excel compatibility
             echo "\xEF\xBB\xBF";
-            
+
             $file = fopen('php://output', 'w');
-            
+
             // Excel headers
             fputcsv($file, [
                 'ID',
@@ -383,7 +383,7 @@ class AppointmentController extends Controller
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->dermatologist->user->name ?? 'N/A',
-                    $appointment->scheduled_at->format('d M Y, h:i A'),
+                    $appointment->scheduled_at->format('d/m/Y, h:i A'),
                     $appointment->status,
                     '₹' . number_format($appointment->consultation_fee, 2),
                     $appointment->is_paid ? 'Paid' : 'Unpaid',

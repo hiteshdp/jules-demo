@@ -13,6 +13,7 @@ import {
   TeamOutlined
 } from '@ant-design/icons';
 import { PageHeader, LoadingSpinner, StatusTag } from '../components/common';
+import { formatDateTimeWithAmPm } from '../utils/dateUtils';
 
 const { Title, Text } = Typography;
 
@@ -244,8 +245,7 @@ const Dashboard: React.FC = () => {
                       <div className="flex items-center">
                         <CalendarOutlined className="mr-2 text-gray-400" />
                         <Text type="secondary">
-                          {new Date(appointment.scheduled_at).toLocaleDateString()} at{' '}
-                          {new Date(appointment.scheduled_at).toLocaleTimeString()}
+                          {formatDateTimeWithAmPm(appointment.scheduled_at)}
                         </Text>
                       </div>
                     </Space>

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchSubscriptionStatus, cancelSubscription } from '../store/slices/subscriptionSlice';
 import toast from 'react-hot-toast';
+import { formatDateTime } from '../utils/dateUtils';
 
 const SubscriptionStatus: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,13 +36,7 @@ const SubscriptionStatus: React.FC = () => {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '—';
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return formatDateTime(dateString);
   };
 
   return (

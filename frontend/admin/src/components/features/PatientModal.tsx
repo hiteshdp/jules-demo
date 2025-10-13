@@ -94,7 +94,7 @@ const PatientModal: React.FC<Props> = ({ open, onClose, onSubmit, initialData, t
           <Input />
         </Form.Item>
         <Form.Item name="dob" label="Date of Birth">
-          <DatePicker style={{ width: '100%' }} format="YYYY-MM-DD" />
+          <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
         </Form.Item>
         <Form.Item name="gender" label="Gender">
           <Select>

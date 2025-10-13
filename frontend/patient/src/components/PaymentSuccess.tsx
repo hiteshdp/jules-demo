@@ -4,6 +4,7 @@ import React from 'react';
 import { Card, Button, Typography, Space, Tag } from 'antd';
 import { CheckCircleOutlined, CalendarOutlined, CreditCardOutlined, HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { formatDateTime } from '../utils/dateUtils';
 
 const { Title, Text } = Typography;
 
@@ -27,13 +28,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({ subscriptionData }) => 
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return formatDateTime(dateString);
   };
 
   return (

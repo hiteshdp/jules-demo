@@ -8,6 +8,7 @@ import { Avatar, Typography, Button, Form, Input, DatePicker, Select, Space, Dra
 import { PageHeader, LoadingSpinner, EmptyState, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
+import { formatDateTimeWithAmPm } from '../utils/dateUtils';
 
 const { Text } = Typography;
 
@@ -430,7 +431,7 @@ const Appointments: React.FC = () => {
                           <div className="flex items-center gap-2 text-gray-700">
                             <CalendarOutlined className="text-blue-500" />
                             <span className="text-sm">
-                              {(appointment as any).formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                              {(appointment as any).formatted_date_time || formatDateTimeWithAmPm(appointment.scheduled_at)}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 text-gray-700">

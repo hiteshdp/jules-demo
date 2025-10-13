@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchProducts, createProduct, updateProduct, deleteProduct } from '../store/slices/productSlice';
+import { formatDate } from '../utils/dateUtils';
 import { 
   Card, 
   Table, 
@@ -415,14 +416,14 @@ const Products: React.FC = () => {
                   <Text type="secondary">Created:</Text>
                   <br />
                   <Text strong>
-                    {new Date(viewingProduct.created_at).toLocaleDateString()}
+                    {formatDate(viewingProduct.created_at)}
                   </Text>
                 </div>
                 <div>
                   <Text type="secondary">Last Updated:</Text>
                   <br />
                   <Text strong>
-                    {new Date(viewingProduct.updated_at).toLocaleDateString()}
+                    {formatDate(viewingProduct.updated_at)}
                   </Text>
                 </div>
                 <div>
