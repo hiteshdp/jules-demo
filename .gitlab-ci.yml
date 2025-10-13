@@ -29,6 +29,12 @@ build_admin:
     - REACTJS_RPOJECT
   before_script:
     - cd $CI_PROJECT_DIR/frontend/admin
+    - rm -f .env
+    - |
+      echo "REACT_APP_API_URL=https://hair-skin-health.projectbeta.biz/api" > .env
+      echo "REACT_APP_APP_NAME=Hair Skin Health - Admin Panel" >> .env
+      echo "REACT_APP_VERSION=1.0.0" >> .env
+      echo "VITE_API_URL=https://hair-skin-health.projectbeta.biz/api" >> .env
     - source ~/.bash_profile
     - nvm use 20.18.1
   script:
@@ -49,13 +55,19 @@ build_dermatologist:
     - REACTJS_RPOJECT
   before_script:
     - cd $CI_PROJECT_DIR/frontend/dermatologist
+    - rm -f .env
+    - |
+      echo "REACT_APP_API_URL=https://hair-skin-health.projectbeta.biz/api" > .env
+      echo "REACT_APP_APP_NAME=Hair Skin Health - Dermatologist Panel" >> .env
+      echo "REACT_APP_VERSION=1.0.0" >> .env
+      echo "VITE_API_URL=https://hair-skin-health.projectbeta.biz/api" >> .env
     - source ~/.bash_profile
     - nvm use 20.18.1
   script:
     - rm -rf build
     - npm install
     - npm run build
-    - rsync -avz --exclude 'frontend/admin/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/dermatologist/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/dermatologist/
+    - rsync -avz --exclude 'frontend/dermatologist/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/dermatologist/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/dermatologist/
   rules:
   - changes:
       - frontend/dermatologist/**
@@ -69,13 +81,19 @@ build_patient:
     - REACTJS_RPOJECT
   before_script:
     - cd $CI_PROJECT_DIR/frontend/patient
+    - rm -f .env
+    - |
+      echo "REACT_APP_API_URL=https://hair-skin-health.projectbeta.biz/api" > .env
+      echo "REACT_APP_APP_NAME=Hair Skin Health - Patient Panel" >> .env
+      echo "REACT_APP_VERSION=1.0.0" >> .env
+      echo "VITE_API_URL=https://hair-skin-health.projectbeta.biz/api" >> .env
     - source ~/.bash_profile
     - nvm use 20.18.1
   script:
     - rm -rf build
     - npm install
     - npm run build
-    - rsync -avz --exclude 'frontend/admin/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
+    - rsync -avz --exclude 'frontend/patient/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
   rules:
   - changes:
       - frontend/patient/**
