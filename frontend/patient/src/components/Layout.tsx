@@ -1,12 +1,15 @@
-import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { useEffect, ReactNode } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { getMe } from '../store/slices/authSlice';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-const Layout = () => {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
   const dispatch = useDispatch<AppDispatch>();
   // const navigate = useNavigate(); // TODO: Will be used for navigation logic
   // const location = useLocation(); // TODO: Will be used for route-based logic
@@ -35,7 +38,7 @@ const Layout = () => {
         <div className="flex-1 flex flex-col">
           <Header />
           <main className="flex-1 p-6">
-            <Outlet />
+            {children}
           </main>
         </div>
       </div>
