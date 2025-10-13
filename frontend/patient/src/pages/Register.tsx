@@ -33,22 +33,31 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl w-full">
-        <Card className="shadow-lg">
-          <div className="text-center mb-6">
-            <Title level={2} className="!mb-2">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F8F8' }}>
+      <div className="w-full max-w-md px-4">
+        <div 
+          className="bg-white rounded-lg shadow-lg p-8"
+          style={{ 
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px'
+          }}
+        >
+          {/* Branding Section */}
+          <div className="text-center mb-8">
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'sans-serif' }}>
+                HAIR HEALTH
+              </h1>
+              <p className="text-sm text-gray-600 uppercase tracking-wide" style={{ fontFamily: 'sans-serif' }}>
+                DIAGNOSIS & TREATMENT PLATFORM
+              </p>
+            </div>
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: '#2C5282', fontFamily: 'sans-serif' }}>
               Create your account
-            </Title>
-            <Text type="secondary">
-              Or{' '}
-              <Link
-                to="/login"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                sign in to your existing account
-              </Link>
-            </Text>
+            </h2>
+            <p className="text-sm" style={{ color: '#718096', fontFamily: 'sans-serif' }}>
+              Join our platform to get started
+            </p>
           </div>
           
           <Form
@@ -192,12 +201,33 @@ const Register = () => {
                 loading={loading}
                 className="w-full"
                 size="large"
+                style={{ 
+                  backgroundColor: '#2C5282',
+                  borderColor: '#2C5282',
+                  height: '48px',
+                  fontSize: '16px',
+                  fontWeight: '600'
+                }}
               >
                 {loading ? 'Creating account...' : 'Create account'}
               </Button>
             </Form.Item>
           </Form>
-        </Card>
+
+          {/* Footer Link */}
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600" style={{ fontFamily: 'sans-serif' }}>
+              Already have an account?{' '}
+              <Link
+                to="/login"
+                className="font-medium"
+                style={{ color: '#2C5282' }}
+              >
+                Sign in here
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
