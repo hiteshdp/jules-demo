@@ -1766,6 +1766,50 @@
       "date": "2025-01-28T12:30:00Z",
       "user_prompt": "Please use DD/MM/YYYY formate in overall project",
       "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_dashboard_cards_update_v1",
+      "path": "prompts/patient_dashboard_cards_update_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T13:00:00Z",
+      "user_prompt": "in patient module , dashboard section , here i need only - Total appointments and Upcoming appointments. Move Total Appointments at first then show Upcoming Appointments",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_quick_actions_cleanup_v1",
+      "path": "prompts/patient_quick_actions_cleanup_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T13:15:00Z",
+      "user_prompt": "in patient module , dashboard section , here i need only Take hair loss quiz and Book appointmnet only remove view recommandations",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "patient_manage_profile_addition_v1",
+      "path": "prompts/patient_manage_profile_addition_v1.md",
+      "used_in": [
+        "frontend/patient/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T13:30:00Z",
+      "user_prompt": "in patient module , dashboard section , i need to add manage profile that would redirect to the profile of patient",
+      "prompt_type": "user_request"
+    },
+    {
+      "id": "dermatologist_dashboard_cleanup_v1",
+      "path": "prompts/dermatologist_dashboard_cleanup_v1.md",
+      "used_in": [
+        "frontend/dermatologist/src/pages/Dashboard.tsx"
+      ],
+      "author": "AI Assistant",
+      "date": "2025-01-28T13:45:00Z",
+      "user_prompt": "in dermatologist module , dashboard section , remove patient chat from quick action part also , remove total patients from here , and there i need only Make Total Appointments and Upcoming Appointments only so do changes accordingly",
+      "prompt_type": "user_request"
     }
   ]
 }
