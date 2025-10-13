@@ -4,6 +4,7 @@ import { RootState } from './store/store';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Appointments from './pages/Appointments';
 import AppointmentDetail from './pages/AppointmentDetail';
@@ -30,6 +31,10 @@ function App() {
           <Route 
             path="/login" 
             element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+          />
+          <Route 
+            path="/forgot-password" 
+            element={<ForgotPassword />} 
           />
           
           <Route path="/" element={

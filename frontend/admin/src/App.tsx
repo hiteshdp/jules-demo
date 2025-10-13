@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/Layout';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Patients from './pages/Patients';
 import Dermatologists from './pages/Dermatologists';
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           {/* <Route path="/login" element={ !isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} /> */}
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           
           <Route path="/" element={
             <ProtectedRoute>

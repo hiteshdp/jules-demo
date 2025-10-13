@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
 import { Form, Card, Typography } from 'antd';
@@ -74,6 +74,15 @@ const Login: React.FC = () => {
                 { required: true, message: 'Please input your password!' }
               ]}
             />
+
+            <div className="text-right mb-4">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-green-600 hover:text-green-500"
+              >
+                Forgot your password?
+              </Link>
+            </div>
 
             <Form.Item className="mb-0">
               <Button

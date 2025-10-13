@@ -1,7 +1,7 @@
 // Generated via prompt: prompts/antd_admin_full_conversion_v1.md
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
 import { Card, Form, Input, Button, Typography, Space } from 'antd';
@@ -94,6 +94,15 @@ const Login = () => {
                 placeholder="Password"
               />
             </Form.Item>
+
+            <div style={{ textAlign: 'right', marginBottom: '16px' }}>
+              <Link
+                to="/forgot-password"
+                style={{ color: '#ff4d4f', fontSize: '14px' }}
+              >
+                Forgot your password?
+              </Link>
+            </div>
 
             <Form.Item>
               <Button 
