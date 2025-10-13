@@ -8,7 +8,8 @@ import { Card, Row, Col, Statistic, Typography, Space } from 'antd';
 import { 
   CalendarOutlined, 
   FileTextOutlined, 
-  TeamOutlined
+  TeamOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { PageHeader, StatusTag } from '../components/common';
 import { formatDateTimeWithAmPm } from '../utils/dateUtils';
@@ -74,7 +75,7 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <Card title="Quick Actions">
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} lg={12}>
+          <Col xs={24} sm={12} lg={8}>
             <Card 
               hoverable
               className="h-full"
@@ -96,7 +97,7 @@ const Dashboard = () => {
             </Card>
           </Col>
 
-          <Col xs={24} sm={12} lg={12}>
+          <Col xs={24} sm={12} lg={8}>
             <Card 
               hoverable
               className="h-full"
@@ -112,6 +113,28 @@ const Dashboard = () => {
                   <Title level={4} className="!mb-2">Book Appointment</Title>
                   <Text type="secondary">
                     Schedule a consultation with our dermatologists.
+                  </Text>
+                </div>
+              </Space>
+            </Card>
+          </Col>
+
+          <Col xs={24} sm={12} lg={8}>
+            <Card 
+              hoverable
+              className="h-full"
+              onClick={() => navigate('/profile')}
+            >
+              <Space direction="vertical" size="middle" className="w-full">
+                <div className="text-center">
+                  <div className="inline-flex p-3 bg-green-50 text-green-700 rounded-lg">
+                    <UserOutlined className="text-2xl" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <Title level={4} className="!mb-2">Manage Profile</Title>
+                  <Text type="secondary">
+                    Update your personal information and preferences.
                   </Text>
                 </div>
               </Space>
