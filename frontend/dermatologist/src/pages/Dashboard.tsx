@@ -156,75 +156,7 @@ const Dashboard: React.FC = () => {
         </Row>
       </Card>
 
-      {/* Today's Appointments */}
-      {todayAppointments.length > 0 && (
-        <Card title="Today's Appointments">
-          <List
-            dataSource={todayAppointments}
-            renderItem={(appointment) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={
-                    <Avatar icon={<UserOutlined />} className="bg-blue-100 text-blue-600" />
-                  }
-                  title={
-                    <div className="flex items-center justify-between">
-                      <Text strong>{appointment.patient?.name || 'Unknown Patient'}</Text>
-                      <StatusTag status={appointment.status} />
-                        </div>
-                  }
-                  description={
-                    <Space direction="vertical" size="small">
-                      <div className="flex items-center">
-                        <CalendarOutlined className="mr-2 text-gray-400" />
-                        <Text type="secondary">{new Date(appointment.scheduled_at).toLocaleTimeString()}</Text>
-                      </div>
-                      <div className="flex items-center">
-                        <DollarOutlined className="mr-2 text-gray-400" />
-                        <Text type="secondary">₹{appointment.consultation_fee}</Text>
-                      </div>
-                    </Space>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        </Card>
-      )}
-
-      {/* Upcoming Appointments */}
-      {upcomingAppointments.length > 0 && (
-        <Card title="Upcoming Appointments">
-          <List
-            dataSource={upcomingAppointments}
-            renderItem={(appointment) => (
-              <List.Item>
-                <List.Item.Meta
-                  avatar={
-                    <Avatar icon={<CalendarOutlined />} className="bg-green-100 text-green-600" />
-                  }
-                  title={
-                        <div className="flex items-center justify-between">
-                      <Text strong>{appointment.patient?.name || 'Unknown Patient'}</Text>
-                      <StatusTag status={appointment.status} />
-                        </div>
-                  }
-                  description={
-                    <Space direction="vertical" size="small">
-                      <div className="flex items-center">
-                        <CalendarOutlined className="mr-2 text-gray-400" />
-                        <Text type="secondary">
-                          {formatDateTimeWithAmPm(appointment.scheduled_at)}
-                        </Text>
-                      </div>
-                    </Space>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        </Card>
-      )}
+      
 
       {(!Array.isArray(appointments) || appointments.length === 0) && !loading && (
         <Card>
