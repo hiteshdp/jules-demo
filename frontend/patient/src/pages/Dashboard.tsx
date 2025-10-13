@@ -8,10 +8,11 @@ import { Card, Row, Col, Statistic, Typography, Space } from 'antd';
 import { 
   CalendarOutlined, 
   FileTextOutlined, 
-  BulbOutlined,
-  TeamOutlined
+  TeamOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { PageHeader, StatusTag } from '../components/common';
+import { formatDateTimeWithAmPm } from '../utils/dateUtils';
 
 const { Title, Text } = Typography;
 
@@ -20,7 +21,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const { appointments } = useSelector((state: RootState) => state.appointment);
-  const { isSubmitted } = useSelector((state: RootState) => state.quiz);
 
   useEffect(() => {
     // Only fetch data if user is authenticated
@@ -36,22 +36,16 @@ const Dashboard = () => {
 
   const stats = [
     {
-      title: 'Upcoming Appointments',
-      value: upcomingAppointments.length,
-      icon: <CalendarOutlined className="text-blue-600" />,
-      color: '#1890ff',
-    },
-    {
-      title: 'Quiz Completed',
-      value: isSubmitted ? 'Yes' : 'No',
-      icon: <FileTextOutlined className="text-green-600" />,
-      color: '#52c41a',
-    },
-    {
       title: 'Total Appointments',
       value: Array.isArray(appointments) ? appointments.length : 0,
       icon: <TeamOutlined className="text-purple-600" />,
       color: '#722ed1',
+    },
+    {
+      title: 'Upcoming Appointments',
+      value: upcomingAppointments.length,
+      icon: <CalendarOutlined className="text-blue-600" />,
+      color: '#1890ff',
     },
   ];
 
@@ -65,7 +59,7 @@ const Dashboard = () => {
       {/* Stats */}
       <Row gutter={[16, 16]}>
         {stats.map((stat, index) => (
-          <Col xs={24} sm={12} lg={8} key={index}>
+          <Col xs={24} sm={12} lg={12} key={index}>
             <Card>
               <Statistic
                 title={stat.title}
@@ -107,28 +101,6 @@ const Dashboard = () => {
             <Card 
               hoverable
               className="h-full"
-              onClick={() => navigate('/recommendations')}
-            >
-              <Space direction="vertical" size="middle" className="w-full">
-                <div className="text-center">
-                  <div className="inline-flex p-3 bg-green-50 text-green-700 rounded-lg">
-                    <BulbOutlined className="text-2xl" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <Title level={4} className="!mb-2">View Recommendations</Title>
-                  <Text type="secondary">
-                    See personalized product and lifestyle recommendations.
-                  </Text>
-                </div>
-              </Space>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={8}>
-            <Card 
-              hoverable
-              className="h-full"
               onClick={() => navigate('/appointments')}
             >
               <Space direction="vertical" size="middle" className="w-full">
@@ -141,6 +113,28 @@ const Dashboard = () => {
                   <Title level={4} className="!mb-2">Book Appointment</Title>
                   <Text type="secondary">
                     Schedule a consultation with our dermatologists.
+                  </Text>
+                </div>
+              </Space>
+            </Card>
+          </Col>
+
+          <Col xs={24} sm={12} lg={8}>
+            <Card 
+              hoverable
+              className="h-full"
+              onClick={() => navigate('/profile')}
+            >
+              <Space direction="vertical" size="middle" className="w-full">
+                <div className="text-center">
+                  <div className="inline-flex p-3 bg-green-50 text-green-700 rounded-lg">
+                    <UserOutlined className="text-2xl" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <Title level={4} className="!mb-2">Manage Profile</Title>
+                  <Text type="secondary">
+                    Update your personal information and preferences.
                   </Text>
                 </div>
               </Space>
@@ -166,8 +160,7 @@ const Dashboard = () => {
                       {appointment.dermatologist?.user?.name}
                     </Text>
                     <Text type="secondary" className="text-sm">
-                      {new Date(appointment.scheduled_at).toLocaleDateString()} at{' '}
-                      {new Date(appointment.scheduled_at).toLocaleTimeString()}
+                      {formatDateTimeWithAmPm(appointment.scheduled_at)}
                     </Text>
                   </div>
                 </div>

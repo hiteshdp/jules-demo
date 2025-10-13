@@ -6,10 +6,9 @@ import { fetchChatMessages, sendChatMessage, clearMessages } from '../store/slic
 import { fetchAppointments } from '../store/slices/appointmentSlice';
 import { useLocation } from 'react-router-dom';
 import { Card, Typography, Avatar, Button, Input, Space, Row, Col, Alert, Tag } from 'antd';
-import { MessageOutlined, UserOutlined, CalendarOutlined, SendOutlined, PaperClipOutlined } from '@ant-design/icons';
+import { MessageOutlined, UserOutlined, CalendarOutlined, SendOutlined } from '@ant-design/icons';
 import toast from 'react-hot-toast';
 import ZoomMeetingButton from '../components/ZoomMeetingButton';
-import MessageAttachment from '../components/MessageAttachment';
 
 const Chat: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,7 +19,6 @@ const Chat: React.FC = () => {
   
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null);
   const [newMessage, setNewMessage] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSwitchingAppointment, setIsSwitchingAppointment] = useState(false);
   const [isManualSelection, setIsManualSelection] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -120,19 +118,14 @@ const Chat: React.FC = () => {
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedAppointmentId || (!newMessage.trim() && !selectedFile)) return;
+    if (!selectedAppointmentId || !newMessage.trim()) return;
 
     const messageToSend = newMessage.trim();
-    const fileToSend = selectedFile;
-    
-    // Clear inputs immediately for better UX
-    setNewMessage('');
-    setSelectedFile(null);
+    setNewMessage(''); // Clear input immediately for better UX
 
     dispatch(sendChatMessage({ 
       appointmentId: selectedAppointmentId, 
-      message: messageToSend, // Send the actual message (empty string if no text)
-      file: fileToSend || undefined
+      message: messageToSend 
     }))
       .unwrap()
       .then(() => {
@@ -140,14 +133,9 @@ const Chat: React.FC = () => {
       })
       .catch((err) => {
         toast.error(err || 'Failed to send message');
-        // Restore inputs on error
+        // Restore message on error
         setNewMessage(messageToSend);
-        setSelectedFile(fileToSend);
       });
-  };
-
-  const handleFileSelect = (file: File) => {
-    setSelectedFile(file);
   };
 
   const formatDateTime = (dateTime: string) => {
@@ -208,7 +196,7 @@ const Chat: React.FC = () => {
                         {appointment.dermatologist?.name || 'Unknown Doctor'}
                       </Typography.Text>
                       <div className="flex items-center space-x-2">
-                        <Tag color={appointment.status === 'scheduled' ? 'blue' : appointment.status === 'completed' ? 'green' : 'default'}>
+                        <Tag color={appointment.status === 'pending_review' ? 'blue' : appointment.status === 'confirmed' ? 'cyan' : appointment.status === 'in_progress' ? 'orange' : appointment.status === 'completed' ? 'green' : 'default'}>
                           {appointment.status}
                         </Tag>
                         <div className="text-xs text-gray-400">Click to chat</div>
@@ -316,52 +304,21 @@ const Chat: React.FC = () => {
                           key={message.id}
                           className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} ${isConsecutive ? 'mt-1' : 'mt-3'}`}
                         >
-                          <div className={`${message.attachment && message.type === 'image' ? 'max-w-[85%]' : 'max-w-[70%]'} ${isOwnMessage ? 'order-2' : 'order-1'}`}>
-                            {message.attachment && message.type === 'image' && !message.message ? (
-                              // Image-only message - no bubble background
-                              <MessageAttachment
-                                attachment={{
-                                  path: message.attachment,
-                                  type: message.type,
-                                  originalName: message.attachment.split('/').pop()
-                                }}
-                                messageId={message.id}
-                                appointmentId={selectedAppointmentId!}
-                                isOwnMessage={isOwnMessage}
-                              />
-                            ) : (
-                              // Text message or mixed content - with bubble background
-                              <div className={`px-3 py-2 rounded-2xl transition-all duration-200 hover:shadow-md ${
-                                isOwnMessage
-                                  ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
-                                  : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm'
-                              } ${isConsecutive ? (isOwnMessage ? 'rounded-tr-md' : 'rounded-tl-md') : ''}`}
-                              style={{
-                                boxShadow: isOwnMessage 
-                                  ? '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)' 
-                                  : '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12)'
-                              }}>
-                                {message.attachment && (
-                                  <div className="mb-2">
-                                    <MessageAttachment
-                                      attachment={{
-                                        path: message.attachment,
-                                        type: message.type,
-                                        originalName: message.attachment.split('/').pop()
-                                      }}
-                                      messageId={message.id}
-                                      appointmentId={selectedAppointmentId!}
-                                      isOwnMessage={isOwnMessage}
-                                    />
-                                  </div>
-                                )}
-                                {message.message && (
-                                  <Typography.Text className={`text-sm leading-relaxed break-words ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
-                                    {message.message}
-                                  </Typography.Text>
-                                )}
-                              </div>
-                            )}
+                          <div className={`max-w-[70%] ${isOwnMessage ? 'order-2' : 'order-1'}`}>
+                            <div className={`px-3 py-2 rounded-2xl transition-all duration-200 hover:shadow-md ${
+                              isOwnMessage
+                                ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
+                                : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm'
+                            } ${isConsecutive ? (isOwnMessage ? 'rounded-tr-md' : 'rounded-tl-md') : ''}`}
+                            style={{
+                              boxShadow: isOwnMessage 
+                                ? '0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)' 
+                                : '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12)'
+                            }}>
+                              <Typography.Text className={`text-sm leading-relaxed break-words ${isOwnMessage ? 'text-white' : 'text-gray-900'}`}>
+                                {message.message}
+                              </Typography.Text>
+                            </div>
                             {showTime && (
                               <div className={`flex items-center mt-1 space-x-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                                 <Typography.Text className={`text-[10px] text-gray-500 ${isOwnMessage ? 'text-right' : 'text-left'}`}>
@@ -377,79 +334,9 @@ const Chat: React.FC = () => {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message Input - WhatsApp Style */}
+                {/* Message Input - WhatsApp Style with Ant Design */}
                 <div className="bg-white border-t border-gray-200 p-3">
-                  {/* File Upload Preview */}
-                  {selectedFile && (
-                    <div className="mb-3 p-2 bg-gray-50 rounded-lg border">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div className="text-green-500">
-                            {selectedFile.type.startsWith('image/') ? '🖼️' : '📎'}
-                          </div>
-                          <span className="text-sm text-gray-700 truncate max-w-xs">
-                            {selectedFile.name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            ({(selectedFile.size / 1024 / 1024).toFixed(1)}MB)
-                          </span>
-                        </div>
-                        <Button
-                          type="text"
-                          size="small"
-                          onClick={() => setSelectedFile(null)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          ✕
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-end space-x-2 bg-gray-100 rounded-2xl px-3 py-2">
-                    {/* Attachment Button */}
-                    <Button
-                      type="text"
-                      icon={<PaperClipOutlined />}
-                      onClick={() => document.getElementById('file-input')?.click()}
-                      disabled={loading}
-                      className="text-gray-500 hover:text-gray-700 p-2 h-8 w-8 flex items-center justify-center"
-                      style={{ border: 'none', boxShadow: 'none' }}
-                    />
-                    
-                    {/* Hidden File Input */}
-                    <input
-                      id="file-input"
-                      type="file"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          // Validate file size (10MB max)
-                          if (file.size > 10 * 1024 * 1024) {
-                            toast.error('File size must be less than 10MB');
-                            return;
-                          }
-                          // Validate file type
-                          const allowedTypes = [
-                            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-                            'application/pdf', 'text/plain', 'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            'video/mp4', 'video/avi', 'video/mov',
-                            'audio/mp3', 'audio/wav', 'audio/ogg',
-                            'application/zip', 'application/x-rar-compressed'
-                          ];
-                          if (!allowedTypes.includes(file.type)) {
-                            toast.error('File type not supported');
-                            return;
-                          }
-                          handleFileSelect(file);
-                        }
-                      }}
-                      accept="image/*,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,video/mp4,video/avi,video/mov,audio/mp3,audio/wav,audio/ogg,application/zip,application/x-rar-compressed"
-                      style={{ display: 'none' }}
-                    />
-                    
-                    {/* Text Input */}
+                  <div className="flex items-center space-x-2">
                     <Input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
@@ -462,31 +349,59 @@ const Chat: React.FC = () => {
                         }
                       }}
                       style={{
-                        border: 'none',
-                        backgroundColor: 'transparent',
+                        borderRadius: '20px',
+                        border: '1px solid #d9d9d9',
+                        backgroundColor: '#f5f5f5',
                         fontSize: '14px',
-                        padding: '8px 12px',
-                        height: '36px',
+                        padding: '8px 16px',
+                        height: '40px',
+                        transition: 'all 0.2s ease',
                         boxShadow: 'none',
                         flex: 1
                       }}
                       onFocus={(e) => {
-                        e.target.style.outline = 'none';
+                        e.target.style.borderColor = '#1890ff';
+                        e.target.style.backgroundColor = '#ffffff';
+                        e.target.style.boxShadow = '0 0 0 2px rgba(24, 144, 255, 0.2)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#d9d9d9';
+                        e.target.style.backgroundColor = '#f5f5f5';
+                        e.target.style.boxShadow = 'none';
                       }}
                     />
-                    
-                    {/* Send Button */}
                     <Button
                       type="primary"
                       icon={<SendOutlined />}
                       onClick={handleSendMessage}
-                      disabled={(!newMessage.trim() && !selectedFile) || loading}
-                      className="h-8 w-8 p-0 flex items-center justify-center"
+                      disabled={!newMessage.trim() || loading}
                       style={{
                         borderRadius: '50%',
-                        backgroundColor: (newMessage.trim() || selectedFile) ? '#25D366' : '#d9d9d9',
-                        borderColor: (newMessage.trim() || selectedFile) ? '#25D366' : '#d9d9d9',
+                        height: '40px',
+                        width: '40px',
+                        minWidth: '40px',
+                        padding: '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
+                        borderColor: newMessage.trim() ? '#3B82F6' : '#d9d9d9',
+                        transition: 'all 0.2s ease',
                         boxShadow: 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (newMessage.trim()) {
+                          e.currentTarget.style.backgroundColor = '#128C7E';
+                          e.currentTarget.style.borderColor = '#128C7E';
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (newMessage.trim()) {
+                          e.currentTarget.style.backgroundColor = '#3B82F6';
+                          e.currentTarget.style.borderColor = '#3B82F6';
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }
                       }}
                     />
                   </div>

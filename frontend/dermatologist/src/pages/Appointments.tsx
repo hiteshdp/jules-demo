@@ -8,6 +8,7 @@ import { CalendarOutlined, ClockCircleOutlined, UserOutlined, MessageOutlined, E
 import { PageHeader, LoadingSpinner, EmptyState } from '../components/common';
 import toast from 'react-hot-toast';
 import dayjs from 'dayjs';
+import { formatDateTimeWithAmPm } from '../utils/dateUtils';
 
 const { Text } = Typography;
 
@@ -118,12 +119,6 @@ const Appointments: React.FC = () => {
   const handleExport = async (format: 'excel' | 'csv') => {
     try {
       const token = localStorage.getItem('dermatologist_token') || localStorage.getItem('token');
-      if (!token) {
-        toast.error('You are not authenticated. Please login again.');
-        return;
-      }
-      const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '/api';
-      const API_BASE = String(API_BASE_URL).replace(/\/+$/, '');
       const queryParams = new URLSearchParams();
       
       // Apply current filters to export
@@ -133,14 +128,11 @@ const Appointments: React.FC = () => {
       if (filters.status) queryParams.append('status', filters.status);
       queryParams.append('export', format);
 
-      const response = await fetch(`${API_BASE}/dermatologist/appointments?${queryParams.toString()}`, {
+      const response = await fetch(`/api/dermatologist/appointments?${queryParams.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          // Avoid overriding Accept; let server decide correct content-type for stream
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        method: 'GET',
-        mode: 'cors'
+          'Accept': format === 'excel' ? 'application/vnd.ms-excel' : 'text/csv'
+        }
       });
 
       if (response.ok) {
@@ -260,7 +252,8 @@ const Appointments: React.FC = () => {
           </Form.Item>
           <Form.Item name="status" label="Status">
             <Select placeholder="Select status" allowClear style={{ width: '100%' }}>
-              <Select.Option value="scheduled">Scheduled</Select.Option>
+              <Select.Option value="pending_review">Pending Review</Select.Option>
+              <Select.Option value="confirmed">Confirmed</Select.Option>
               <Select.Option value="in_progress">In Progress</Select.Option>
               <Select.Option value="completed">Completed</Select.Option>
             </Select>
@@ -332,8 +325,10 @@ const Appointments: React.FC = () => {
           ) : (
             <div className="space-y-2">
               {filteredAppointments.map((appointment, idx) => {
-                const statusColor = appointment.status === 'completed' ? 'green' : appointment.status === 'in_progress' ? 'blue' : 'default';
-                const doctorAmount = Number((appointment as any).dermatologist_fee || 0);
+                const statusColor = appointment.status === 'completed' ? 'green' : appointment.status === 'in_progress' ? 'orange' : appointment.status === 'confirmed' ? 'cyan' : 'blue';
+                const totalPaid = Number(appointment.consultation_fee || 0);
+                const doctorSharePercent = Number((import.meta as any).env?.VITE_DERMATOLOGIST_SHARE_PERCENT || 70);
+                const doctorAmount = (totalPaid * doctorSharePercent) / 100;
 
                 return (
                   <div key={appointment.id} className="px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors">
@@ -357,7 +352,7 @@ const Appointments: React.FC = () => {
                             <div className="flex items-center gap-2 text-gray-700">
                               <CalendarOutlined className="text-blue-500" />
                               <span className="text-sm">
-                                {(appointment as any).formatted_date_time || new Date(appointment.scheduled_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                                {(appointment as any).formatted_date_time || formatDateTimeWithAmPm(appointment.scheduled_at)}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-gray-700">
@@ -376,7 +371,8 @@ const Appointments: React.FC = () => {
                           trigger={["click"]}
                           menu={{
                             items: [
-                              { key: 'scheduled', label: 'Scheduled', onClick: () => handleStatusChange(appointment.id, 'scheduled') },
+                              { key: 'pending_review', label: 'Pending Review', onClick: () => handleStatusChange(appointment.id, 'pending_review') },
+                              { key: 'confirmed', label: 'Confirmed', onClick: () => handleStatusChange(appointment.id, 'confirmed') },
                               { key: 'in_progress', label: 'In Progress', onClick: () => handleStatusChange(appointment.id, 'in_progress') },
                               { key: 'completed', label: 'Completed', onClick: () => handleStatusChange(appointment.id, 'completed') },
                             ]

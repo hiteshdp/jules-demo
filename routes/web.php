@@ -27,14 +27,14 @@ Route::get('/login', function () {
 Route::get('/test-zoom', function () {
     try {
         $zoomService = app(\App\Services\ZoomService::class);
-        
+
         // Create a test meeting
         $meeting = $zoomService->createMeeting(
-            'Test Consultation - ' . now()->format('Y-m-d H:i:s'),
+            'Test Consultation - ' . now()->format('d/m/Y H:i:s'),
             now()->addMinutes(5)->toIso8601String(),
             30
         );
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Zoom test meeting created successfully!',
@@ -67,5 +67,3 @@ Route::get('/test-zoom', function () {
         ], 500);
     }
 });
-
-

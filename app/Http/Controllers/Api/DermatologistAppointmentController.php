@@ -94,7 +94,7 @@ class DermatologistAppointmentController extends Controller
 
         // Check if user is a dermatologist by checking if they have a dermatologist profile
         $dermatologist = \App\Models\Dermatologist::where('user_id', $user->id)->first();
-        
+
         if (!$dermatologist) {
             return response()->json([
                 'success' => false,
@@ -107,7 +107,7 @@ class DermatologistAppointmentController extends Controller
 
         // Apply filters
         if ($request->has('patient_name')) {
-            $query->whereHas('patient', function($q) use ($request) {
+            $query->whereHas('patient', function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->patient_name . '%');
             });
         }
@@ -128,7 +128,7 @@ class DermatologistAppointmentController extends Controller
 
         // Add formatted date time and ensure consultation_fee is included
         $appointments->transform(function ($appointment) {
-            $appointment->formatted_date_time = $appointment->scheduled_at->format('d M Y, h:i A');
+            $appointment->formatted_date_time = $appointment->scheduled_at->format('d/m/Y, h:i A');
             return $appointment;
         });
 
@@ -169,15 +169,15 @@ class DermatologistAppointmentController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="appointment", type="object",
-	*                   @OA\Property(property="id", type="integer", example=1),
-	*                   @OA\Property(property="patient_id", type="integer", example=1),
+     *                   @OA\Property(property="id", type="integer", example=1),
+     *                   @OA\Property(property="patient_id", type="integer", example=1),
      *                     @OA\Property(property="dermatologist_id", type="integer", example=2),
      *                     @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
      *                     @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
-	*                   @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
-	*                   @OA\Property(property="notes", type="string", example="Follow-up consultation"),
-	*                   @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
-	*                   @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
+     *                   @OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *                   @OA\Property(property="notes", type="string", example="Follow-up consultation"),
+     *                   @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+     *                   @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
      *             )
      *         )
      *     ),
@@ -270,15 +270,15 @@ class DermatologistAppointmentController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="appointment", type="object",
-	*                   	@OA\Property(property="id", type="integer", example=1),
-	*                   	@OA\Property(property="patient_id", type="integer", example=1),
-	*                   @OA\Property(property="dermatologist_id", type="integer", example=2),
-	*                   @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
-	*                   @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
-	*                   	@OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
-	*                   	@OA\Property(property="notes", type="string", example="Follow-up consultation"),
-	*                   	@OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
-	*                   	@OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
+     *                   	@OA\Property(property="id", type="integer", example=1),
+     *                   	@OA\Property(property="patient_id", type="integer", example=1),
+     *                   @OA\Property(property="dermatologist_id", type="integer", example=2),
+     *                   @OA\Property(property="scheduled_at", type="string", format="date-time", example="2024-01-15T10:00:00Z"),
+     *                   @OA\Property(property="status", type="string", enum={"scheduled","in_progress","completed"}, example="scheduled"),
+     *                   	@OA\Property(property="consultation_fee", type="number", format="float", example=100.00),
+     *                   	@OA\Property(property="notes", type="string", example="Follow-up consultation"),
+     *                   	@OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
+     *                   	@OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"))
      *             )
      *         )
      *     ),
@@ -417,7 +417,7 @@ class DermatologistAppointmentController extends Controller
     private function exportAppointments($appointments, $format)
     {
         $filename = 'dermatologist_appointments_' . date('Y-m-d_H-i-s') . '.' . $format;
-        
+
         if ($format === 'csv') {
             return $this->exportToCsv($appointments, $filename);
         } else {
@@ -435,9 +435,9 @@ class DermatologistAppointmentController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = function() use ($appointments) {
+        $callback = function () use ($appointments) {
             $file = fopen('php://output', 'w');
-            
+
             // CSV headers
             fputcsv($file, [
                 'ID',
@@ -455,7 +455,7 @@ class DermatologistAppointmentController extends Controller
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',
-                    $appointment->scheduled_at->format('d M Y, h:i A'),
+                    $appointment->scheduled_at->format('d/m/Y, h:i A'),
                     $appointment->status,
                     '₹' . number_format($payout, 2),
                     $appointment->is_paid ? 'Paid' : 'Unpaid',
@@ -481,12 +481,12 @@ class DermatologistAppointmentController extends Controller
             'Cache-Control' => 'max-age=0',
         ];
 
-        $callback = function() use ($appointments) {
+        $callback = function () use ($appointments) {
             // Add UTF-8 BOM for Excel compatibility
             echo "\xEF\xBB\xBF";
-            
+
             $file = fopen('php://output', 'w');
-            
+
             // Excel headers
             fputcsv($file, [
                 'ID',
@@ -504,7 +504,7 @@ class DermatologistAppointmentController extends Controller
                 fputcsv($file, [
                     $appointment->id,
                     $appointment->patient->name ?? 'N/A',
-                    $appointment->scheduled_at->format('d M Y, h:i A'),
+                    $appointment->scheduled_at->format('d/m/Y, h:i A'),
                     $appointment->status,
                     '₹' . number_format($payout, 2),
                     $appointment->is_paid ? 'Paid' : 'Unpaid',
