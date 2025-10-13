@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * @OA\Schema(
@@ -418,9 +419,23 @@ class AuthController extends Controller
             ]
         );
 
-        // Send email notification (you can implement this with your preferred email service)
-        // For now, we'll just return success
-        // In production, you would send an email with the reset link
+        // Generate reset URL
+        $resetUrl = config('app.frontend_url', 'http://localhost:3000') . '/forgot-password?token=' . $token . '&email=' . urlencode($request->email);
+        
+        // Send email notification
+        try {
+            Mail::send('emails.password-reset', [
+                'user' => $user,
+                'token' => $token,
+                'resetUrl' => $resetUrl
+            ], function ($message) use ($user) {
+                $message->to($user->email, $user->name)
+                        ->subject('Password Reset - Hair & Skin Health');
+            });
+        } catch (\Exception $e) {
+            // Log the error but don't fail the request
+            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+        }
         
         return response()->json([
             'success' => true,

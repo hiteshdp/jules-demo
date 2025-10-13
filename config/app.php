@@ -19,6 +19,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+
     'ZOOM_ACCOUNT_ID' => env('ZOOM_ACCOUNT_ID'),
     'ZOOM_CLIENT_ID' => env('ZOOM_CLIENT_ID'),
     'ZOOM_CLIENT_SECRET' => env('ZOOM_CLIENT_SECRET'),

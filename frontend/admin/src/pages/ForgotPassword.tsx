@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message } from 'antd';
-import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { Form, message } from 'antd';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-
-const { Title, Text, Paragraph } = Typography;
+import { Button as CustomButton, FormField } from '../components/common';
+import authAPI from '../store/api/authAPI';
 
 interface ForgotPasswordForm {
   email: string;
@@ -43,27 +41,29 @@ const ForgotPassword: React.FC = () => {
   const handleForgotPassword = async (values: ForgotPasswordForm) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
+      const response = await authAPI.forgotPassword(values);
+      const data = response.data;
 
       if (data.success) {
-        message.success(data.message);
+        message.success('Password reset link sent successfully. Please check your email.');
         // In development, show the token for testing
         if (data.data?.token) {
           message.info(`Development Mode: Token is ${data.data.token}`);
         }
       } else {
-        message.error(data.message);
+        message.error(data.message || 'Something went wrong. Please try again.');
       }
-    } catch (error) {
-      message.error('Something went wrong. Please try again.');
+    } catch (error: any) {
+      if (error.response?.status === 422) {
+        const errorMessage = error.response?.data?.errors?.email?.[0] || 
+                           error.response?.data?.message || 
+                           'Please enter a valid email address.';
+        message.error(errorMessage);
+      } else if (error.response?.status === 404) {
+        message.error('Email not found. Please check your email address.');
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -72,58 +72,62 @@ const ForgotPassword: React.FC = () => {
   const handleResetPassword = async (values: ResetPasswordForm) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
+      const response = await authAPI.resetPassword(values);
+      const data = response.data;
 
       if (data.success) {
-        message.success(data.message);
+        message.success('Password reset successfully. You can now login with your new password.');
         navigate('/login');
       } else {
-        message.error(data.message);
+        message.error(data.message || 'Something went wrong. Please try again.');
       }
-    } catch (error) {
-      message.error('Something went wrong. Please try again.');
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        message.error('Invalid or expired token. Please request a new password reset.');
+      } else if (error.response?.status === 422) {
+        const errorMessage = error.response?.data?.errors?.password?.[0] || 
+                           error.response?.data?.message || 
+                           'Please check your password and try again.';
+        message.error(errorMessage);
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-md w-full space-y-8"
-      >
-        <div className="text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="mx-auto h-12 w-12 bg-gradient-to-r from-red-500 to-purple-600 rounded-full flex items-center justify-center"
-          >
-            <LockOutlined className="h-6 w-6 text-white" />
-          </motion.div>
-          <Title level={2} className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {step === 'forgot' ? 'Forgot Password?' : 'Reset Password'}
-          </Title>
-          <Paragraph className="mt-2 text-center text-sm text-gray-600">
-            {step === 'forgot' 
-              ? 'Enter your email address and we\'ll send you a link to reset your password.'
-              : 'Enter your new password below.'
-            }
-          </Paragraph>
-        </div>
-
-        <Card className="shadow-xl border-0">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F8F8' }}>
+      <div className="w-full max-w-md px-4">
+        <div 
+          className="bg-white rounded-lg shadow-lg p-8"
+          style={{ 
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px'
+          }}
+        >
+          {/* Branding Section */}
+          <div className="text-center mb-8">
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'sans-serif' }}>
+                HAIR HEALTH
+              </h1>
+              <p className="text-sm text-gray-600 uppercase tracking-wide" style={{ fontFamily: 'sans-serif' }}>
+                ADMIN PORTAL
+              </p>
+            </div>
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: '#2C5282', fontFamily: 'sans-serif' }}>
+              {step === 'forgot' ? 'Forgot Password' : 'Reset Password'}
+            </h2>
+            <p className="text-sm" style={{ color: '#718096', fontFamily: 'sans-serif' }}>
+              {step === 'forgot' 
+                ? 'Enter your registered email address and we\'ll send you a reset link.'
+                : 'Enter your new password below.'
+              }
+            </p>
+          </div>
+          
           {step === 'forgot' ? (
             <Form
               form={form}
@@ -132,43 +136,36 @@ const ForgotPassword: React.FC = () => {
               layout="vertical"
               size="large"
             >
-              <Form.Item
+              <FormField
                 name="email"
                 label="Email Address"
+                type="email"
+                placeholder="Enter your email address"
+                required
                 rules={[
                   { required: true, message: 'Please input your email!' },
                   { type: 'email', message: 'Please enter a valid email!' }
                 ]}
-              >
-                <Input
-                  prefix={<MailOutlined className="text-gray-400" />}
-                  placeholder="Enter your email address"
-                  className="rounded-lg"
-                />
-              </Form.Item>
+              />
 
               <Form.Item>
-                <Button
+                <CustomButton
                   type="primary"
                   htmlType="submit"
                   loading={loading}
-                  className="w-full h-12 bg-gradient-to-r from-red-500 to-purple-600 border-0 rounded-lg font-semibold text-lg hover:from-red-600 hover:to-purple-700"
+                  className="w-full"
+                  size="large"
+                  style={{ 
+                    backgroundColor: '#2C5282',
+                    borderColor: '#2C5282',
+                    height: '48px',
+                    fontSize: '16px',
+                    fontWeight: '600'
+                  }}
                 >
                   {loading ? 'Sending...' : 'Send Reset Link'}
-                </Button>
+                </CustomButton>
               </Form.Item>
-
-              <div className="text-center">
-                <Text className="text-gray-600">
-                  Remember your password?{' '}
-                  <Link 
-                    to="/login" 
-                    className="text-red-600 hover:text-red-500 font-medium"
-                  >
-                    Sign in
-                  </Link>
-                </Text>
-              </div>
             </Form>
           ) : (
             <Form
@@ -178,55 +175,48 @@ const ForgotPassword: React.FC = () => {
               layout="vertical"
               size="large"
             >
-              <Form.Item
+              <FormField
                 name="email"
                 label="Email Address"
+                type="email"
+                placeholder="Enter your email address"
+                required
                 rules={[
                   { required: true, message: 'Please input your email!' },
                   { type: 'email', message: 'Please enter a valid email!' }
                 ]}
-              >
-                <Input
-                  prefix={<MailOutlined className="text-gray-400" />}
-                  placeholder="Enter your email address"
-                  className="rounded-lg"
-                  disabled
-                />
-              </Form.Item>
+                disabled
+              />
 
-              <Form.Item
+              <FormField
                 name="token"
                 label="Reset Token"
+                type="input"
+                placeholder="Enter the reset token from your email"
+                required
                 rules={[
                   { required: true, message: 'Please input the reset token!' }
                 ]}
-              >
-                <Input
-                  prefix={<LockOutlined className="text-gray-400" />}
-                  placeholder="Enter the reset token from your email"
-                  className="rounded-lg"
-                />
-              </Form.Item>
+              />
 
-              <Form.Item
+              <FormField
                 name="password"
                 label="New Password"
+                type="password"
+                placeholder="Enter your new password"
+                required
                 rules={[
                   { required: true, message: 'Please input your new password!' },
                   { min: 6, message: 'Password must be at least 6 characters!' }
                 ]}
-              >
-                <Input.Password
-                  prefix={<LockOutlined className="text-gray-400" />}
-                  placeholder="Enter your new password"
-                  className="rounded-lg"
-                />
-              </Form.Item>
+              />
 
-              <Form.Item
+              <FormField
                 name="password_confirmation"
                 label="Confirm New Password"
-                dependencies={['password']}
+                type="password"
+                placeholder="Confirm your new password"
+                required
                 rules={[
                   { required: true, message: 'Please confirm your password!' },
                   ({ getFieldValue }) => ({
@@ -238,49 +228,44 @@ const ForgotPassword: React.FC = () => {
                     },
                   }),
                 ]}
-              >
-                <Input.Password
-                  prefix={<LockOutlined className="text-gray-400" />}
-                  placeholder="Confirm your new password"
-                  className="rounded-lg"
-                />
-              </Form.Item>
+              />
 
               <Form.Item>
-                <Button
+                <CustomButton
                   type="primary"
                   htmlType="submit"
                   loading={loading}
-                  className="w-full h-12 bg-gradient-to-r from-red-500 to-purple-600 border-0 rounded-lg font-semibold text-lg hover:from-red-600 hover:to-purple-700"
+                  className="w-full"
+                  size="large"
+                  style={{ 
+                    backgroundColor: '#2C5282',
+                    borderColor: '#2C5282',
+                    height: '48px',
+                    fontSize: '16px',
+                    fontWeight: '600'
+                  }}
                 >
                   {loading ? 'Resetting...' : 'Reset Password'}
-                </Button>
+                </CustomButton>
               </Form.Item>
-
-              <div className="text-center">
-                <Text className="text-gray-600">
-                  Remember your password?{' '}
-                  <Link 
-                    to="/login" 
-                    className="text-red-600 hover:text-red-500 font-medium"
-                  >
-                    Sign in
-                  </Link>
-                </Text>
-              </div>
             </Form>
           )}
-        </Card>
 
-        <div className="text-center">
-          <Text className="text-gray-500 text-sm">
-            Need help? Contact our{' '}
-            <Link to="/contact" className="text-red-600 hover:text-red-500">
-              support team
-            </Link>
-          </Text>
+          {/* Footer Link */}
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-600" style={{ fontFamily: 'sans-serif' }}>
+              Remember your password?{' '}
+              <Link
+                to="/login"
+                className="font-medium"
+                style={{ color: '#2C5282' }}
+              >
+                Back to Login
+              </Link>
+            </p>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
