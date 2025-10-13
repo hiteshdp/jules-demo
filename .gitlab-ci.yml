@@ -40,7 +40,16 @@ build_admin:
   script:
     - rm -rf build
     - npm install
-    - npm run build
+    script:
+    - rm -rf build
+    - npm install
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "stage" ]]; then
+        npm run build:staging
+      elif [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+        npm run build:production
+      fi
+    - rsync -avz --exclude 'frontend/patient/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
     - rsync -avz --exclude 'frontend/admin/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/admin/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/admin/
   rules:
   - changes:
@@ -66,7 +75,16 @@ build_dermatologist:
   script:
     - rm -rf build
     - npm install
-    - npm run build
+    script:
+    - rm -rf build
+    - npm install
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "stage" ]]; then
+        npm run build:staging
+      elif [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+        npm run build:production
+      fi
+    - rsync -avz --exclude 'frontend/patient/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
     - rsync -avz --exclude 'frontend/dermatologist/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/dermatologist/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/dermatologist/
   rules:
   - changes:
@@ -92,7 +110,16 @@ build_patient:
   script:
     - rm -rf build
     - npm install
-    - npm run build
+    script:
+    - rm -rf build
+    - npm install
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "stage" ]]; then
+        npm run build:staging
+      elif [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+        npm run build:production
+      fi
+    - rsync -avz --exclude 'frontend/patient/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
     - rsync -avz --exclude 'frontend/patient/.env' -e 'ssh -o StrictHostKeyChecking=no -p 22' $CI_PROJECT_DIR/frontend/patient/build/ ubuntu@3.109.28.118:/var/www/html/hair-skin-health/public/patient/
   rules:
   - changes:
