@@ -4,11 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
-import { Card, Form, Input, Button, Typography, Space } from 'antd';
-import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
+import { Form } from 'antd';
+import { Button as CustomButton, FormField } from '../components/common';
 import toast from 'react-hot-toast';
-
-const { Title, Text } = Typography;
 
 const Login = () => {
   const [form] = Form.useForm();
@@ -39,29 +37,31 @@ const Login = () => {
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      background: '#f5f5f5',
-      padding: '24px'
-    }}>
-      <Card 
-        style={{ 
-          width: '100%', 
-          maxWidth: 400,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-        }}
-      >
-        <Space direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
-          <div>
-            <Title level={2} style={{ margin: 0, color: '#1890ff' }}>
-              Admin Login
-            </Title>
-            <Text type="secondary">
-              Sign in to access the admin panel
-            </Text>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F8F8' }}>
+      <div className="w-full max-w-md px-4">
+        <div 
+          className="bg-white rounded-lg shadow-lg p-8"
+          style={{ 
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px'
+          }}
+        >
+          {/* Branding Section */}
+          <div className="text-center mb-8">
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'sans-serif' }}>
+                HAIR HEALTH
+              </h1>
+              <p className="text-sm text-gray-600 uppercase tracking-wide" style={{ fontFamily: 'sans-serif' }}>
+                ADMIN PORTAL
+              </p>
+            </div>
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: '#2C5282', fontFamily: 'sans-serif' }}>
+              Welcome back
+            </h2>
+            <p className="text-sm" style={{ color: '#718096', fontFamily: 'sans-serif' }}>
+              Sign in to your admin account
+            </p>
           </div>
           
           <Form
@@ -70,30 +70,29 @@ const Login = () => {
             onFinish={handleSubmit}
             layout="vertical"
             size="large"
-            requiredMark={false}
           >
-            <Form.Item
+            <FormField className='login-form-container'
               name="email"
+              label="Email Address"
+              type="email"
+              placeholder="Enter your email"
+              required
               rules={[
-                { required: true, message: 'Please enter your email' },
-                { type: 'email', message: 'Please enter a valid email' }
+                { required: true, message: 'Please input your email!' },
+                { type: 'email', message: 'Please enter a valid email!' }
               ]}
-            >
-              <Input 
-                prefix={<UserOutlined />} 
-                placeholder="Email address"
-              />
-            </Form.Item>
-
-            <Form.Item
+            />
+            
+            <FormField
               name="password"
-              rules={[{ required: true, message: 'Please enter your password' }]}
-            >
-              <Input.Password 
-                prefix={<LockOutlined />} 
-                placeholder="Password"
-              />
-            </Form.Item>
+              label="Password"
+              type="password"
+              placeholder="Enter your password"
+              required
+              rules={[
+                { required: true, message: 'Please input your password!' }
+              ]}
+            />
 
             <div style={{ textAlign: 'right', marginBottom: '16px' }}>
               <Link
@@ -105,19 +104,28 @@ const Login = () => {
             </div>
 
             <Form.Item>
-              <Button 
+              <CustomButton 
                 type="primary" 
                 htmlType="submit" 
                 loading={loading}
-                icon={<LoginOutlined />}
-                style={{ width: '100%' }}
+                className="w-full"
+                size="large"
+                style={{ 
+                  backgroundColor: '#2C5282',
+                  borderColor: '#2C5282',
+                  height: '48px',
+                  fontSize: '16px',
+                  fontWeight: '600'
+                }}
               >
                 {loading ? 'Signing in...' : 'Sign in'}
-              </Button>
+              </CustomButton>
             </Form.Item>
           </Form>
-        </Space>
-      </Card>
+
+
+        </div>
+      </div>
     </div>
   );
 };

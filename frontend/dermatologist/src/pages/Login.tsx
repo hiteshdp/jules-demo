@@ -3,12 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
-import { Form, Card, Typography } from 'antd';
+import { Form } from 'antd';
 import { Button, FormField } from '../components/common';
 import toast from 'react-hot-toast';
-
-
-const { Title, Text } = Typography;
 
 const Login: React.FC = () => {
   const [form] = Form.useForm();
@@ -34,16 +31,31 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        <Card className="shadow-lg">
-          <div className="text-center mb-6">
-            <Title level={2} className="!mb-2">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F8F8' }}>
+      <div className="w-full max-w-md px-4">
+        <div 
+          className="bg-white rounded-lg shadow-lg p-8"
+          style={{ 
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px'
+          }}
+        >
+          {/* Branding Section */}
+          <div className="text-center mb-8">
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'sans-serif' }}>
+                HAIR HEALTH
+              </h1>
+              <p className="text-sm text-gray-600 uppercase tracking-wide" style={{ fontFamily: 'sans-serif' }}>
+                DERMATOLOGIST PORTAL
+              </p>
+            </div>
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: '#2C5282', fontFamily: 'sans-serif' }}>
+              Welcome back
+            </h2>
+            <p className="text-sm" style={{ color: '#718096', fontFamily: 'sans-serif' }}>
               Sign in to your account
-            </Title>
-            <Text type="secondary">
-              Dermatologist Portal
-            </Text>
+            </p>
           </div>
           
           <Form
@@ -91,12 +103,21 @@ const Login: React.FC = () => {
                 loading={loading}
                 className="w-full"
                 size="large"
+                style={{ 
+                  backgroundColor: '#2C5282',
+                  borderColor: '#2C5282',
+                  height: '48px',
+                  fontSize: '16px',
+                  fontWeight: '600'
+                }}
               >
                 {loading ? 'Signing in...' : 'Sign in'}
               </Button>
             </Form.Item>
           </Form>
-        </Card>
+
+          
+        </div>
       </div>
     </div>
   );
