@@ -51,4 +51,29 @@ class ChatMessage extends Model
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
+
+    /**
+     * Get the full URL to the attachment.
+     *
+     * @return string|null
+     */
+    public function getAttachmentUrlAttribute()
+    {
+        if (!$this->attachment) {
+            return null;
+        }
+
+        // If it's already a full URL, return it as is
+        if (str_starts_with($this->attachment, 'http')) {
+            return $this->attachment;
+        }
+
+        // If it starts with 'storage/', use it directly
+        if (str_starts_with($this->attachment, 'storage/')) {
+            return asset($this->attachment);
+        }
+
+        // Otherwise, prepend 'storage/' and create full URL
+        return asset('storage/' . $this->attachment);
+    }
 }

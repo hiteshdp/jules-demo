@@ -7,6 +7,7 @@ export interface ChatMessage {
   sender_id: number;
   message: string;
   attachment?: string;
+  attachment_url?: string;
   type: 'text' | 'image' | 'file' | 'video' | 'audio' | 'document';
   is_read: boolean;
   created_at: string;

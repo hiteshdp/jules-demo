@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
@@ -45,6 +46,12 @@ class AppointmentChatController extends Controller
 
         $messages = $query->orderBy('id', 'asc')->get();
 
+        // Transform messages to include full URL paths for attachments using model accessor
+        $messages->transform(function ($message) {
+            $message->attachment_url = $message->attachment_url;
+            return $message;
+        });
+
         return response()->json([
             'success' => true,
             'data' => $messages,
@@ -57,6 +64,7 @@ class AppointmentChatController extends Controller
      */
     public function store(Request $request, int $appointmentId): JsonResponse
     {
+
         $user = $request->user();
 
         $appointment = Appointment::where('id', $appointmentId)
@@ -88,7 +96,7 @@ class AppointmentChatController extends Controller
         $validator = Validator::make($request->all(), [
             'message' => 'sometimes|nullable|string|max:5000',
             'type' => 'nullable|in:text,image,file,video,audio,document',
-            'attachment' => 'nullable|file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,txt,mp4,avi,mov,mp3,wav,ogg,zip,rar'
+            'attachment' => 'nullable|file|max:2048' // 2MB limit to match PHP upload_max_filesize
         ]);
 
         if ($validator->fails()) {
@@ -106,30 +114,45 @@ class AppointmentChatController extends Controller
 
         // Handle file upload
         if ($request->hasFile('attachment')) {
-            $file = $request->file('attachment');
-            $originalName = $file->getClientOriginalName();
-            $extension = $file->getClientOriginalExtension();
-            
-            // Determine file type based on extension
-            $imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-            $videoExtensions = ['mp4', 'avi', 'mov'];
-            $audioExtensions = ['mp3', 'wav', 'ogg'];
-            $documentExtensions = ['pdf', 'doc', 'docx', 'txt'];
-            
-            if (in_array(strtolower($extension), $imageExtensions)) {
-                $messageType = 'image';
-            } elseif (in_array(strtolower($extension), $videoExtensions)) {
-                $messageType = 'video';
-            } elseif (in_array(strtolower($extension), $audioExtensions)) {
-                $messageType = 'audio';
-            } elseif (in_array(strtolower($extension), $documentExtensions)) {
-                $messageType = 'document';
-            } else {
-                $messageType = 'file';
-            }
+            try {
+                $file = $request->file('attachment');
+                $extension = $file->getClientOriginalExtension();
+                
+                // Check if file is valid
+                if (!$file->isValid()) {
+                    $errorMessage = $file->getErrorMessage();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'File upload failed: ' . $errorMessage
+                    ], 400);
+                }
+                
+                // Determine file type based on extension
+                $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                $videoExtensions = ['mp4', 'avi', 'mov'];
+                $audioExtensions = ['mp3', 'wav', 'ogg'];
+                $documentExtensions = ['pdf', 'doc', 'docx', 'txt'];
+                
+                if (in_array(strtolower($extension), $imageExtensions)) {
+                    $messageType = 'image';
+                } elseif (in_array(strtolower($extension), $videoExtensions)) {
+                    $messageType = 'video';
+                } elseif (in_array(strtolower($extension), $audioExtensions)) {
+                    $messageType = 'audio';
+                } elseif (in_array(strtolower($extension), $documentExtensions)) {
+                    $messageType = 'document';
+                } else {
+                    $messageType = 'file';
+                }
 
-            // Store file in storage/app/public/chat-attachments
-            $attachmentPath = $file->store('chat-attachments', 'public');
+                // Store file in storage/app/public/chat-attachments
+                $attachmentPath = $file->store('chat-attachments', 'public');
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File upload failed: ' . $e->getMessage()
+                ], 500);
+            }
         }
 
 
@@ -143,6 +166,9 @@ class AppointmentChatController extends Controller
         ]);
 
         $message->load('sender');
+        
+        // Add attachment_url to the response
+        $message->attachment_url = $message->attachment_url;
 
         return response()->json([
             'success' => true,

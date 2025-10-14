@@ -147,6 +147,13 @@ const Chat: React.FC = () => {
   };
 
   const handleFileSelect = (file: File) => {
+    // Check file size (2MB limit)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      toast.error('File size must be less than 2MB');
+      return;
+    }
+    
     setSelectedFile(file);
   };
 
@@ -321,9 +328,9 @@ const Chat: React.FC = () => {
                               // Image-only message - no bubble background
                               <MessageAttachment
                                 attachment={{
-                                  path: message.attachment,
+                                  path: message.attachment_url || message.attachment,
                                   type: message.type,
-                                  originalName: message.attachment.split('/').pop()
+                                  originalName: (message.attachment_url || message.attachment).split('/').pop()
                                 }}
                                 messageId={message.id}
                                 appointmentId={selectedAppointmentId!}
@@ -333,7 +340,7 @@ const Chat: React.FC = () => {
                               // Text message or mixed content - with bubble background
                               <div className={`px-3 py-2 rounded-2xl transition-all duration-200 hover:shadow-md ${
                                 isOwnMessage
-                                  ? 'bg-blue-500 text-white rounded-br-md shadow-sm'
+                                  ? (message.attachment ? 'bg-white' : 'bg-blue-500 text-white rounded-br-md shadow-sm')
                                   : 'bg-white text-gray-900 border border-gray-200 rounded-bl-md shadow-sm'
                               } ${isConsecutive ? (isOwnMessage ? 'rounded-tr-md' : 'rounded-tl-md') : ''}`}
                               style={{
@@ -345,9 +352,9 @@ const Chat: React.FC = () => {
                                   <div className="mb-2">
                                     <MessageAttachment
                                       attachment={{
-                                        path: message.attachment,
+                                        path: message.attachment_url || message.attachment,
                                         type: message.type,
-                                        originalName: message.attachment.split('/').pop()
+                                        originalName: (message.attachment_url || message.attachment).split('/').pop()
                                       }}
                                       messageId={message.id}
                                       appointmentId={selectedAppointmentId!}
@@ -410,7 +417,7 @@ const Chat: React.FC = () => {
                     {/* Attachment Button */}
                     <Button
                       type="text"
-                      icon={<PaperClipOutlined />}
+                      icon={<PaperClipOutlined style={{ fontSize: 22 }} />}
                       onClick={() => document.getElementById('file-input')?.click()}
                       disabled={loading}
                       className="text-gray-500 hover:text-gray-700 p-2 h-8 w-8 flex items-center justify-center"
@@ -424,9 +431,9 @@ const Chat: React.FC = () => {
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          // Validate file size (10MB max)
-                          if (file.size > 10 * 1024 * 1024) {
-                            toast.error('File size must be less than 10MB');
+                          // Validate file size (2MB max)
+                          if (file.size > 2 * 1024 * 1024) {
+                            toast.error('File size must be less than 2MB');
                             return;
                           }
                           // Validate file type

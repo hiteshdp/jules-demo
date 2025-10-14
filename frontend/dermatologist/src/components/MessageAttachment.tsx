@@ -64,9 +64,9 @@ const MessageAttachment: React.FC<MessageAttachmentProps> = ({
   const handleDownload = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('dermatologist_token') || localStorage.getItem('token');
       const response = await fetch(
-        `/api/patient/appointments/${appointmentId}/chat/${messageId}/download`,
+        `/api/dermatologist/appointments/${appointmentId}/chat/${messageId}/download`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -169,7 +169,6 @@ const MessageAttachment: React.FC<MessageAttachmentProps> = ({
               </div>
             </div>
           </div>
-          
         </div>
       ) : (
         // Non-image files - WhatsApp Document Style

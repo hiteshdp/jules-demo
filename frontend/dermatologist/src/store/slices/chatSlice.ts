@@ -1,21 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { chatAPI } from '../api/chatAPI';
-
-interface ChatMessage {
-  id: number;
-  appointment_id: number;
-  sender_id: number;
-  message: string;
-  attachment?: string;
-  type: string;
-  is_read: boolean;
-  created_at: string;
-  sender?: {
-    id: number;
-    name: string;
-    role: string;
-  };
-}
+import { chatAPI, ChatMessage } from '../api/chatAPI';
 
 interface ChatState {
   messages: ChatMessage[];
@@ -48,14 +32,13 @@ export const fetchChatMessages = createAsyncThunk(
 
 export const sendMessage = createAsyncThunk(
   'chat/sendMessage',
-  async ({ appointmentId, message, type, attachment }: {
+  async ({ appointmentId, message, file }: {
     appointmentId: number;
-    message: string;
-    type?: string;
-    attachment?: File;
+    message?: string;
+    file?: File;
   }, { rejectWithValue }) => {
     try {
-      const response = await chatAPI.sendMessage(appointmentId, message, type, attachment);
+      const response = await chatAPI.sendMessage(appointmentId, { message, file });
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to send message');
