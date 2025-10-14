@@ -72,7 +72,18 @@ const ForgotPassword: React.FC = () => {
   const handleResetPassword = async (values: ResetPasswordForm) => {
     setLoading(true);
     try {
-      const response = await authAPI.resetPassword(values);
+      // Get email and token from URL parameters
+      const email = searchParams.get('email');
+      const token = searchParams.get('token');
+      
+      // Add email and token to the request
+      const requestData = {
+        ...values,
+        email: email,
+        token: token
+      };
+      
+      const response = await authAPI.resetPassword(requestData);
       const data = response.data;
 
       if (data.success) {
@@ -174,31 +185,11 @@ const ForgotPassword: React.FC = () => {
               onFinish={handleResetPassword}
               layout="vertical"
               size="large"
+              initialValues={{
+                email: searchParams.get('email') || '',
+                token: searchParams.get('token') || ''
+              }}
             >
-              <FormField
-                name="email"
-                label="Email Address"
-                type="email"
-                placeholder="Enter your email address"
-                required
-                rules={[
-                  { required: true, message: 'Please input your email!' },
-                  { type: 'email', message: 'Please enter a valid email!' }
-                ]}
-                disabled
-              />
-
-              <FormField
-                name="token"
-                label="Reset Token"
-                type="input"
-                placeholder="Enter the reset token from your email"
-                required
-                rules={[
-                  { required: true, message: 'Please input the reset token!' }
-                ]}
-              />
-
               <FormField
                 name="password"
                 label="New Password"

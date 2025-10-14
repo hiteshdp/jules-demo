@@ -27,8 +27,10 @@ export const authAPI = {
   forgotPassword: (data: ForgotPasswordRequest) =>
     apiClient.post('/forgot-password', data),
 
-  resetPassword: (data: ResetPasswordRequest) =>
-    apiClient.post('/reset-password', data),
+  resetPassword: (data: ResetPasswordRequest) => {
+    const { email, token, ...passwordData } = data;
+    return apiClient.post(`/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`, passwordData);
+  },
 };
 
 export default authAPI;
