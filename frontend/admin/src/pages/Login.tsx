@@ -108,10 +108,19 @@ const Login = () => {
               ]}
             />
 
-            <Form.Item className="mb-0">
-              <CustomButton
-                type="primary"
-                htmlType="submit"
+            <div style={{ textAlign: 'right', marginBottom: '16px' }}>
+              <Link
+                to="/forgot-password"
+                style={{ color: '#ff4d4f', fontSize: '14px' }}
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
+            <Form.Item>
+              <CustomButton 
+                type="primary" 
+                htmlType="submit" 
                 loading={loading}
                 className="w-full"
                 size="large"

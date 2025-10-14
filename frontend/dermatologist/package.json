@@ -15,6 +15,7 @@
     "chart.js": "^4.4.1",
     "date-fns": "^3.3.1",
     "dayjs": "^1.11.18",
+    "framer-motion": "^12.23.24",
     "postcss": "^8.4.35",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.2.0",

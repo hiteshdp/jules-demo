@@ -3,14 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchAppointments } from '../store/slices/appointmentSlice';
-import { Card, Row, Col, Statistic, Typography, Space, List, Avatar } from 'antd';
+import { Card, Row, Col, Statistic, Typography, Space } from 'antd';
 import { 
   CalendarOutlined, 
-  UserOutlined,
-  DollarOutlined
+  UserOutlined
 } from '@ant-design/icons';
-import { PageHeader, LoadingSpinner, StatusTag } from '../components/common';
-import { formatDateTimeWithAmPm } from '../utils/dateUtils';
+import { PageHeader, LoadingSpinner } from '../components/common';
 
 const { Title, Text } = Typography;
 
@@ -27,17 +25,9 @@ const Dashboard: React.FC = () => {
     }
   }, [dispatch, user]);
 
-  const todayAppointments = (Array.isArray(appointments) ? appointments : []).filter(
-    appointment => new Date(appointment.scheduled_at).toDateString() === new Date().toDateString()
-  );
-
   const upcomingAppointments = (Array.isArray(appointments) ? appointments : []).filter(
     appointment => new Date(appointment.scheduled_at) > new Date()
   ).slice(0, 5);
-
-  const completedAppointments = (Array.isArray(appointments) ? appointments : []).filter(
-    appointment => appointment.status === 'completed'
-  );
 
   const stats = [
     {

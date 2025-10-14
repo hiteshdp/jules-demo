@@ -10,7 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * @OA\Schema(
@@ -335,6 +340,238 @@ class AuthController extends Controller
             'data' => [
                 'user' => $user
             ]
+        ], 200);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/forgot-password",
+     *     summary="Send password reset link",
+     *     description="Send password reset link to user's email",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email"},
+     *             @OA\Property(property="email", type="string", format="email", example="patient@example.com")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Password reset link sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Password reset link sent to your email")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Email not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Email not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation errors"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email not found'
+            ], 404);
+        }
+
+        // Generate reset token
+        $token = Str::random(64);
+
+        // Store token in database
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'email' => $request->email,
+                'token' => $token,
+                'created_at' => now()
+            ]
+        );
+
+        // Generate reset URL
+        $resetUrl = config('app.frontend_url', 'http://localhost:3000') . '/forgot-password?token=' . $token . '&email=' . urlencode($request->email);
+
+        // Send email notification
+        try {
+            Mail::send('emails.password-reset', [
+                'user' => $user,
+                'token' => $token,
+                'resetUrl' => $resetUrl
+            ], function ($message) use ($user) {
+                $message->to($user->email, $user->name)
+                    ->subject('Password Reset - Hair & Skin Health');
+            });
+        } catch (\Exception $e) {
+            // Log the error but don't fail the request
+            \Log::error('Failed to send password reset email: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset link sent to your email',
+            'data' => [
+                'token' => $token, // Remove this in production
+                'email' => $request->email
+            ]
+        ], 200);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/reset-password",
+     *     summary="Reset user password",
+     *     description="Reset user password using token",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","token","password","password_confirmation"},
+     *             @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
+     *             @OA\Property(property="token", type="string", example="abc123..."),
+     *             @OA\Property(property="password", type="string", format="password", example="newpassword123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="newpassword123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Password reset successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Password reset successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid or expired token",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Invalid or expired token")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation errors",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation errors"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        // Get email and token from URL parameters
+        $email = $request->query('email');
+        $token = $request->query('token');
+
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        // Validate email and token separately
+        if (!$email || !$token) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email and token are required in URL parameters'
+            ], 422);
+        }
+
+        // Validate email format and existence
+        $emailValidator = Validator::make(['email' => $email], [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($emailValidator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid email address',
+                'errors' => $emailValidator->errors()
+            ], 422);
+        }
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Check if token exists and is valid
+        $passwordReset = DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->where('token', $token)
+            ->first();
+
+        if (!$passwordReset) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired token'
+            ], 400);
+        }
+
+        // Check if token is not expired (24 hours)
+        if (now()->diffInHours($passwordReset->created_at) > 24) {
+            // Delete expired token
+            DB::table('password_reset_tokens')
+                ->where('email', $email)
+                ->delete();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Token has expired. Please request a new password reset.'
+            ], 400);
+        }
+
+        // Update user password
+        $user = User::where('email', $email)->first();
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        // Delete the used token
+        DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->delete();
+
+        // Fire password reset event
+        event(new PasswordReset($user));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset successfully'
         ], 200);
     }
 }

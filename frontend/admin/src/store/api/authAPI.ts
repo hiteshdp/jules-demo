@@ -1,45 +1,36 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+export interface ForgotPasswordRequest {
+  email: string;
+}
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Handle response errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      // Only redirect if not already on login page
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  password: string;
+  password_confirmation: string;
+}
 
 export const authAPI = {
-  login: (credentials: { email: string; password: string }) =>
-    api.post('/login', credentials),
+  login: (data: { email: string; password: string }) =>
+    apiClient.post('/login', data),
 
-  logout: () =>
-    api.post('/logout'),
+  register: (data: { name: string; email: string; password: string; password_confirmation: string }) =>
+    apiClient.post('/register', data),
 
   getMe: () =>
-    api.get('/me'),
+    apiClient.get('/me'),
+
+  logout: () =>
+    apiClient.post('/logout'),
+
+  forgotPassword: (data: ForgotPasswordRequest) =>
+    apiClient.post('/forgot-password', data),
+
+  resetPassword: (data: ResetPasswordRequest) => {
+    const { email, token, ...passwordData } = data;
+    return apiClient.post(`/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`, passwordData);
+  },
 };
+
+export default authAPI;

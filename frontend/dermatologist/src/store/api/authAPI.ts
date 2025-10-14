@@ -1,36 +1,36 @@
-import axios from 'axios';
+import apiClient from './apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+export interface ForgotPasswordRequest {
+  email: string;
+}
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Add token to requests (dermatologist-specific key)
-api.interceptors.request.use((config) => {
-  const token =
-    localStorage.getItem('dermatologist_token') ||
-    localStorage.getItem('token'); // fallback if old key still present
-  if (token) {
-    const headers = {
-      ...(config.headers || {}),
-      Authorization: `Bearer ${token}`,
-    } as any;
-    config.headers = headers;
-  }
-  return config;
-});
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  password: string;
+  password_confirmation: string;
+}
 
 export const authAPI = {
-  login: (credentials: { email: string; password: string }) =>
-    api.post('/login', credentials),
-  
-  logout: () =>
-    api.post('/logout'),
-  
+  login: (data: { email: string; password: string }) =>
+    apiClient.post('/login', data),
+
+  register: (data: { name: string; email: string; password: string; password_confirmation: string }) =>
+    apiClient.post('/register', data),
+
   getMe: () =>
-    api.get('/dermatologist/me'),
+    apiClient.get('/me'),
+
+  logout: () =>
+    apiClient.post('/logout'),
+
+  forgotPassword: (data: ForgotPasswordRequest) =>
+    apiClient.post('/forgot-password', data),
+
+  resetPassword: (data: ResetPasswordRequest) => {
+    const { email, token, ...passwordData } = data;
+    return apiClient.post(`/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`, passwordData);
+  },
 };
+
+export default authAPI;

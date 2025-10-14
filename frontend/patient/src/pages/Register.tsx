@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { register, clearError } from '../store/slices/authSlice';
-import { Form, Card, Typography, Row, Col, Switch } from 'antd';
+import { Form, Row, Col, Switch, Typography } from 'antd';
 import { Button, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Register = () => {
   const [form] = Form.useForm();

@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../store/store';
 import { login, clearError } from '../store/slices/authSlice';
-import { Form, Card, Typography } from 'antd';
+import { Form } from 'antd';
 import { Button, FormField } from '../components/common';
 import toast from 'react-hot-toast';
 
 
-const { Title, Text } = Typography;
 
 const Login: React.FC = () => {
   const [form] = Form.useForm();
@@ -103,6 +102,15 @@ const Login: React.FC = () => {
                 { required: true, message: 'Please input your password!' }
               ]}
             />
+
+            <div className="text-right mb-4">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-500"
+              >
+                Forgot your password?
+              </Link>
+            </div>
 
             <Form.Item className="mb-0">
               <Button
