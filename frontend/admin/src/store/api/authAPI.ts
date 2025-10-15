@@ -13,7 +13,7 @@ export interface ResetPasswordRequest {
 
 export const authAPI = {
   login: (data: { email: string; password: string }) =>
-    apiClient.post('/login', data),
+    apiClient.post('/admin/login', data),
 
   register: (data: { name: string; email: string; password: string; password_confirmation: string }) =>
     apiClient.post('/register', data),
