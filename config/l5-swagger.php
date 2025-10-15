@@ -110,8 +110,8 @@ return [
              * @link https://zircote.github.io/swagger-php/reference/processors.html
              */
             'default_processors_configuration' => [
-                /** Example */
-                /**
+            /** Example */
+            /**
              * 'operationId.hash' => true,
              * 'pathFilter' => [
              * 'tags' => [
@@ -265,7 +265,7 @@ return [
 
         'security' => [
             [
-                'bearerAuth' => []
+                'bearerAuth' => [],
             ],
         ],
     ],

@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Http\Controllers\Api;
@@ -29,7 +30,7 @@ class NotificationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -52,7 +53,7 @@ class NotificationController extends Controller
                 'message' => $request->message,
             ], function ($mail) use ($user, $request) {
                 $mail->to($user->email, $user->name)
-                     ->subject($request->subject);
+                    ->subject($request->subject);
             });
 
             // Update notification status
@@ -64,7 +65,7 @@ class NotificationController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Email notification sent successfully',
-                'data' => $notification
+                'data' => $notification,
             ]);
 
         } catch (\Exception $e) {
@@ -76,7 +77,7 @@ class NotificationController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send email notification: ' . $e->getMessage()
+                'message' => 'Failed to send email notification: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -95,15 +96,15 @@ class NotificationController extends Controller
         $subject = 'Appointment Reminder - Hair Skin Health';
         $message = "Dear {$patient->name},\n\n";
         $message .= "This is a reminder for your upcoming appointment:\n\n";
-        $message .= "Date: " . $appointment->scheduled_at->format('M d, Y') . "\n";
-        $message .= "Time: " . $appointment->scheduled_at->format('h:i A') . "\n";
+        $message .= 'Date: '.$appointment->scheduled_at->format('M d, Y')."\n";
+        $message .= 'Time: '.$appointment->scheduled_at->format('h:i A')."\n";
         $message .= "Dermatologist: Dr. {$dermatologist->name}\n";
         $message .= "Consultation Fee: ₹{$appointment->consultation_fee}\n\n";
-        
+
         if ($appointment->zoom_link) {
             $message .= "Zoom Link: {$appointment->zoom_link}\n\n";
         }
-        
+
         $message .= "Please ensure you are available at the scheduled time.\n\n";
         $message .= "Best regards,\nHair Skin Health Team";
 
@@ -127,9 +128,9 @@ class NotificationController extends Controller
         $message .= "Your payment has been processed successfully.\n\n";
         $message .= "Payment Details:\n";
         $message .= "Amount: ₹{$payment->amount}\n";
-        $message .= "Type: " . ucfirst($payment->type) . "\n";
+        $message .= 'Type: '.ucfirst($payment->type)."\n";
         $message .= "Payment ID: {$payment->razorpay_payment_id}\n";
-        $message .= "Date: " . $payment->paid_at->format('M d, Y h:i A') . "\n\n";
+        $message .= 'Date: '.$payment->paid_at->format('M d, Y h:i A')."\n\n";
         $message .= "Thank you for your payment.\n\n";
         $message .= "Best regards,\nHair Skin Health Team";
 
@@ -175,7 +176,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $notifications
+            'data' => $notifications,
         ]);
     }
 
@@ -191,7 +192,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Notification marked as read'
+            'message' => 'Notification marked as read',
         ]);
     }
 
@@ -211,7 +212,7 @@ class NotificationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -237,7 +238,7 @@ class NotificationController extends Controller
             'data' => [
                 'success_count' => $successCount,
                 'failure_count' => $failureCount,
-            ]
+            ],
         ]);
     }
 }

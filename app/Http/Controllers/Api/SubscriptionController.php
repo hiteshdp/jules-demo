@@ -1,15 +1,16 @@
 <?php
+
 // Generated via prompt: prompts/razorpay_recurring_payments_v1.md
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
+use App\Models\Subscription;
+use App\Services\PaymentNotificationService;
+use App\Services\RazorpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\RazorpayService;
-use App\Services\PaymentNotificationService;
-use App\Models\Subscription;
-use App\Models\Payment;
 
 /**
  * @OA\Tag(
@@ -22,8 +23,7 @@ class SubscriptionController extends Controller
     public function __construct(
         private RazorpayService $razorpay,
         private PaymentNotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     /**
      * Create a Razorpay plan and subscription
@@ -33,10 +33,13 @@ class SubscriptionController extends Controller
      *   tags={"Subscription"},
      *   security={{"sanctum": {}}},
      *   summary="Create subscription (₹500/month)",
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Subscription created",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="message", type="string", example="Subscription created"),
      *       @OA\Property(
@@ -94,27 +97,36 @@ class SubscriptionController extends Controller
      *   tags={"Subscription"},
      *   security={{"sanctum": {}}},
      *   summary="Verify subscription payment signature",
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"razorpay_payment_id","razorpay_subscription_id","razorpay_signature"},
+     *
      *       @OA\Property(property="razorpay_payment_id", type="string", example="pay_29QQoUBi66xm2f"),
      *       @OA\Property(property="razorpay_subscription_id", type="string", example="sub_00000000000001"),
      *       @OA\Property(property="razorpay_signature", type="string", example="generated_signature_here")
      *     )
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Subscription activated",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="message", type="string", example="Subscription activated")
      *     )
      *   ),
+     *
      *   @OA\Response(
      *     response=422,
      *     description="Invalid signature",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=false),
      *       @OA\Property(property="message", type="string", example="Invalid signature")
      *     )
@@ -131,7 +143,7 @@ class SubscriptionController extends Controller
 
         $isValid = $this->razorpay->verifyPaymentSignature($attributes);
 
-        if (!$isValid) {
+        if (! $isValid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid signature',
@@ -139,10 +151,10 @@ class SubscriptionController extends Controller
         }
 
         $subscription = Subscription::where('razorpay_subscription_id', $attributes['razorpay_subscription_id'])->first();
-        
+
         if ($subscription) {
             $subscription->update(['status' => 'active']);
-            
+
             // Create a payment record for the subscription
             $payment = Payment::create([
                 'user_id' => Auth::id(),
@@ -165,14 +177,14 @@ class SubscriptionController extends Controller
         $startDate = now();
         $endDate = now()->addMonth();
         $nextBillingDate = now()->addMonth();
-        
+
         Subscription::where('razorpay_subscription_id', $attributes['razorpay_subscription_id'])
             ->update([
                 'status' => 'active',
                 'payment_id' => $attributes['razorpay_payment_id'],
                 'next_billing_date' => $nextBillingDate,
                 'starts_at' => $startDate,
-                'ends_at' => $endDate
+                'ends_at' => $endDate,
             ]);
 
         return response()->json([
@@ -189,10 +201,13 @@ class SubscriptionController extends Controller
      *   tags={"Subscription"},
      *   security={{"sanctum": {}}},
      *   summary="Get subscription status",
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Status fetched",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="data", type="object",
      *         nullable=true,
@@ -213,6 +228,7 @@ class SubscriptionController extends Controller
     {
         $userId = Auth::id();
         $sub = Subscription::where('user_id', $userId)->latest()->first();
+
         return response()->json([
             'success' => true,
             'data' => $sub,
@@ -227,14 +243,18 @@ class SubscriptionController extends Controller
      *   tags={"Subscription"},
      *   security={{"sanctum": {}}},
      *   summary="Cancel subscription",
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Cancelled",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="message", type="string", example="Subscription cancelled successfully")
      *     )
      *   ),
+     *
      *   @OA\Response(
      *     response=404,
      *     description="No subscription found"
@@ -249,22 +269,22 @@ class SubscriptionController extends Controller
     {
         $userId = Auth::id();
         $sub = Subscription::where('user_id', $userId)->latest()->first();
-        
-        if (!$sub) {
+
+        if (! $sub) {
             return response()->json([
-                'success' => false, 
-                'message' => 'No subscription found'
+                'success' => false,
+                'message' => 'No subscription found',
             ], 404);
         }
 
         try {
             // Cancel subscription in Razorpay first
             $razorpayCancelled = $this->razorpay->cancelSubscription($sub->razorpay_subscription_id);
-            
-            if (!$razorpayCancelled) {
+
+            if (! $razorpayCancelled) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to cancel subscription in Razorpay. Please try again or contact support.'
+                    'message' => 'Failed to cancel subscription in Razorpay. Please try again or contact support.',
                 ], 400);
             }
 
@@ -274,17 +294,15 @@ class SubscriptionController extends Controller
             $sub->save();
 
             return response()->json([
-                'success' => true, 
-                'message' => 'Subscription cancelled successfully. You will not be charged for future billing cycles.'
+                'success' => true,
+                'message' => 'Subscription cancelled successfully. You will not be charged for future billing cycles.',
             ]);
 
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to cancel subscription: ' . $e->getMessage()
+                'message' => 'Failed to cancel subscription: '.$e->getMessage(),
             ], 400);
         }
     }
 }
-
-

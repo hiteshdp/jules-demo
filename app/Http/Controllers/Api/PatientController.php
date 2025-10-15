@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/admin_patients_crud_v1.md
 
 namespace App\Http\Controllers\Api;
@@ -16,22 +17,23 @@ use Illuminate\Validation\Rule;
  *     version="1.0.0",
  *     description="Complete API documentation for the Hair Loss Diagnosis & Treatment Platform"
  * )
- * 
+ *
  * @OA\Server(
  *     url="http://localhost:8000/api",
  *     description="Development server"
  * )
- * 
+ *
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
  *     type="http",
  *     scheme="bearer",
  *     bearerFormat="JWT"
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="Patient",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="John Doe"),
  *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
@@ -42,11 +44,12 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="subscription_status", type="string", example="-"),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="PatientCreateRequest",
  *     type="object",
  *     required={"name","email","phone_no","password"},
+ *
  *     @OA\Property(property="name", type="string", example="John Doe"),
  *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
  *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
@@ -58,10 +61,11 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="smoking", type="boolean", example=false),
  *     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="PatientUpdateRequest",
  *     type="object",
+ *
  *     @OA\Property(property="name", type="string", example="John Doe"),
  *     @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
  *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
@@ -74,23 +78,25 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="smoking", type="boolean", example=false),
  *     @OA\Property(property="alcohol_consumption", type="boolean", example=false)
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="ApiError",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean", example=false),
  *     @OA\Property(property="message", type="string", example="Error message"),
  *     @OA\Property(property="error", type="string", example="Detailed error information")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="ValidationError",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean", example=false),
  *     @OA\Property(property="message", type="string", example="Validation errors"),
  *     @OA\Property(property="errors", type="object", example={"field": "The field is required."})
  * )
- * 
+ *
  * @OA\Tag(
  *     name="Patients",
  *     description="Patient management endpoints (Admin)"
@@ -104,13 +110,17 @@ class PatientController extends Controller
      *     summary="List patients",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", example=1)),
      *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", example=15)),
      *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string", example="john")),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Patients retrieved",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Patients retrieved successfully"),
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Patient")),
@@ -120,13 +130,14 @@ class PatientController extends Controller
      *             @OA\Property(property="total", type="integer", example=75)
      *         )
      *     ),
+     *
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
      * )
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            $perPage = (int)($request->query('per_page', 15));
+            $perPage = (int) ($request->query('per_page', 15));
             $query = User::where('role', 'patient')
                 ->select([
                     'id',
@@ -136,11 +147,11 @@ class PatientController extends Controller
                     'date_of_birth as dob',
                     'gender',
                     'is_active',
-                    'created_at'
+                    'created_at',
                 ])
                 ->orderBy('created_at', 'desc');
 
-            if ($search = trim((string)$request->query('search', ''))) {
+            if ($search = trim((string) $request->query('search', ''))) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
@@ -158,10 +169,11 @@ class PatientController extends Controller
                         'allergies',
                         'current_medications',
                         'smoking',
-                        'alcohol_consumption'
+                        'alcohol_consumption',
                     ])->first();
 
                 $patient->profile = $profile;
+
                 return $patient;
             });
 
@@ -178,7 +190,7 @@ class PatientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve patients',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -189,7 +201,9 @@ class PatientController extends Controller
      *     summary="Create patient",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/PatientCreateRequest")),
+     *
      *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/Patient")),
      *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
@@ -254,13 +268,13 @@ class PatientController extends Controller
                     'is_active' => $patient->is_active,
                     'subscription_status' => '-',
                     'created_at' => $patient->created_at,
-                ]
+                ],
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create patient',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -271,7 +285,9 @@ class PatientController extends Controller
      *     summary="Get patient",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *
      *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Patient")),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
@@ -285,10 +301,10 @@ class PatientController extends Controller
                 ->with('patientProfile')
                 ->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Patient not found'
+                    'message' => 'Patient not found',
                 ], 404);
             }
 
@@ -325,7 +341,7 @@ class PatientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve patient',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -336,8 +352,11 @@ class PatientController extends Controller
      *     summary="Update patient",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *
      *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/PatientUpdateRequest")),
+     *
      *     @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/Patient")),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
@@ -348,10 +367,10 @@ class PatientController extends Controller
     {
         try {
             $patient = User::where('role', 'patient')->where('id', $id)->first();
-            if (!$patient) {
+            if (! $patient) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Patient not found'
+                    'message' => 'Patient not found',
                 ], 404);
             }
 
@@ -380,8 +399,12 @@ class PatientController extends Controller
             $userData = [];
             $profileData = [];
 
-            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
-            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
+            if (isset($updateData['name'])) {
+                $userData['name'] = $updateData['name'];
+            }
+            if (isset($updateData['email'])) {
+                $userData['email'] = $updateData['email'];
+            }
             if (isset($updateData['phone_no'])) {
                 $userData['phone'] = $updateData['phone_no'] ?: null;
                 unset($updateData['phone_no']);
@@ -390,8 +413,12 @@ class PatientController extends Controller
                 $userData['date_of_birth'] = $updateData['dob'];
                 unset($updateData['dob']);
             }
-            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
-            if (isset($updateData['is_active'])) $userData['is_active'] = $updateData['is_active'];
+            if (isset($updateData['gender'])) {
+                $userData['gender'] = $updateData['gender'];
+            }
+            if (isset($updateData['is_active'])) {
+                $userData['is_active'] = $updateData['is_active'];
+            }
             if (array_key_exists('password', $updateData)) {
                 if ($updateData['password']) {
                     $userData['password'] = Hash::make($updateData['password']);
@@ -400,18 +427,26 @@ class PatientController extends Controller
             }
 
             // Profile fields
-            if (isset($updateData['allergies'])) $profileData['allergies'] = $updateData['allergies'];
-            if (isset($updateData['current_medications'])) $profileData['current_medications'] = $updateData['current_medications'];
-            if (isset($updateData['smoking'])) $profileData['smoking'] = $updateData['smoking'];
-            if (isset($updateData['alcohol_consumption'])) $profileData['alcohol_consumption'] = $updateData['alcohol_consumption'];
+            if (isset($updateData['allergies'])) {
+                $profileData['allergies'] = $updateData['allergies'];
+            }
+            if (isset($updateData['current_medications'])) {
+                $profileData['current_medications'] = $updateData['current_medications'];
+            }
+            if (isset($updateData['smoking'])) {
+                $profileData['smoking'] = $updateData['smoking'];
+            }
+            if (isset($updateData['alcohol_consumption'])) {
+                $profileData['alcohol_consumption'] = $updateData['alcohol_consumption'];
+            }
 
             // Update user data
-            if (!empty($userData)) {
+            if (! empty($userData)) {
                 $patient->update($userData);
             }
 
             // Update or create profile data
-            if (!empty($profileData)) {
+            if (! empty($profileData)) {
                 $profile = \App\Models\PatientProfile::where('user_id', $patient->id)->first();
                 if ($profile) {
                     $profile->update($profileData);
@@ -434,13 +469,13 @@ class PatientController extends Controller
                     'is_active' => $patient->is_active,
                     'subscription_status' => '-',
                     'created_at' => $patient->created_at,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update patient',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -451,7 +486,9 @@ class PatientController extends Controller
      *     summary="Delete patient",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *
      *     @OA\Response(response=200, description="Deleted", @OA\JsonContent(@OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Patient deleted successfully"))),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
@@ -461,10 +498,10 @@ class PatientController extends Controller
     {
         try {
             $patient = User::where('role', 'patient')->where('id', $id)->first();
-            if (!$patient) {
+            if (! $patient) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Patient not found'
+                    'message' => 'Patient not found',
                 ], 404);
             }
 
@@ -472,13 +509,13 @@ class PatientController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Patient deleted successfully'
+                'message' => 'Patient deleted successfully',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete patient',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -490,10 +527,13 @@ class PatientController extends Controller
      *     description="Get list of available dermatologists for appointment booking",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Dermatologists retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Dermatologists retrieved successfully"),
      *             @OA\Property(
@@ -502,7 +542,9 @@ class PatientController extends Controller
      *                 @OA\Property(
      *                     property="dermatologists",
      *                     type="array",
+     *
      *                     @OA\Items(
+     *
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
      *                         @OA\Property(property="email", type="string", example="dermatologist@example.com"),
@@ -515,10 +557,13 @@ class PatientController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated")
      *         )
      *     )
@@ -533,6 +578,7 @@ class PatientController extends Controller
                 ->get()
                 ->map(function ($user) {
                     $profile = $user->dermatologistProfile;
+
                     return [
                         'id' => $user->id,
                         'name' => $user->name,
@@ -540,7 +586,7 @@ class PatientController extends Controller
                         'specialization' => $profile ? $profile->specialization : 'General Dermatology',
                         'consultation_fee' => $profile ? $profile->consultation_fee : 0,
                         'years_of_experience' => $profile ? $profile->years_of_experience : 0,
-                        'qualifications' => $profile ? $profile->qualifications : 'MD'
+                        'qualifications' => $profile ? $profile->qualifications : 'MD',
                     ];
                 });
 
@@ -548,14 +594,14 @@ class PatientController extends Controller
                 'success' => true,
                 'message' => 'Dermatologists retrieved successfully',
                 'data' => [
-                    'dermatologists' => $dermatologists
-                ]
+                    'dermatologists' => $dermatologists,
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve dermatologists',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -567,10 +613,13 @@ class PatientController extends Controller
      *     description="Get current authenticated patient's profile information",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Patient profile retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Profile retrieved successfully"),
      *             @OA\Property(
@@ -593,10 +642,13 @@ class PatientController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated")
      *         )
      *     )
@@ -610,7 +662,7 @@ class PatientController extends Controller
             if ($user->role !== 'patient') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Access denied. Patient role required.'
+                    'message' => 'Access denied. Patient role required.',
                 ], 403);
             }
 
@@ -626,14 +678,14 @@ class PatientController extends Controller
                     'phone' => $user->phone,
                     'date_of_birth' => $user->date_of_birth,
                     'gender' => $user->gender,
-                    'patientProfile' => $user->patientProfile
-                ]
+                    'patientProfile' => $user->patientProfile,
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve profile',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -645,9 +697,12 @@ class PatientController extends Controller
      *     description="Update current authenticated patient's profile information",
      *     tags={"Patients"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="patient@example.com"),
      *             @OA\Property(property="phone", type="string", example="+1234567890"),
@@ -659,10 +714,13 @@ class PatientController extends Controller
      *             @OA\Property(property="alcohol_consumption", type="boolean", example=false)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Profile updated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Profile updated successfully"),
      *             @OA\Property(
@@ -685,17 +743,23 @@ class PatientController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Validation errors"),
      *             @OA\Property(property="errors", type="object", example={"field": "The field is required."})
@@ -711,7 +775,7 @@ class PatientController extends Controller
             if ($user->role !== 'patient') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Access denied. Patient role required.'
+                    'message' => 'Access denied. Patient role required.',
                 ], 403);
             }
 
@@ -738,25 +802,43 @@ class PatientController extends Controller
             $userData = [];
             $profileData = [];
 
-            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
-            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
-            if (isset($updateData['phone'])) $userData['phone'] = $updateData['phone'];
-            if (isset($updateData['date_of_birth'])) $userData['date_of_birth'] = $updateData['date_of_birth'];
-            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
+            if (isset($updateData['name'])) {
+                $userData['name'] = $updateData['name'];
+            }
+            if (isset($updateData['email'])) {
+                $userData['email'] = $updateData['email'];
+            }
+            if (isset($updateData['phone'])) {
+                $userData['phone'] = $updateData['phone'];
+            }
+            if (isset($updateData['date_of_birth'])) {
+                $userData['date_of_birth'] = $updateData['date_of_birth'];
+            }
+            if (isset($updateData['gender'])) {
+                $userData['gender'] = $updateData['gender'];
+            }
 
             // Profile fields
-            if (isset($updateData['allergies'])) $profileData['allergies'] = $updateData['allergies'];
-            if (isset($updateData['current_medications'])) $profileData['current_medications'] = $updateData['current_medications'];
-            if (isset($updateData['smoking'])) $profileData['smoking'] = $updateData['smoking'];
-            if (isset($updateData['alcohol_consumption'])) $profileData['alcohol_consumption'] = $updateData['alcohol_consumption'];
+            if (isset($updateData['allergies'])) {
+                $profileData['allergies'] = $updateData['allergies'];
+            }
+            if (isset($updateData['current_medications'])) {
+                $profileData['current_medications'] = $updateData['current_medications'];
+            }
+            if (isset($updateData['smoking'])) {
+                $profileData['smoking'] = $updateData['smoking'];
+            }
+            if (isset($updateData['alcohol_consumption'])) {
+                $profileData['alcohol_consumption'] = $updateData['alcohol_consumption'];
+            }
 
             // Update user data
-            if (!empty($userData)) {
+            if (! empty($userData)) {
                 $user->update($userData);
             }
 
             // Update or create profile data
-            if (!empty($profileData)) {
+            if (! empty($profileData)) {
                 $profile = \App\Models\PatientProfile::where('user_id', $user->id)->first();
                 if ($profile) {
                     $profile->update($profileData);
@@ -779,14 +861,14 @@ class PatientController extends Controller
                     'phone' => $user->phone,
                     'date_of_birth' => $user->date_of_birth,
                     'gender' => $user->gender,
-                    'patientProfile' => $user->patientProfile
-                ]
+                    'patientProfile' => $user->patientProfile,
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update profile',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

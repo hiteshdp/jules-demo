@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('products', function (Blueprint $table) {
             // Drop columns only if they exist
             $columnsToDrop = [];
-            
+
             if (Schema::hasColumn('products', 'brand')) {
                 $columnsToDrop[] = 'brand';
             }
@@ -30,8 +30,8 @@ return new class extends Migration
             if (Schema::hasColumn('products', 'stock_quantity')) {
                 $columnsToDrop[] = 'stock_quantity';
             }
-            
-            if (!empty($columnsToDrop)) {
+
+            if (! empty($columnsToDrop)) {
                 $table->dropColumn($columnsToDrop);
             }
         });
@@ -44,25 +44,25 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             // Add columns only if they don't exist
-            if (!Schema::hasColumn('products', 'brand')) {
+            if (! Schema::hasColumn('products', 'brand')) {
                 $table->string('brand');
             }
-            if (!Schema::hasColumn('products', 'ingredients')) {
+            if (! Schema::hasColumn('products', 'ingredients')) {
                 $table->text('ingredients');
             }
-            if (!Schema::hasColumn('products', 'usage_instructions')) {
+            if (! Schema::hasColumn('products', 'usage_instructions')) {
                 $table->text('usage_instructions');
             }
-            if (!Schema::hasColumn('products', 'dosage')) {
+            if (! Schema::hasColumn('products', 'dosage')) {
                 $table->text('dosage')->nullable();
             }
-            if (!Schema::hasColumn('products', 'restrictions')) {
+            if (! Schema::hasColumn('products', 'restrictions')) {
                 $table->text('restrictions')->nullable();
             }
-            if (!Schema::hasColumn('products', 'requires_prescription')) {
+            if (! Schema::hasColumn('products', 'requires_prescription')) {
                 $table->boolean('requires_prescription')->default(false);
             }
-            if (!Schema::hasColumn('products', 'stock_quantity')) {
+            if (! Schema::hasColumn('products', 'stock_quantity')) {
                 $table->integer('stock_quantity')->default(0);
             }
         });

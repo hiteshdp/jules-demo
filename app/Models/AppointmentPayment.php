@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/appointment_payment_integration_v1.md
 
 namespace App\Models;

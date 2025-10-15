@@ -1,10 +1,11 @@
 <?php
+
 // Generated via prompt: prompts/razorpay_recurring_payments_v1.md
 
 namespace App\Services;
 
-use Razorpay\Api\Api;
 use Illuminate\Support\Facades\Log;
+use Razorpay\Api\Api;
 
 class RazorpayService
 {
@@ -17,7 +18,6 @@ class RazorpayService
             config('services.razorpay.key_secret')
         );
 
-      
     }
 
     public function createPlan(int $amount, string $name)
@@ -48,11 +48,13 @@ class RazorpayService
     {
         try {
             $this->api->utility->verifyPaymentSignature($attributes);
+
             return true;
         } catch (\Throwable $e) {
             Log::warning('Razorpay signature verification failed', [
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -63,17 +65,18 @@ class RazorpayService
             // Cancel the subscription in Razorpay
             $subscription = $this->api->subscription->fetch($subscriptionId);
             $subscription->cancel();
-            
+
             Log::info('Razorpay subscription cancelled', [
                 'subscription_id' => $subscriptionId,
             ]);
-            
+
             return true;
         } catch (\Throwable $e) {
             Log::error('Failed to cancel Razorpay subscription', [
                 'subscription_id' => $subscriptionId,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -87,6 +90,7 @@ class RazorpayService
                 'subscription_id' => $subscriptionId,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -97,7 +101,7 @@ class RazorpayService
             $orderData = [
                 'amount' => $amount,
                 'currency' => $currency,
-                'receipt' => $options['receipt'] ?? 'order_' . time(),
+                'receipt' => $options['receipt'] ?? 'order_'.time(),
             ];
 
             if (isset($options['notes'])) {
@@ -129,9 +133,8 @@ class RazorpayService
                 'order_id' => $orderId,
                 'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
 }
-
-

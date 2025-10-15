@@ -1,9 +1,11 @@
 <?php
-// Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -57,7 +59,7 @@ class User extends Authenticatable
     /**
      * Get the patient profile associated with the user.
      */
-    public function patientProfile()
+    public function patientProfile(): HasOne
     {
         return $this->hasOne(PatientProfile::class);
     }
@@ -65,7 +67,7 @@ class User extends Authenticatable
     /**
      * Get the dermatologist profile associated with the user.
      */
-    public function dermatologistProfile()
+    public function dermatologistProfile(): HasOne
     {
         return $this->hasOne(Dermatologist::class);
     }
@@ -73,7 +75,7 @@ class User extends Authenticatable
     /**
      * Get the quiz responses for the user.
      */
-    public function quizResponses()
+    public function quizResponses(): HasMany
     {
         return $this->hasMany(HairLossQuizResponse::class);
     }
@@ -81,7 +83,7 @@ class User extends Authenticatable
     /**
      * Get the subscriptions for the user.
      */
-    public function subscriptions()
+    public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
     }
@@ -89,7 +91,7 @@ class User extends Authenticatable
     /**
      * Get the appointments where user is a patient.
      */
-    public function patientAppointments()
+    public function patientAppointments(): HasMany
     {
         return $this->hasMany(Appointment::class, 'patient_id');
     }
@@ -97,7 +99,7 @@ class User extends Authenticatable
     /**
      * Get the appointments where user is a dermatologist.
      */
-    public function dermatologistAppointments()
+    public function dermatologistAppointments(): HasMany
     {
         return $this->hasMany(Appointment::class, 'dermatologist_id');
     }
@@ -105,7 +107,7 @@ class User extends Authenticatable
     /**
      * Get the payments for the user.
      */
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
@@ -113,15 +115,25 @@ class User extends Authenticatable
     /**
      * Get the notifications for the user.
      */
-    public function notifications()
+    public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
     }
 
     /**
+     * Interact with the user's role.
+     */
+    protected function role(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => strtolower($value),
+        );
+    }
+
+    /**
      * Check if user is a patient.
      */
-    public function isPatient()
+    public function isPatient(): bool
     {
         return $this->role === 'patient';
     }
@@ -129,7 +141,7 @@ class User extends Authenticatable
     /**
      * Check if user is a dermatologist.
      */
-    public function isDermatologist()
+    public function isDermatologist(): bool
     {
         return $this->role === 'dermatologist';
     }
@@ -137,7 +149,7 @@ class User extends Authenticatable
     /**
      * Check if user is an admin.
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return $this->role === 'admin';
     }

@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Models;
@@ -28,8 +29,8 @@ class AdminSetting extends Model
     public static function getValue($key, $default = null)
     {
         $setting = static::where('key', $key)->first();
-        
-        if (!$setting) {
+
+        if (! $setting) {
             return $default;
         }
 
@@ -51,9 +52,9 @@ class AdminSetting extends Model
     public static function setValue($key, $value, $type = 'string', $description = null)
     {
         $setting = static::where('key', $key)->first();
-        
-        if (!$setting) {
-            $setting = new static();
+
+        if (! $setting) {
+            $setting = new static;
             $setting->key = $key;
             $setting->type = $type;
             $setting->description = $description;

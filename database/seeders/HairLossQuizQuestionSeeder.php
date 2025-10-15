@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/quiz_questionnaire_update_v1.md
 
 namespace Database\Seeders;

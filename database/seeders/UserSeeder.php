@@ -1,11 +1,11 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Dermatologist;
-use App\Models\PatientProfile;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Create admin user (idempotent)
-        if (!User::where('email', 'admin@hairskinhealth.com')->exists()) {
+        if (! User::where('email', 'admin@hairskinhealth.com')->exists()) {
             $admin = User::create([
                 'name' => 'Admin User',
                 'email' => 'admin@hairskinhealth.com',
@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
         }
 
         // Create sample dermatologist (idempotent)
-        if (!User::where('email', 'dermatologist@hairskinhealth.com')->exists()) {
+        if (! User::where('email', 'dermatologist@hairskinhealth.com')->exists()) {
             $dermatologist = User::create([
                 'name' => 'Dr. Sarah Johnson',
                 'email' => 'dermatologist@hairskinhealth.com',
@@ -44,19 +44,19 @@ class UserSeeder extends Seeder
                 'is_active' => true,
             ]);
 
-        $dermatologist->dermatologistProfile()->create([
-            'license_number' => 'DERM123456',
-            'specialization' => 'Hair Loss and Scalp Disorders',
-            'years_of_experience' => 15,
-            'qualifications' => 'MD Dermatology, Board Certified',
-            'bio' => 'Dr. Sarah Johnson is a board-certified dermatologist with over 15 years of experience in treating hair loss and scalp disorders.',
-            'consultation_fee' => 1500.00,
-        ]);
+            $dermatologist->dermatologistProfile()->create([
+                'license_number' => 'DERM123456',
+                'specialization' => 'Hair Loss and Scalp Disorders',
+                'years_of_experience' => 15,
+                'qualifications' => 'MD Dermatology, Board Certified',
+                'bio' => 'Dr. Sarah Johnson is a board-certified dermatologist with over 15 years of experience in treating hair loss and scalp disorders.',
+                'consultation_fee' => 1500.00,
+            ]);
 
         }
 
         // Create sample patient (idempotent)
-        if (!User::where('email', 'patient@hairskinhealth.com')->exists()) {
+        if (! User::where('email', 'patient@hairskinhealth.com')->exists()) {
             $patient = User::create([
                 'name' => 'John Doe',
                 'email' => 'patient@hairskinhealth.com',

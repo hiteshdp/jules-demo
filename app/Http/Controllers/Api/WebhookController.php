@@ -1,15 +1,16 @@
 <?php
+
 // Generated via prompt: prompts/razorpay_recurring_payments_v1.md
 
 namespace App\Http\Controllers\Api;
 
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\RazorpayLog;
 use App\Models\Subscription;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Services\PaymentNotificationService;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -19,9 +20,8 @@ use App\Services\PaymentNotificationService;
  */
 class WebhookController extends Controller
 {
-    public function __construct(private PaymentNotificationService $notificationService)
-    {
-    }
+    public function __construct(private PaymentNotificationService $notificationService) {}
+
     /**
      * Razorpay webhook handler
      *
@@ -30,18 +30,24 @@ class WebhookController extends Controller
      *   tags={"Razorpay Webhook"},
      *   summary="Handle Razorpay webhook events",
      *   description="Verifies X-Razorpay-Signature and processes events like subscription.charged, payment.failed, subscription.cancelled",
+     *
      *   @OA\RequestBody(
      *     required=true,
      *     description="Razorpay event payload",
+     *
      *     @OA\JsonContent()
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Webhook processed",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true)
      *     )
      *   ),
+     *
      *   @OA\Response(
      *     response=400,
      *     description="Invalid signature"
@@ -55,7 +61,7 @@ class WebhookController extends Controller
 
         $secret = config('services.razorpay.webhook_secret');
 
-        if (!$this->verifySignature($payload, $signature, $secret)) {
+        if (! $this->verifySignature($payload, $signature, $secret)) {
             return response()->json(['success' => false, 'message' => 'Invalid signature'], 400);
         }
 
@@ -97,8 +103,8 @@ class WebhookController extends Controller
                     'next_payment_date' => $next ? date('Y-m-d H:i:s', $next) : null,
                 ]);
 
-				// Send payment success notifications
-				$this->notificationService->sendPaymentSuccessNotifications($payment);
+                // Send payment success notifications
+                $this->notificationService->sendPaymentSuccessNotifications($payment);
             }
         } elseif ($event === 'payment.failed') {
             $payment = $data['payload']['payment']['entity'] ?? null;
@@ -131,12 +137,12 @@ class WebhookController extends Controller
         } elseif ($event === 'subscription.cancelled') {
             $subscription = $data['payload']['subscription']['entity'] ?? null;
             $subId = $subscription['id'] ?? null;
-        
+
             if ($subId) {
                 // Mark previous as old
                 Subscription::where('razorpay_subscription_id', $subId)
                     ->update(['is_latest' => false]);
-        
+
                 // Insert cancellation record
                 Subscription::create([
                     'user_id' => $user_id ?? null,
@@ -156,7 +162,7 @@ class WebhookController extends Controller
                     'next_payment_date' => null,
                 ]);
             }
-        
+
         }
 
         return response()->json(['success' => true]);
@@ -164,13 +170,12 @@ class WebhookController extends Controller
 
     private function verifySignature(string $payload, ?string $signature, string $secret): bool
     {
-        if (!$signature) {
+        if (! $signature) {
             return false;
         }
 
         $expectedSignature = hash_hmac('sha256', $payload, $secret);
+
         return hash_equals($expectedSignature, $signature);
     }
 }
-
-

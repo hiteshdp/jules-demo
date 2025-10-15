@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 use Illuminate\Database\Migrations\Migration;

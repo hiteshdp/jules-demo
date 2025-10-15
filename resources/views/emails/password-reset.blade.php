@@ -74,9 +74,6 @@
         <p>Or copy and paste this link into your browser:</p>
         <div class="token">{{ $resetUrl }}</div>
         
-        <p><strong>For development/testing purposes, your reset token is:</strong></p>
-        <div class="token">{{ $token }}</div>
-        
         <p><strong>Important:</strong></p>
         <ul>
             <li>This link will expire in 24 hours</li>

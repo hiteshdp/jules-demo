@@ -1,14 +1,15 @@
 <?php
+
 // Generated via prompt: prompts/payment_email_notifications_v1.md
 
 namespace App\Services;
 
-use App\Mail\PaymentSuccessMail;
 use App\Mail\AdminPaymentNotificationMail;
+use App\Mail\PaymentSuccessMail;
 use App\Models\Payment;
 use App\Models\User;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentNotificationService
 {
@@ -32,14 +33,14 @@ class PaymentNotificationService
                 'payment_id' => $payment->id,
                 'user_id' => $user->id,
                 'amount' => $payment->amount,
-                'type' => $paymentType
+                'type' => $paymentType,
             ]);
 
         } catch (\Exception $e) {
             Log::error('Failed to send payment notifications', [
                 'payment_id' => $payment->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -56,14 +57,14 @@ class PaymentNotificationService
 
             Log::info('Customer payment notification sent', [
                 'payment_id' => $payment->id,
-                'user_email' => $user->email
+                'user_email' => $user->email,
             ]);
 
         } catch (\Exception $e) {
             Log::error('Failed to send customer payment notification', [
                 'payment_id' => $payment->id,
                 'user_email' => $user->email,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -76,20 +77,20 @@ class PaymentNotificationService
         try {
             // Get admin email from config or use a default
             $adminEmail = config('services.mail.admin_email', 'admin@hairskinhealth.com');
-            
+
             Mail::to($adminEmail)->send(
                 new AdminPaymentNotificationMail($payment, $user, $paymentType, $itemName)
             );
 
             Log::info('Admin payment notification sent', [
                 'payment_id' => $payment->id,
-                'admin_email' => $adminEmail
+                'admin_email' => $adminEmail,
             ]);
 
         } catch (\Exception $e) {
             Log::error('Failed to send admin payment notification', [
                 'payment_id' => $payment->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
     }
@@ -108,18 +109,18 @@ class PaymentNotificationService
     private function getItemName(Payment $payment): string
     {
         $payable = $payment->payable;
-        
-        if (!$payable) {
+
+        if (! $payable) {
             return 'Service Payment';
         }
 
         switch ($payment->type) {
             case 'subscription':
                 return $payable->plan_name ?? 'Monthly Subscription';
-            
+
             case 'consultation':
                 return 'Dermatologist Consultation';
-            
+
             default:
                 return 'Service Payment';
         }

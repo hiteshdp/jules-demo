@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/laravel_missing_api_routes_fix_v1.md
 
 namespace App\Http\Controllers\Api;
@@ -6,14 +7,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\HairLossQuizQuestion;
 use App\Models\HairLossQuizResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 /**
  * @OA\Schema(
  *     schema="QuizQuestion",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="question", type="string", example="Do you experience hair loss?"),
  *     @OA\Property(property="type", type="string", enum={"multiple_choice","text","yes_no"}, example="yes_no"),
@@ -21,10 +23,11 @@ use Illuminate\Support\Facades\Validator;
  *     @OA\Property(property="is_active", type="boolean", example=true),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="QuizResponse",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="user_id", type="integer", example=1),
  *     @OA\Property(property="question_id", type="integer", example=1),
@@ -33,22 +36,25 @@ use Illuminate\Support\Facades\Validator;
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z"),
  *     @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="QuizSubmitRequest",
  *     type="object",
  *     required={"responses"},
+ *
  *     @OA\Property(
  *         property="responses",
  *         type="array",
+ *
  *         @OA\Items(
+ *
  *             @OA\Property(property="question_id", type="integer", example=1),
  *             @OA\Property(property="answer", type="string", example="Yes"),
  *             @OA\Property(property="selected_option_id", type="integer", example=1)
  *         )
  *     )
  * )
- * 
+ *
  * @OA\Tag(
  *     name="Quiz",
  *     description="Hair loss quiz endpoints"
@@ -63,10 +69,13 @@ class QuizController extends Controller
      *     description="Get all hair loss quiz questions",
      *     tags={"Quiz"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Quiz questions retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
@@ -75,10 +84,13 @@ class QuizController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated")
      *         )
      *     )
@@ -91,8 +103,8 @@ class QuizController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'questions' => $questions
-            ]
+                'questions' => $questions,
+            ],
         ], 200);
     }
 
@@ -103,14 +115,19 @@ class QuizController extends Controller
      *     description="Submit hair loss quiz responses for analysis",
      *     tags={"Quiz"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"responses"},
+     *
      *             @OA\Property(
      *                 property="responses",
      *                 type="array",
+     *
      *                 @OA\Items(
+     *
      *                     @OA\Property(property="question_id", type="integer", example=1),
      *                     @OA\Property(property="answer", type="string", example="Yes"),
      *                     @OA\Property(property="selected_option_id", type="integer", example=1)
@@ -118,19 +135,25 @@ class QuizController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Quiz responses submitted successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Quiz responses submitted successfully"),
      *             @OA\Property(property="data", type="object")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation errors",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Validation errors"),
      *             @OA\Property(property="errors", type="object")
@@ -153,7 +176,7 @@ class QuizController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -183,8 +206,8 @@ class QuizController extends Controller
                 'total_questions' => $totalQuestions,
                 'risk_factors' => $riskFactors,
                 'recommendations' => $recommendations,
-                'next_steps' => $this->getNextSteps($riskFactors)
-            ]
+                'next_steps' => $this->getNextSteps($riskFactors),
+            ],
         ], 200);
     }
 
@@ -195,10 +218,13 @@ class QuizController extends Controller
      *     description="Get all quiz responses for the authenticated user",
      *     tags={"Quiz"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Quiz responses retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
@@ -221,8 +247,8 @@ class QuizController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'responses' => $responses
-            ]
+                'responses' => $responses,
+            ],
         ], 200);
     }
 
@@ -258,11 +284,11 @@ class QuizController extends Controller
         $recommendations = [];
 
         if (count($riskFactors) > 5) {
-            $recommendations[] = "High risk detected. We recommend consulting with a dermatologist immediately.";
+            $recommendations[] = 'High risk detected. We recommend consulting with a dermatologist immediately.';
         } elseif (count($riskFactors) > 2) {
-            $recommendations[] = "Moderate risk detected. Consider lifestyle changes and monitor your hair health.";
+            $recommendations[] = 'Moderate risk detected. Consider lifestyle changes and monitor your hair health.';
         } else {
-            $recommendations[] = "Low risk detected. Continue maintaining good hair care practices.";
+            $recommendations[] = 'Low risk detected. Continue maintaining good hair care practices.';
         }
 
         return $recommendations;
@@ -276,11 +302,11 @@ class QuizController extends Controller
         $nextSteps = [];
 
         if (count($riskFactors) > 3) {
-            $nextSteps[] = "Schedule a consultation with a dermatologist";
-            $nextSteps[] = "Consider our premium treatment plans";
+            $nextSteps[] = 'Schedule a consultation with a dermatologist';
+            $nextSteps[] = 'Consider our premium treatment plans';
         } else {
-            $nextSteps[] = "Explore our hair care products";
-            $nextSteps[] = "Join our community for tips and support";
+            $nextSteps[] = 'Explore our hair care products';
+            $nextSteps[] = 'Join our community for tips and support';
         }
 
         return $nextSteps;

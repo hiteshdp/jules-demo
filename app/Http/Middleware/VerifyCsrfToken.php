@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/laravel_csrf_api_fix_v1.md
 
 namespace App\Http\Middleware;

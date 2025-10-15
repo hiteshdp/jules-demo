@@ -1,11 +1,12 @@
 <?php
+
 // Generated via prompt: prompts/zoom_meeting_database_v1.md
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\ZoomMeeting;
 use App\Models\Appointment;
+use App\Models\ZoomMeeting;
 use App\Services\ZoomService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class ZoomMeetingController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             $request->validate([
                 'appointment_id' => 'required|exists:appointments,id',
                 'topic' => 'required|string|max:255',
@@ -34,7 +35,7 @@ class ZoomMeetingController extends Controller
 
             // Get appointment details
             $appointment = Appointment::with(['patient', 'dermatologist'])->findOrFail($request->appointment_id);
-            
+
             // Check if user has permission to create meeting for this appointment
             if ($user->role === 'dermatologist' && $appointment->dermatologist_id !== $user->id) {
                 return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
@@ -59,13 +60,13 @@ class ZoomMeetingController extends Controller
                 'appointment_id' => $request->appointment_id,
                 'dermatologist_id' => $appointment->dermatologist_id,
                 'patient_id' => $appointment->patient_id,
-                'status' => 'created'
+                'status' => 'created',
             ]);
 
             Log::info('Zoom meeting created and stored', [
                 'meeting_id' => $meeting['id'],
                 'appointment_id' => $request->appointment_id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
 
             return response()->json([
@@ -80,8 +81,8 @@ class ZoomMeetingController extends Controller
                     'topic' => $meeting['topic'],
                     'start_time' => $meeting['start_time'],
                     'duration' => $meeting['duration'],
-                    'status' => 'created'
-                ]
+                    'status' => 'created',
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Zoom meeting creation failed', [
@@ -91,7 +92,7 @@ class ZoomMeetingController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create Zoom meeting: ' . $e->getMessage(),
+                'message' => 'Failed to create Zoom meeting: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -109,12 +110,12 @@ class ZoomMeetingController extends Controller
 
             $zoomMeeting->update([
                 'status' => 'started',
-                'started_at' => now()
+                'started_at' => now(),
             ]);
 
             Log::info('Zoom meeting started', [
                 'meeting_id' => $zoomMeeting->meeting_id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
 
             return response()->json([
@@ -124,19 +125,19 @@ class ZoomMeetingController extends Controller
                     'status' => 'started',
                     'started_at' => $zoomMeeting->started_at,
                     'join_url' => $zoomMeeting->join_url,
-                    'password' => $zoomMeeting->password
-                ]
+                    'password' => $zoomMeeting->password,
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to start meeting', [
                 'meeting_id' => $id,
                 'user_id' => Auth::id(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to start meeting: ' . $e->getMessage(),
+                'message' => 'Failed to start meeting: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -154,12 +155,12 @@ class ZoomMeetingController extends Controller
 
             $zoomMeeting->update([
                 'status' => 'ended',
-                'ended_at' => now()
+                'ended_at' => now(),
             ]);
 
             Log::info('Zoom meeting ended', [
                 'meeting_id' => $zoomMeeting->meeting_id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]);
 
             return response()->json([
@@ -167,19 +168,19 @@ class ZoomMeetingController extends Controller
                 'message' => 'Meeting ended successfully',
                 'data' => [
                     'status' => 'ended',
-                    'ended_at' => $zoomMeeting->ended_at
-                ]
+                    'ended_at' => $zoomMeeting->ended_at,
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to end meeting', [
                 'meeting_id' => $id,
                 'user_id' => Auth::id(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to end meeting: ' . $e->getMessage(),
+                'message' => 'Failed to end meeting: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -188,9 +189,9 @@ class ZoomMeetingController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             $zoomMeeting = ZoomMeeting::where('appointment_id', $appointmentId)
-                ->where(function($query) use ($user) {
+                ->where(function ($query) use ($user) {
                     if ($user->role === 'dermatologist') {
                         $query->where('dermatologist_id', $user->id);
                     } elseif ($user->role === 'patient') {
@@ -200,13 +201,13 @@ class ZoomMeetingController extends Controller
                 ->latest()
                 ->first();
 
-            if (!$zoomMeeting) {
+            if (! $zoomMeeting) {
                 return response()->json([
                     'success' => true,
                     'data' => [
                         'status' => 'not_created',
-                        'meeting' => null
-                    ]
+                        'meeting' => null,
+                    ],
                 ]);
             }
 
@@ -224,20 +225,20 @@ class ZoomMeetingController extends Controller
                         'start_time' => $zoomMeeting->start_time,
                         'duration' => $zoomMeeting->duration,
                         'started_at' => $zoomMeeting->started_at,
-                        'ended_at' => $zoomMeeting->ended_at
-                    ]
-                ]
+                        'ended_at' => $zoomMeeting->ended_at,
+                    ],
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get meeting status', [
                 'appointment_id' => $appointmentId,
                 'user_id' => Auth::id(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to get meeting status: ' . $e->getMessage(),
+                'message' => 'Failed to get meeting status: '.$e->getMessage(),
             ], 500);
         }
     }

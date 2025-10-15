@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/appointments_fee_breakdown_v1.md
 
 use Illuminate\Database\Migrations\Migration;
@@ -28,5 +29,3 @@ return new class extends Migration
         });
     }
 };
-
-

@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::table('subscriptions', function (Blueprint $table) {
             // Add failure_reason (nullable text)
             $table->text('failure_reason')
-                    ->nullable()
-                    ->after('ends_at')
-                    ->comment('Reason for failed payment if applicable');
+                ->nullable()
+                ->after('ends_at')
+                ->comment('Reason for failed payment if applicable');
 
             // Add payment_response (nullable JSON)
             $table->json('payment_response')
-                    ->nullable()
-                    ->after('failure_reason')
-                    ->comment('Full Razorpay payment response payload');
+                ->nullable()
+                ->after('failure_reason')
+                ->comment('Full Razorpay payment response payload');
         });
     }
 

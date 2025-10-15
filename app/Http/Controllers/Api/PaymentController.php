@@ -1,12 +1,13 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appointment;
 use App\Models\Payment;
 use App\Models\Subscription;
-use App\Models\Appointment;
 use App\Services\PaymentNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -16,6 +17,7 @@ use Razorpay\Api\Errors\SignatureVerificationError;
 class PaymentController extends Controller
 {
     private $razorpay;
+
     private $notificationService;
 
     public function __construct(PaymentNotificationService $notificationService)
@@ -40,7 +42,7 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -50,7 +52,7 @@ class PaymentController extends Controller
         if ($subscription->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized',
             ], 403);
         }
 
@@ -58,11 +60,11 @@ class PaymentController extends Controller
             $order = $this->razorpay->order->create([
                 'amount' => $subscription->price * 100, // Convert to paise
                 'currency' => 'INR',
-                'receipt' => 'sub_' . $subscription->id,
+                'receipt' => 'sub_'.$subscription->id,
                 'notes' => [
                     'subscription_id' => $subscription->id,
                     'user_id' => $user->id,
-                ]
+                ],
             ]);
 
             return response()->json([
@@ -72,12 +74,12 @@ class PaymentController extends Controller
                     'amount' => $subscription->price,
                     'currency' => 'INR',
                     'key_id' => config('services.razorpay.key_id'),
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create order: ' . $e->getMessage()
+                'message' => 'Failed to create order: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -95,7 +97,7 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -105,7 +107,7 @@ class PaymentController extends Controller
         if ($appointment->patient_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized'
+                'message' => 'Unauthorized',
             ], 403);
         }
 
@@ -113,11 +115,11 @@ class PaymentController extends Controller
             $order = $this->razorpay->order->create([
                 'amount' => $appointment->consultation_fee * 100, // Convert to paise
                 'currency' => 'INR',
-                'receipt' => 'appt_' . $appointment->id,
+                'receipt' => 'appt_'.$appointment->id,
                 'notes' => [
                     'appointment_id' => $appointment->id,
                     'user_id' => $user->id,
-                ]
+                ],
             ]);
 
             return response()->json([
@@ -127,12 +129,12 @@ class PaymentController extends Controller
                     'amount' => $appointment->consultation_fee,
                     'currency' => 'INR',
                     'key_id' => config('services.razorpay.key_id'),
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create order: ' . $e->getMessage()
+                'message' => 'Failed to create order: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -153,7 +155,7 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -216,18 +218,18 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Payment verified successfully',
-                'data' => $payment
+                'data' => $payment,
             ]);
 
         } catch (SignatureVerificationError $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Payment verification failed: Invalid signature'
+                'message' => 'Payment verification failed: Invalid signature',
             ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Payment verification failed: ' . $e->getMessage()
+                'message' => 'Payment verification failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -244,7 +246,7 @@ class PaymentController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $payments
+            'data' => $payments,
         ]);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/zoom_meeting_database_v1.md
 
 use Illuminate\Database\Migrations\Migration;

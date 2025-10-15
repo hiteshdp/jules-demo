@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/laravel_skeleton_generation_v1.md
 
 namespace Database\Factories;

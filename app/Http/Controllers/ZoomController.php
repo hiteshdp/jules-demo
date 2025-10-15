@@ -1,10 +1,11 @@
 <?php
+
 // Generated via prompt: prompts/zoom_video_call_integration_v1.md
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\ZoomService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -14,7 +15,7 @@ class ZoomController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             // Validate required fields
             $req->validate([
                 'topic' => 'required|string|max:255',
@@ -25,7 +26,7 @@ class ZoomController extends Controller
             $meeting = $zoom->createMeeting(
                 $req->input('topic', 'Consultation'),
                 $req->input('start_time', now()->addMinutes(5)->toIso8601String()),
-                (int)$req->input('duration', 30)
+                (int) $req->input('duration', 30)
             );
 
             // Log meeting creation for audit
@@ -40,14 +41,14 @@ class ZoomController extends Controller
                 'success' => true,
                 'message' => 'Zoom meeting created successfully',
                 'data' => [
-                    'id'        => $meeting['id'],
-                    'join_url'  => $meeting['join_url'],
+                    'id' => $meeting['id'],
+                    'join_url' => $meeting['join_url'],
                     'start_url' => $meeting['start_url'],
-                    'password'  => $meeting['password'] ?? null,
-                    'topic'     => $meeting['topic'],
+                    'password' => $meeting['password'] ?? null,
+                    'topic' => $meeting['topic'],
                     'start_time' => $meeting['start_time'],
-                    'duration'  => $meeting['duration'],
-                ]
+                    'duration' => $meeting['duration'],
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Zoom meeting creation failed', [
@@ -57,7 +58,7 @@ class ZoomController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create Zoom meeting: ' . $e->getMessage(),
+                'message' => 'Failed to create Zoom meeting: '.$e->getMessage(),
             ], 500);
         }
     }

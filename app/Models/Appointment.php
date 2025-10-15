@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Models;
@@ -53,12 +54,13 @@ class Appointment extends Model
     {
         if (empty($value)) {
             $this->attributes['zoom_link'] = null;
+
             return;
         }
 
         $link = trim($value);
-        if (!preg_match('/^https?:\/\//i', $link)) {
-            $link = 'https://' . $link;
+        if (! preg_match('/^https?:\/\//i', $link)) {
+            $link = 'https://'.$link;
         }
         $this->attributes['zoom_link'] = $link;
     }

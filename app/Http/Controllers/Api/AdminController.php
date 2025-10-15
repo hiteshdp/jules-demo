@@ -1,31 +1,31 @@
 <?php
+
 // Generated via prompt: prompts/laravel_swagger_documentation_v1.md
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\PatientProfile;
-use App\Models\Dermatologist;
+use App\Models\AdminSetting;
 use App\Models\Appointment;
+use App\Models\Dermatologist;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Subscription;
-use App\Models\Payment;
-use App\Models\AdminSetting;
-use App\Models\ChatMessage;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * @OA\Tag(
  *     name="Admin",
  *     description="Admin panel endpoints"
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="DashboardStats",
  *     type="object",
+ *
  *     @OA\Property(property="total_patients", type="integer", example=150, description="Total number of patients"),
  *     @OA\Property(property="total_dermatologists", type="integer", example=25, description="Total number of dermatologists"),
  *     @OA\Property(property="total_appointments", type="integer", example=500, description="Total number of appointments"),
@@ -33,18 +33,20 @@ use Illuminate\Support\Facades\DB;
  *     @OA\Property(property="pending_appointments", type="integer", example=15, description="Number of scheduled appointments"),
  *     @OA\Property(property="active_subscriptions", type="integer", example=120, description="Number of active subscriptions")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="MonthlyTrend",
  *     type="object",
+ *
  *     @OA\Property(property="month", type="string", example="2024-01", description="Month in YYYY-MM format"),
  *     @OA\Property(property="count", type="integer", example=45, description="Number of appointments for the month"),
  *     @OA\Property(property="total", type="number", format="float", example=5000.00, description="Total revenue for the month")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="DashboardResponse",
  *     type="object",
+ *
  *     @OA\Property(property="success", type="boolean", example=true),
  *     @OA\Property(
  *         property="data",
@@ -53,12 +55,15 @@ use Illuminate\Support\Facades\DB;
  *         @OA\Property(
  *             property="monthly_appointments",
  *             type="array",
+ *
  *             @OA\Items(ref="#/components/schemas/MonthlyTrend"),
  *             description="Monthly appointment trends for the last 12 months"
  *         ),
+ *
  *         @OA\Property(
  *             property="monthly_revenue",
  *             type="array",
+ *
  *             @OA\Items(ref="#/components/schemas/MonthlyTrend"),
  *             description="Monthly revenue trends for the last 12 months"
  *         )
@@ -74,23 +79,31 @@ class AdminController extends Controller
      *     description="Retrieve comprehensive dashboard statistics including patient counts, revenue, appointments, and monthly trends for the last 12 months",
      *     tags={"Admin"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Dashboard statistics retrieved successfully",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/DashboardResponse")
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized - Bearer token required",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Unauthenticated")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Internal server error")
      *         )
@@ -135,7 +148,7 @@ class AdminController extends Controller
                 'stats' => $stats,
                 'monthly_appointments' => $monthlyAppointments,
                 'monthly_revenue' => $monthlyRevenue,
-            ]
+            ],
         ]);
     }
 
@@ -151,7 +164,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $patients
+            'data' => $patients,
         ]);
     }
 
@@ -166,7 +179,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $patient
+            'data' => $patient,
         ]);
     }
 
@@ -183,7 +196,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -193,7 +206,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Patient status updated successfully',
-            'data' => $patient
+            'data' => $patient,
         ]);
     }
 
@@ -209,7 +222,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $dermatologists
+            'data' => $dermatologists,
         ]);
     }
 
@@ -234,7 +247,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -260,7 +273,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Dermatologist created successfully',
-            'data' => $user
+            'data' => $user,
         ], 201);
     }
 
@@ -273,7 +286,7 @@ class AdminController extends Controller
             'patient',
             'dermatologist.user',
             'chatMessages',
-            'payments'
+            'payments',
         ]);
 
         // Apply filters
@@ -301,7 +314,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $appointments
+            'data' => $appointments,
         ]);
     }
 
@@ -314,17 +327,17 @@ class AdminController extends Controller
             'patient.patientProfile',
             'dermatologist.user',
             'chatMessages',
-            'payments'
+            'payments',
         ])->findOrFail($id);
 
         // Ensure zoom_link is absolute for frontend safety
-        if (!empty($appointment->zoom_link) && !preg_match('/^https?:\/\//i', $appointment->zoom_link)) {
-            $appointment->zoom_link = 'https://' . $appointment->zoom_link;
+        if (! empty($appointment->zoom_link) && ! preg_match('/^https?:\/\//i', $appointment->zoom_link)) {
+            $appointment->zoom_link = 'https://'.$appointment->zoom_link;
         }
 
         return response()->json([
             'success' => true,
-            'data' => $appointment
+            'data' => $appointment,
         ]);
     }
 
@@ -341,7 +354,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $chatMessages
+            'data' => $chatMessages,
         ]);
     }
 
@@ -356,13 +369,13 @@ class AdminController extends Controller
                 return [
                     'id' => $dermatologist->user_id,
                     'name' => $dermatologist->user->name,
-                    'specialization' => $dermatologist->specialization
+                    'specialization' => $dermatologist->specialization,
                 ];
             });
 
         return response()->json([
             'success' => true,
-            'data' => $dermatologists
+            'data' => $dermatologists,
         ]);
     }
 
@@ -377,16 +390,15 @@ class AdminController extends Controller
                 return [
                     'id' => $patient->id,
                     'name' => $patient->name,
-                    'email' => $patient->email
+                    'email' => $patient->email,
                 ];
             });
 
         return response()->json([
             'success' => true,
-            'data' => $patients
+            'data' => $patients,
         ]);
     }
-
 
     /**
      * Update an appointment's payment status (admin only)
@@ -434,7 +446,6 @@ class AdminController extends Controller
         ]);
     }
 
-
     /**
      * Get all products
      */
@@ -444,7 +455,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => $products,
         ]);
     }
 
@@ -465,7 +476,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -474,7 +485,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Product created successfully',
-            'data' => $product
+            'data' => $product,
         ], 201);
     }
 
@@ -496,7 +507,7 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation errors',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -506,7 +517,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Product updated successfully',
-            'data' => $product
+            'data' => $product,
         ]);
     }
 
@@ -519,7 +530,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $product
+            'data' => $product,
         ]);
     }
 
@@ -533,7 +544,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Product deleted successfully'
+            'message' => 'Product deleted successfully',
         ]);
     }
 
@@ -548,7 +559,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $subscriptions
+            'data' => $subscriptions,
         ]);
     }
 
@@ -563,7 +574,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $payments
+            'data' => $payments,
         ]);
     }
 
@@ -573,10 +584,13 @@ class AdminController extends Controller
      *     summary="Get admin settings",
      *     tags={"Admin Settings"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Settings retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
@@ -608,6 +622,7 @@ class AdminController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="Unauthenticated", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
      * )
@@ -631,7 +646,7 @@ class AdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $flat
+            'data' => $flat,
         ]);
     }
 
@@ -641,13 +656,18 @@ class AdminController extends Controller
      *     summary="Update admin settings",
      *     tags={"Admin Settings"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(
      *                 property="settings",
      *                 type="array",
+     *
      *                 @OA\Items(
+     *
      *                     @OA\Property(property="key", type="string", example="platform_commission_percentage"),
      *                     @OA\Property(property="value", type="string", example="15"),
      *                     @OA\Property(property="type", type="string", example="number", enum={"string","number","boolean","json"})
@@ -672,18 +692,24 @@ class AdminController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Settings updated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Settings updated successfully")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Validation errors"),
      *             @OA\Property(
@@ -692,16 +718,20 @@ class AdminController extends Controller
      *                 @OA\Property(
      *                     property="settings",
      *                     type="array",
+     *
      *                     @OA\Items(type="string", example="The settings field is required.")
      *                 ),
+     *
      *                 @OA\Property(
      *                     property="settings.0.key",
      *                     type="array",
+     *
      *                     @OA\Items(type="string", example="The settings.0.key field is required.")
      *                 )
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=401, description="Unauthenticated", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
      * )
@@ -720,7 +750,7 @@ class AdminController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Validation errors',
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -734,13 +764,13 @@ class AdminController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Settings updated successfully'
+                'message' => 'Settings updated successfully',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update settings',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

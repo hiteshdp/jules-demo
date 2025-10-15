@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/payment_email_notifications_v1.md
 
 namespace App\Mail;
@@ -17,8 +18,11 @@ class PaymentSuccessMail extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public Payment $payment;
+
     public User $user;
+
     public string $paymentType;
+
     public string $itemName;
 
     /**

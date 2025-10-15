@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/payment_email_notifications_v1.md
 
 namespace App\Mail;
@@ -6,7 +7,6 @@ namespace App\Mail;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -17,8 +17,11 @@ class AdminPaymentNotificationMail extends Mailable
     use Queueable, SerializesModels;
 
     public Payment $payment;
+
     public User $user;
+
     public string $paymentType;
+
     public string $itemName;
 
     /**

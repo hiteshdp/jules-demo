@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 use Illuminate\Database\Migrations\Migration;
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->text('answer');
             $table->integer('selected_option_id')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['user_id', 'question_id']);
         });
     }

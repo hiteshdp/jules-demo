@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Http\Middleware;
@@ -16,10 +17,10 @@ class EnsureEmailIsVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->hasVerifiedEmail()) {
+        if (! $request->user() || ! $request->user()->hasVerifiedEmail()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email verification required'
+                'message' => 'Email verification required',
             ], 403);
         }
 

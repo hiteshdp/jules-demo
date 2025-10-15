@@ -1,15 +1,13 @@
 <?php
+
 // Generated via prompt: prompts/admin_subscription_management_v1.md
 
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Subscription;
 use App\Models\Payment;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+use App\Models\Subscription;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -27,12 +25,15 @@ class AdminSubscriptionController extends Controller
      *   tags={"Admin Subscription Management"},
      *   security={{"sanctum": {}}},
      *   summary="Get all subscriptions with filters",
+     *
      *   @OA\Parameter(
      *     name="status",
      *     in="query",
      *     description="Filter by subscription status",
+     *
      *     @OA\Schema(type="string", enum={"active", "cancelled", "expired", "pending"})
      *   ),
+     *
      *   @OA\Parameter(
      *     name="patient_name",
      *     in="query",
@@ -52,12 +53,16 @@ class AdminSubscriptionController extends Controller
      *     name="per_page",
      *     in="query",
      *     description="Items per page",
+     *
      *     @OA\Schema(type="integer", default=15)
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Subscriptions retrieved successfully",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="data", type="object",
      *         @OA\Property(property="subscriptions", type="array", @OA\Items(type="object")),
@@ -83,7 +88,7 @@ class AdminSubscriptionController extends Controller
         }
 
         if ($request->filled('patient_name')) {
-            $query->where('users.name', 'like', '%' . $request->patient_name . '%');
+            $query->where('users.name', 'like', '%'.$request->patient_name.'%');
         }
 
         if ($request->filled('date_from')) {
@@ -93,7 +98,6 @@ class AdminSubscriptionController extends Controller
         if ($request->filled('date_to')) {
             $query->whereDate('subscriptions.created_at', '<=', $request->date_to);
         }
-
 
         $perPage = $request->get('per_page', 15);
         $subscriptions = $query->orderBy('subscriptions.created_at', 'desc')
@@ -111,7 +115,7 @@ class AdminSubscriptionController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $subscriptions
+            'data' => $subscriptions,
         ]);
     }
 
@@ -123,12 +127,14 @@ class AdminSubscriptionController extends Controller
      *   tags={"Admin Subscription Management"},
      *   security={{"sanctum": {}}},
      *   summary="Get subscription details",
+     *
      *   @OA\Parameter(
      *     name="id",
      *     in="path",
      *     required=true,
      *     description="Subscription ID"
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Subscription details retrieved successfully"
@@ -145,10 +151,10 @@ class AdminSubscriptionController extends Controller
             $query->orderBy('created_at', 'desc');
         }])->find($id);
 
-        if (!$subscription) {
+        if (! $subscription) {
             return response()->json([
                 'success' => false,
-                'message' => 'Subscription not found'
+                'message' => 'Subscription not found',
             ], 404);
         }
 
@@ -159,11 +165,9 @@ class AdminSubscriptionController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $subscription
+            'data' => $subscription,
         ]);
     }
-
-
 
     /**
      * Get subscription statistics
@@ -173,6 +177,7 @@ class AdminSubscriptionController extends Controller
      *   tags={"Admin Subscription Management"},
      *   security={{"sanctum": {}}},
      *   summary="Get subscription statistics",
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Statistics retrieved successfully"
@@ -199,7 +204,7 @@ class AdminSubscriptionController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stats
+            'data' => $stats,
         ]);
     }
 }

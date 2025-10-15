@@ -1,5 +1,4 @@
 <?php
-// Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace Database\Seeders;
 
@@ -101,7 +100,7 @@ class AdminSettingSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            AdminSetting::create($setting);
+            AdminSetting::updateOrCreate(['key' => $setting['key']], $setting);
         }
     }
 }

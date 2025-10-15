@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/laravel_swagger_documentation_v1.md
 
 namespace App\Http\Controllers;

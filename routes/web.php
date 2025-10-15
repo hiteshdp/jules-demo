@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/laravel_skeleton_generation_v1.md
 
 use Illuminate\Support\Facades\Route;
@@ -30,7 +31,7 @@ Route::get('/test-zoom', function () {
 
         // Create a test meeting
         $meeting = $zoomService->createMeeting(
-            'Test Consultation - ' . now()->format('d/m/Y H:i:s'),
+            'Test Consultation - '.now()->format('d/m/Y H:i:s'),
             now()->addMinutes(5)->toIso8601String(),
             30
         );
@@ -45,14 +46,14 @@ Route::get('/test-zoom', function () {
                 'start_url' => $meeting['start_url'],
                 'password' => $meeting['password'] ?? 'No password required',
                 'start_time' => $meeting['start_time'],
-                'duration' => $meeting['duration']
+                'duration' => $meeting['duration'],
             ],
             'instructions' => [
                 '1. Click the join_url to join the meeting',
                 '2. Use start_url if you are the host',
                 '3. Meeting will start in 5 minutes',
-                '4. Duration: 30 minutes'
-            ]
+                '4. Duration: 30 minutes',
+            ],
         ]);
     } catch (\Exception $e) {
         return response()->json([
@@ -62,8 +63,8 @@ Route::get('/test-zoom', function () {
             'troubleshooting' => [
                 '1. Check your .env file for ZOOM_CLIENT_ID, ZOOM_CLIENT_SECRET, and ZOOM_ACCOUNT_ID',
                 '2. Ensure your Zoom app has the necessary permissions',
-                '3. Check the Laravel logs for detailed error information'
-            ]
+                '3. Check the Laravel logs for detailed error information',
+            ],
         ], 500);
     }
 });

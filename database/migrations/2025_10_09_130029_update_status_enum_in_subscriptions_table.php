@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Update ENUM field to include 'failed'
-        DB::statement("ALTER TABLE subscriptions 
-            MODIFY COLUMN status 
-            ENUM('active', 'cancelled', 'pending', 'failed') 
-            CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending'");
+        Schema::table('subscriptions', function (Blueprint $table) {
+            $table->string('status')->default('pending')->change();
+        });
     }
 
     /**
@@ -24,11 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            // Revert to previous ENUM values
-            DB::statement("ALTER TABLE subscriptions 
-            MODIFY COLUMN status 
-            ENUM('active', 'cancelled', 'expired', 'pending') 
-            CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending'");
+            $table->string('status')->default('pending')->change();
         });
     }
 };

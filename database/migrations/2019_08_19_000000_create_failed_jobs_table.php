@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/laravel_migrations_fix_v1.md
 
 use Illuminate\Database\Migrations\Migration;

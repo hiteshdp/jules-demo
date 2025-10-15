@@ -1,15 +1,16 @@
 <?php
+
 // Generated via prompt: prompts/appointment_payment_integration_v1.md
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Appointment;
+use App\Http\Controllers\Controller;
 use App\Models\AdminSetting;
-use Illuminate\Http\Request;
+use App\Models\Appointment;
+use App\Models\AppointmentPayment;
 use App\Models\Dermatologist;
 use App\Services\RazorpayService;
-use App\Models\AppointmentPayment;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -20,9 +21,7 @@ use Illuminate\Support\Facades\Auth;
  */
 class AppointmentPaymentController extends Controller
 {
-    public function __construct(private RazorpayService $razorpay)
-    {
-    }
+    public function __construct(private RazorpayService $razorpay) {}
 
     /**
      * Create Razorpay order for appointment payment
@@ -32,18 +31,24 @@ class AppointmentPaymentController extends Controller
      *   tags={"Appointment Payment"},
      *   security={{"sanctum": {}}},
      *   summary="Create payment order for appointment",
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"dermatologist_id","scheduled_at"},
+     *
      *       @OA\Property(property="dermatologist_id", type="integer", example=1),
      *       @OA\Property(property="scheduled_at", type="string", format="date-time", example="2025-10-15T10:00:00Z")
      *     )
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Payment order created",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="message", type="string", example="Payment order created"),
      *       @OA\Property(
@@ -62,7 +67,7 @@ class AppointmentPaymentController extends Controller
     public function createPayment(Request $request)
     {
         $user = Auth::user();
-        
+
         $request->validate([
             'dermatologist_id' => 'required|exists:dermatologists,user_id',
             'scheduled_at' => 'required|date|after:now',
@@ -71,18 +76,17 @@ class AppointmentPaymentController extends Controller
         try {
             // Get dermatologist details
             $dermatologist = Dermatologist::where('user_id', $request->dermatologist_id)->first();
-            if (!$dermatologist) {
+            if (! $dermatologist) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dermatologist not found'
+                    'message' => 'Dermatologist not found',
                 ], 404);
             }
 
-            
             // Create Razorpay order first (without creating appointment)
             $amount = $dermatologist->consultation_fee * 100; // Convert to paise
             $order = $this->razorpay->createOrder($amount, 'INR', [
-                'receipt' => 'appointment_pending_' . time(),
+                'receipt' => 'appointment_pending_'.time(),
                 'notes' => [
                     'patient_id' => $user->id,
                     'dermatologist_id' => $request->dermatologist_id,
@@ -90,7 +94,7 @@ class AppointmentPaymentController extends Controller
                     'consultation_fee' => $dermatologist->consultation_fee,
                 ],
                 // Restrict payment methods to only cards
-                'method' => 'card'
+                'method' => 'card',
             ]);
 
             // Create payment record (without appointment_id)
@@ -131,20 +135,26 @@ class AppointmentPaymentController extends Controller
      *   tags={"Appointment Payment"},
      *   security={{"sanctum": {}}},
      *   summary="Verify appointment payment",
+     *
      *   @OA\RequestBody(
      *     required=true,
+     *
      *     @OA\JsonContent(
      *       required={"razorpay_payment_id","razorpay_order_id","razorpay_signature","payment_id"},
+     *
      *       @OA\Property(property="razorpay_payment_id", type="string", example="pay_29QQoUBi66xm2f"),
      *       @OA\Property(property="razorpay_order_id", type="string", example="order_00000000000001"),
      *       @OA\Property(property="razorpay_signature", type="string", example="generated_signature_here"),
      *       @OA\Property(property="payment_id", type="integer", example=1)
      *     )
      *   ),
+     *
      *   @OA\Response(
      *     response=200,
      *     description="Payment verified and appointment created",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=true),
      *       @OA\Property(property="message", type="string", example="Payment verified and appointment created"),
      *       @OA\Property(
@@ -154,10 +164,13 @@ class AppointmentPaymentController extends Controller
      *       )
      *     )
      *   ),
+     *
      *   @OA\Response(
      *     response=422,
      *     description="Invalid signature",
+     *
      *     @OA\JsonContent(
+     *
      *       @OA\Property(property="success", type="boolean", example=false),
      *       @OA\Property(property="message", type="string", example="Invalid signature")
      *     )
@@ -180,7 +193,7 @@ class AppointmentPaymentController extends Controller
 
         $isValid = $this->razorpay->verifyPaymentSignature($attributes);
 
-        if (!$isValid) {
+        if (! $isValid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid signature',
@@ -191,7 +204,7 @@ class AppointmentPaymentController extends Controller
             // Get payment record
             $appointmentPayment = AppointmentPayment::where('razorpay_order_id', $request->razorpay_order_id)->first();
 
-            if (!$appointmentPayment) {
+            if (! $appointmentPayment) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Payment record not found',
@@ -202,16 +215,16 @@ class AppointmentPaymentController extends Controller
             $order = $this->razorpay->getOrder($request->razorpay_order_id);
             $notes = $order['notes'] ?? [];
 
-			// Determine platform commission percentage (create default if missing)
-			$platformCommissionPercentage = AdminSetting::getValue('platform_commission_percentage');
-			if ($platformCommissionPercentage === null) {
-				AdminSetting::setValue('platform_commission_percentage', '0', 'number', 'Platform commission percentage for consultations');
-				$platformCommissionPercentage = 0;
-			}
-	
-			$consultationFee = (float) $appointmentPayment->amount;
-			$platformFeeAmount = round($consultationFee * ((float)$platformCommissionPercentage / 100), 2);
-			$dermatologistFeeAmount = round($consultationFee - $platformFeeAmount, 2);
+            // Determine platform commission percentage (create default if missing)
+            $platformCommissionPercentage = AdminSetting::getValue('platform_commission_percentage');
+            if ($platformCommissionPercentage === null) {
+                AdminSetting::setValue('platform_commission_percentage', '0', 'number', 'Platform commission percentage for consultations');
+                $platformCommissionPercentage = 0;
+            }
+
+            $consultationFee = (float) $appointmentPayment->amount;
+            $platformFeeAmount = round($consultationFee * ((float) $platformCommissionPercentage / 100), 2);
+            $dermatologistFeeAmount = round($consultationFee - $platformFeeAmount, 2);
 
             // Create appointment after successful payment
             $appointment = Appointment::create([
@@ -243,7 +256,7 @@ class AppointmentPaymentController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to verify payment: ' . $e->getMessage(),
+                'message' => 'Failed to verify payment: '.$e->getMessage(),
             ], 400);
         }
     }

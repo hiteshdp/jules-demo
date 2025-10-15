@@ -1,11 +1,11 @@
 <?php
+
 // Generated via prompt: prompts/dermatologist_seeder_v1.md
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\DermatologistProfile;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DermatologistSeeder extends Seeder

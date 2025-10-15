@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Http\Controllers\Api;
@@ -17,7 +18,7 @@ class RecommendationController extends Controller
     public function getRecommendations(Request $request)
     {
         $user = $request->user();
-        
+
         // Get user's quiz responses
         $responses = HairLossQuizResponse::with('question')
             ->where('user_id', $user->id)
@@ -27,7 +28,7 @@ class RecommendationController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [],
-                'message' => 'Please complete the hair loss quiz to get personalized recommendations'
+                'message' => 'Please complete the hair loss quiz to get personalized recommendations',
             ]);
         }
 
@@ -36,7 +37,7 @@ class RecommendationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $recommendations
+            'data' => $recommendations,
         ]);
     }
 
@@ -57,7 +58,7 @@ class RecommendationController extends Controller
                 'description' => 'Based on your responses, we recommend a concentrated hair growth serum with minoxidil.',
                 'priority' => 'high',
                 'category' => 'treatment',
-                'reason' => 'High hair loss severity detected'
+                'reason' => 'High hair loss severity detected',
             ];
         }
 
@@ -68,7 +69,7 @@ class RecommendationController extends Controller
                 'description' => 'A sulfate-free shampoo specifically formulated for hair loss prevention.',
                 'priority' => 'high',
                 'category' => 'shampoo',
-                'reason' => 'Moderate to high hair loss severity'
+                'reason' => 'Moderate to high hair loss severity',
             ];
         }
 
@@ -79,7 +80,7 @@ class RecommendationController extends Controller
                 'title' => 'Stress Management',
                 'description' => 'High stress levels can contribute to hair loss. Consider stress reduction techniques.',
                 'priority' => 'high',
-                'reason' => 'High stress level detected'
+                'reason' => 'High stress level detected',
             ];
         }
 
@@ -89,7 +90,7 @@ class RecommendationController extends Controller
                 'title' => 'Improve Sleep Pattern',
                 'description' => 'Getting 7-8 hours of quality sleep can help reduce hair loss.',
                 'priority' => 'medium',
-                'reason' => 'Insufficient sleep detected'
+                'reason' => 'Insufficient sleep detected',
             ];
         }
 
@@ -99,7 +100,7 @@ class RecommendationController extends Controller
                 'title' => 'Improve Diet',
                 'description' => 'A balanced diet rich in vitamins and minerals supports healthy hair growth.',
                 'priority' => 'medium',
-                'reason' => 'Poor diet quality detected'
+                'reason' => 'Poor diet quality detected',
             ];
         }
 
@@ -111,7 +112,7 @@ class RecommendationController extends Controller
                 'title' => 'Genetic Hair Loss Consultation',
                 'description' => 'Family history of hair loss detected. Consider early intervention with a dermatologist.',
                 'priority' => 'high',
-                'reason' => 'Family history of hair loss'
+                'reason' => 'Family history of hair loss',
             ];
         }
 
@@ -122,7 +123,7 @@ class RecommendationController extends Controller
             'description' => 'Biotin supplements can support healthy hair growth from within.',
             'priority' => 'medium',
             'category' => 'supplement',
-            'reason' => 'General hair health support'
+            'reason' => 'General hair health support',
         ];
 
         $recommendations[] = [
@@ -130,7 +131,7 @@ class RecommendationController extends Controller
             'title' => 'Professional Consultation',
             'description' => 'Book a consultation with our dermatologist for personalized treatment plan.',
             'priority' => 'high',
-            'reason' => 'Professional assessment recommended'
+            'reason' => 'Professional assessment recommended',
         ];
 
         return $recommendations;
@@ -142,10 +143,10 @@ class RecommendationController extends Controller
     private function assessHairLossSeverity($responses)
     {
         $severity = 0;
-        
+
         foreach ($responses as $response) {
             $question = $response->question;
-            
+
             if (strpos($question->question, 'hair loss') !== false) {
                 if (strpos($response->answer, 'More than 2 years') !== false) {
                     $severity += 3;
@@ -155,7 +156,7 @@ class RecommendationController extends Controller
                     $severity += 1;
                 }
             }
-            
+
             if (strpos($question->question, 'lose daily') !== false) {
                 if (strpos($response->answer, 'More than 150') !== false) {
                     $severity += 3;
@@ -166,7 +167,7 @@ class RecommendationController extends Controller
                 }
             }
         }
-        
+
         return min($severity, 10);
     }
 
@@ -180,14 +181,14 @@ class RecommendationController extends Controller
             'sleep_hours' => 7,
             'diet_quality' => 3,
         ];
-        
+
         foreach ($responses as $response) {
             $question = $response->question;
-            
+
             if (strpos($question->question, 'stress level') !== false) {
                 $factors['stress_level'] = (int) $response->answer;
             }
-            
+
             if (strpos($question->question, 'sleep') !== false) {
                 if (strpos($response->answer, 'Less than 5') !== false) {
                     $factors['sleep_hours'] = 4;
@@ -201,7 +202,7 @@ class RecommendationController extends Controller
                     $factors['sleep_hours'] = 9;
                 }
             }
-            
+
             if (strpos($question->question, 'diet') !== false) {
                 if (strpos($response->answer, 'Very healthy') !== false) {
                     $factors['diet_quality'] = 5;
@@ -216,7 +217,7 @@ class RecommendationController extends Controller
                 }
             }
         }
-        
+
         return $factors;
     }
 
@@ -227,12 +228,12 @@ class RecommendationController extends Controller
     {
         foreach ($responses as $response) {
             $question = $response->question;
-            
+
             if (strpos($question->question, 'family history') !== false) {
                 return strpos($response->answer, 'Yes') !== false;
             }
         }
-        
+
         return false;
     }
 
@@ -242,7 +243,7 @@ class RecommendationController extends Controller
     public function getAIRecommendations(Request $request)
     {
         $user = $request->user();
-        
+
         // Get user's quiz responses
         $responses = HairLossQuizResponse::with('question')
             ->where('user_id', $user->id)
@@ -251,7 +252,7 @@ class RecommendationController extends Controller
         if ($responses->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Please complete the hair loss quiz first'
+                'message' => 'Please complete the hair loss quiz first',
             ], 400);
         }
 
@@ -260,19 +261,19 @@ class RecommendationController extends Controller
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . config('services.openai.api_key'),
+                'Authorization' => 'Bearer '.config('services.openai.api_key'),
                 'Content-Type' => 'application/json',
             ])->post('https://api.openai.com/v1/chat/completions', [
                 'model' => 'gpt-3.5-turbo',
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'You are a hair loss specialist. Analyze the patient\'s responses and provide personalized recommendations for hair loss treatment and prevention. Focus on practical, actionable advice.'
+                        'content' => 'You are a hair loss specialist. Analyze the patient\'s responses and provide personalized recommendations for hair loss treatment and prevention. Focus on practical, actionable advice.',
                     ],
                     [
                         'role' => 'user',
-                        'content' => $context
-                    ]
+                        'content' => $context,
+                    ],
                 ],
                 'max_tokens' => 1000,
                 'temperature' => 0.7,
@@ -287,8 +288,8 @@ class RecommendationController extends Controller
                     'data' => [
                         'type' => 'ai_recommendations',
                         'content' => $recommendations,
-                        'generated_at' => now()
-                    ]
+                        'generated_at' => now(),
+                    ],
                 ]);
             }
 
@@ -299,7 +300,7 @@ class RecommendationController extends Controller
 
         return response()->json([
             'success' => false,
-            'message' => 'Failed to generate AI recommendations'
+            'message' => 'Failed to generate AI recommendations',
         ], 500);
     }
 
@@ -309,14 +310,14 @@ class RecommendationController extends Controller
     private function prepareContextForAI($responses)
     {
         $context = "Patient Hair Loss Assessment:\n\n";
-        
+
         foreach ($responses as $response) {
-            $context .= "Q: " . $response->question->question . "\n";
-            $context .= "A: " . $response->answer . "\n\n";
+            $context .= 'Q: '.$response->question->question."\n";
+            $context .= 'A: '.$response->answer."\n\n";
         }
-        
-        $context .= "Please provide personalized recommendations for hair loss treatment and prevention based on these responses.";
-        
+
+        $context .= 'Please provide personalized recommendations for hair loss treatment and prevention based on these responses.';
+
         return $context;
     }
 }

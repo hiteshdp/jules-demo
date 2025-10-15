@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/zoom_meeting_database_v1.md
 
 namespace App\Models;
@@ -23,13 +24,13 @@ class ZoomMeeting extends Model
         'patient_id',
         'status',
         'started_at',
-        'ended_at'
+        'ended_at',
     ];
 
     protected $casts = [
         'start_time' => 'datetime',
         'started_at' => 'datetime',
-        'ended_at' => 'datetime'
+        'ended_at' => 'datetime',
     ];
 
     public function appointment()

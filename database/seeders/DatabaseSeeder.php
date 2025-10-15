@@ -1,13 +1,10 @@
 <?php
+
 // Generated via prompt: prompts/laravel_skeleton_generation_v1.md
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\UserSeeder;
-use Database\Seeders\ProductSeeder;
-use Database\Seeders\AdminSettingSeeder;
-use Database\Seeders\HairLossQuizQuestionSeeder;
 
 class DatabaseSeeder extends Seeder
 {

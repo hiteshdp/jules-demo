@@ -1,4 +1,5 @@
 <?php
+
 // Generated via prompt: prompts/admin_dermatologists_crud_v1.md
 
 namespace App\Http\Controllers\Api;
@@ -14,6 +15,7 @@ use Illuminate\Validation\Rule;
  * @OA\Schema(
  *     schema="Dermatologist",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
  *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
@@ -24,11 +26,12 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="subscription_status", type="string", example="-"),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T00:00:00Z")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="DermatologistCreateRequest",
  *     type="object",
  *     required={"name","email","phone_no","password","license_number","specialization","years_of_experience","qualifications","consultation_fee"},
+ *
  *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
  *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
  *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
@@ -42,10 +45,11 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="consultation_fee", type="number", format="float", example=150.00),
  *     @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatments")
  * )
- * 
+ *
  * @OA\Schema(
  *     schema="DermatologistUpdateRequest",
  *     type="object",
+ *
  *     @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
  *     @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
  *     @OA\Property(property="phone_no", type="string", example="+1234567890"),
@@ -60,7 +64,7 @@ use Illuminate\Validation\Rule;
  *     @OA\Property(property="consultation_fee", type="number", format="float", example=150.00),
  *     @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatments")
  * )
- * 
+ *
  * @OA\Tag(
  *     name="Dermatologists",
  *     description="Dermatologist management endpoints (Admin)"
@@ -74,13 +78,17 @@ class DermatologistController extends Controller
      *     summary="List dermatologists",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", example=1)),
      *     @OA\Parameter(name="per_page", in="query", @OA\Schema(type="integer", example=15)),
      *     @OA\Parameter(name="search", in="query", @OA\Schema(type="string", example="john")),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Dermatologists retrieved",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Dermatologists retrieved successfully"),
      *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Dermatologist")),
@@ -90,13 +98,14 @@ class DermatologistController extends Controller
      *             @OA\Property(property="total", type="integer", example=75)
      *         )
      *     ),
+     *
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
      * )
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            $perPage = (int)($request->query('per_page', 15));
+            $perPage = (int) ($request->query('per_page', 15));
             $query = User::where('role', 'dermatologist')
                 ->select([
                     'id',
@@ -106,11 +115,11 @@ class DermatologistController extends Controller
                     'date_of_birth as dob',
                     'gender',
                     'is_active',
-                    'created_at'
+                    'created_at',
                 ])
                 ->orderBy('created_at', 'desc');
 
-            if ($search = trim((string)$request->query('search', ''))) {
+            if ($search = trim((string) $request->query('search', ''))) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
@@ -130,10 +139,11 @@ class DermatologistController extends Controller
                         'years_of_experience',
                         'qualifications',
                         'consultation_fee',
-                        'bio'
+                        'bio',
                     ])->first();
 
                 $dermatologist->profile = $profile;
+
                 return $dermatologist;
             });
 
@@ -150,7 +160,7 @@ class DermatologistController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve dermatologists',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -161,7 +171,9 @@ class DermatologistController extends Controller
      *     summary="Create dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/DermatologistCreateRequest")),
+     *
      *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/Dermatologist")),
      *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
@@ -230,13 +242,13 @@ class DermatologistController extends Controller
                     'is_active' => $user->is_active,
                     'subscription_status' => '-',
                     'created_at' => $user->created_at,
-                ]
+                ],
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create dermatologist',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -247,7 +259,9 @@ class DermatologistController extends Controller
      *     summary="Get dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *
      *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Dermatologist")),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
@@ -266,14 +280,14 @@ class DermatologistController extends Controller
                     'date_of_birth as dob',
                     'gender',
                     'is_active',
-                    'created_at'
+                    'created_at',
                 ])
                 ->first();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dermatologist not found'
+                    'message' => 'Dermatologist not found',
                 ], 404);
             }
 
@@ -286,7 +300,7 @@ class DermatologistController extends Controller
                     'years_of_experience',
                     'qualifications',
                     'bio',
-                    'consultation_fee'
+                    'consultation_fee',
                 ])->first();
 
             $dermatologist = $user;
@@ -296,13 +310,13 @@ class DermatologistController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Dermatologist retrieved successfully',
-                'data' => $dermatologist
+                'data' => $dermatologist,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve dermatologist',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -313,8 +327,11 @@ class DermatologistController extends Controller
      *     summary="Update dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *
      *     @OA\RequestBody(required=true, @OA\JsonContent(ref="#/components/schemas/DermatologistUpdateRequest")),
+     *
      *     @OA\Response(response=200, description="Updated", @OA\JsonContent(ref="#/components/schemas/Dermatologist")),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ValidationError")),
@@ -325,10 +342,10 @@ class DermatologistController extends Controller
     {
         try {
             $dermatologist = User::where('role', 'dermatologist')->where('id', $id)->first();
-            if (!$dermatologist) {
+            if (! $dermatologist) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dermatologist not found'
+                    'message' => 'Dermatologist not found',
                 ], 404);
             }
 
@@ -351,7 +368,7 @@ class DermatologistController extends Controller
                 'gender' => 'nullable|in:male,female,other',
                 'is_active' => 'sometimes|boolean',
                 // Professional fields
-                'license_number' => 'sometimes|nullable|string|max:255|unique:dermatologists,license_number,' . $dermatologistProfileId,
+                'license_number' => 'sometimes|nullable|string|max:255|unique:dermatologists,license_number,'.$dermatologistProfileId,
                 'specialization' => 'sometimes|nullable|string|max:255',
                 'years_of_experience' => 'sometimes|nullable|integer|min:0|max:50',
                 'qualifications' => 'sometimes|nullable|string',
@@ -363,8 +380,12 @@ class DermatologistController extends Controller
             $userData = [];
             $profileData = [];
 
-            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
-            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
+            if (isset($updateData['name'])) {
+                $userData['name'] = $updateData['name'];
+            }
+            if (isset($updateData['email'])) {
+                $userData['email'] = $updateData['email'];
+            }
             if (isset($updateData['phone_no'])) {
                 $userData['phone'] = $updateData['phone_no'] ?: null;
                 unset($updateData['phone_no']);
@@ -373,8 +394,12 @@ class DermatologistController extends Controller
                 $userData['date_of_birth'] = $updateData['dob'];
                 unset($updateData['dob']);
             }
-            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
-            if (isset($updateData['is_active'])) $userData['is_active'] = $updateData['is_active'];
+            if (isset($updateData['gender'])) {
+                $userData['gender'] = $updateData['gender'];
+            }
+            if (isset($updateData['is_active'])) {
+                $userData['is_active'] = $updateData['is_active'];
+            }
             if (array_key_exists('password', $updateData)) {
                 if ($updateData['password']) {
                     $userData['password'] = Hash::make($updateData['password']);
@@ -383,16 +408,16 @@ class DermatologistController extends Controller
             }
 
             // Profile fields - only update if values are provided and not empty
-            if (isset($updateData['license_number']) && !empty(trim($updateData['license_number']))) {
+            if (isset($updateData['license_number']) && ! empty(trim($updateData['license_number']))) {
                 $profileData['license_number'] = $updateData['license_number'];
             }
-            if (isset($updateData['specialization']) && !empty(trim($updateData['specialization']))) {
+            if (isset($updateData['specialization']) && ! empty(trim($updateData['specialization']))) {
                 $profileData['specialization'] = $updateData['specialization'];
             }
             if (isset($updateData['years_of_experience']) && $updateData['years_of_experience'] !== null) {
                 $profileData['years_of_experience'] = $updateData['years_of_experience'];
             }
-            if (isset($updateData['qualifications']) && !empty(trim($updateData['qualifications']))) {
+            if (isset($updateData['qualifications']) && ! empty(trim($updateData['qualifications']))) {
                 $profileData['qualifications'] = $updateData['qualifications'];
             }
             if (isset($updateData['consultation_fee']) && $updateData['consultation_fee'] !== null) {
@@ -403,12 +428,12 @@ class DermatologistController extends Controller
             }
 
             // Update user data
-            if (!empty($userData)) {
+            if (! empty($userData)) {
                 $dermatologist->update($userData);
             }
 
             // Update or create profile data
-            if (!empty($profileData)) {
+            if (! empty($profileData)) {
                 $profile = \App\Models\Dermatologist::where('user_id', $dermatologist->id)->first();
                 if ($profile) {
                     $profile->update($profileData);
@@ -431,13 +456,13 @@ class DermatologistController extends Controller
                     'is_active' => $dermatologist->is_active,
                     'subscription_status' => '-',
                     'created_at' => $dermatologist->created_at,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update dermatologist',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -448,7 +473,9 @@ class DermatologistController extends Controller
      *     summary="Delete dermatologist",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="string", example="1")),
+     *
      *     @OA\Response(response=200, description="Deleted", @OA\JsonContent(@OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Dermatologist deleted successfully"))),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ApiError")),
      *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ApiError"))
@@ -458,10 +485,10 @@ class DermatologistController extends Controller
     {
         try {
             $dermatologist = User::where('role', 'dermatologist')->where('id', $id)->first();
-            if (!$dermatologist) {
+            if (! $dermatologist) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Dermatologist not found'
+                    'message' => 'Dermatologist not found',
                 ], 404);
             }
 
@@ -469,13 +496,13 @@ class DermatologistController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Dermatologist deleted successfully'
+                'message' => 'Dermatologist deleted successfully',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete dermatologist',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -487,10 +514,13 @@ class DermatologistController extends Controller
      *     description="Get current authenticated dermatologist's profile information",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Dermatologist profile retrieved successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Profile retrieved successfully"),
      *             @OA\Property(
@@ -515,10 +545,13 @@ class DermatologistController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated")
      *         )
      *     )
@@ -532,7 +565,7 @@ class DermatologistController extends Controller
             if ($user->role !== 'dermatologist') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Access denied. Dermatologist role required.'
+                    'message' => 'Access denied. Dermatologist role required.',
                 ], 403);
             }
 
@@ -548,14 +581,14 @@ class DermatologistController extends Controller
                     'phone' => $user->phone,
                     'date_of_birth' => $user->date_of_birth,
                     'gender' => $user->gender,
-                    'dermatologistProfile' => $user->dermatologistProfile
-                ]
+                    'dermatologistProfile' => $user->dermatologistProfile,
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve profile',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -567,9 +600,12 @@ class DermatologistController extends Controller
      *     description="Update current authenticated dermatologist's profile information",
      *     tags={"Dermatologists"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="name", type="string", example="Dr. Jane Smith"),
      *             @OA\Property(property="email", type="string", format="email", example="dermatologist@example.com"),
      *             @OA\Property(property="phone", type="string", example="+1234567890"),
@@ -583,10 +619,13 @@ class DermatologistController extends Controller
      *             @OA\Property(property="bio", type="string", example="Experienced dermatologist specializing in hair loss treatment")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Profile updated successfully",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Profile updated successfully"),
      *             @OA\Property(
@@ -611,17 +650,23 @@ class DermatologistController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthenticated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Unauthenticated")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Validation error",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Validation errors"),
      *             @OA\Property(property="errors", type="object", example={"field": "The field is required."})
@@ -637,7 +682,7 @@ class DermatologistController extends Controller
             if ($user->role !== 'dermatologist') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Access denied. Dermatologist role required.'
+                    'message' => 'Access denied. Dermatologist role required.',
                 ], 403);
             }
 
@@ -658,7 +703,7 @@ class DermatologistController extends Controller
                 'date_of_birth' => 'nullable|date|before:today',
                 'gender' => 'nullable|in:male,female,other',
                 // Professional fields
-                'license_number' => 'sometimes|nullable|string|max:255|unique:dermatologists,license_number,' . $dermatologistProfileId,
+                'license_number' => 'sometimes|nullable|string|max:255|unique:dermatologists,license_number,'.$dermatologistProfileId,
                 'specialization' => 'sometimes|nullable|string|max:255',
                 'years_of_experience' => 'sometimes|nullable|integer|min:0|max:50',
                 'qualifications' => 'sometimes|nullable|string',
@@ -670,23 +715,33 @@ class DermatologistController extends Controller
             $userData = [];
             $profileData = [];
 
-            if (isset($updateData['name'])) $userData['name'] = $updateData['name'];
-            if (isset($updateData['email'])) $userData['email'] = $updateData['email'];
-            if (isset($updateData['phone'])) $userData['phone'] = $updateData['phone'];
-            if (isset($updateData['date_of_birth'])) $userData['date_of_birth'] = $updateData['date_of_birth'];
-            if (isset($updateData['gender'])) $userData['gender'] = $updateData['gender'];
+            if (isset($updateData['name'])) {
+                $userData['name'] = $updateData['name'];
+            }
+            if (isset($updateData['email'])) {
+                $userData['email'] = $updateData['email'];
+            }
+            if (isset($updateData['phone'])) {
+                $userData['phone'] = $updateData['phone'];
+            }
+            if (isset($updateData['date_of_birth'])) {
+                $userData['date_of_birth'] = $updateData['date_of_birth'];
+            }
+            if (isset($updateData['gender'])) {
+                $userData['gender'] = $updateData['gender'];
+            }
 
             // Profile fields - only update if values are provided and not empty
-            if (isset($updateData['license_number']) && !empty(trim($updateData['license_number']))) {
+            if (isset($updateData['license_number']) && ! empty(trim($updateData['license_number']))) {
                 $profileData['license_number'] = $updateData['license_number'];
             }
-            if (isset($updateData['specialization']) && !empty(trim($updateData['specialization']))) {
+            if (isset($updateData['specialization']) && ! empty(trim($updateData['specialization']))) {
                 $profileData['specialization'] = $updateData['specialization'];
             }
             if (isset($updateData['years_of_experience']) && $updateData['years_of_experience'] !== null) {
                 $profileData['years_of_experience'] = $updateData['years_of_experience'];
             }
-            if (isset($updateData['qualifications']) && !empty(trim($updateData['qualifications']))) {
+            if (isset($updateData['qualifications']) && ! empty(trim($updateData['qualifications']))) {
                 $profileData['qualifications'] = $updateData['qualifications'];
             }
             if (isset($updateData['consultation_fee']) && $updateData['consultation_fee'] !== null) {
@@ -697,12 +752,12 @@ class DermatologistController extends Controller
             }
 
             // Update user data
-            if (!empty($userData)) {
+            if (! empty($userData)) {
                 $user->update($userData);
             }
 
             // Update or create profile data
-            if (!empty($profileData)) {
+            if (! empty($profileData)) {
                 $profile = \App\Models\Dermatologist::where('user_id', $user->id)->first();
                 if ($profile) {
                     $profile->update($profileData);
@@ -725,14 +780,14 @@ class DermatologistController extends Controller
                     'phone' => $user->phone,
                     'date_of_birth' => $user->date_of_birth,
                     'gender' => $user->gender,
-                    'dermatologistProfile' => $user->dermatologistProfile
-                ]
+                    'dermatologistProfile' => $user->dermatologistProfile,
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update profile',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

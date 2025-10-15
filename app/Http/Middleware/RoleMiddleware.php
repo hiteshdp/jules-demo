@@ -1,5 +1,4 @@
 <?php
-// Generated via prompt: prompts/hair_skin_health_setup_v1.md
 
 namespace App\Http\Middleware;
 
@@ -13,23 +12,26 @@ class RoleMiddleware
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  string  ...$roles
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!$request->user()) {
+        if (! $request->user()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthenticated'
+                'message' => 'Unauthenticated.',
             ], 401);
         }
 
-        if ($request->user()->role !== $role) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized. Required role: ' . $role
-            ], 403);
+        foreach ($roles as $role) {
+            if ($request->user()->role === $role) {
+                return $next($request);
+            }
         }
 
-        return $next($request);
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized. You do not have the required role.',
+        ], 403);
     }
 }

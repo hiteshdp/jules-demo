@@ -1,10 +1,10 @@
 <?php
+
 // Generated via prompt: prompts/laravel_providers_fix_v1.md
 
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
