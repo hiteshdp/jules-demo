@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\Admin\AdminSubscriptionController;
 
 // Admin routes
 Route::prefix('admin')->group(function () {
+    Route::post('login', [AdminController::class, 'login']);
     Route::get('dashboard', [AdminController::class, 'getDashboard']);
 });
 
