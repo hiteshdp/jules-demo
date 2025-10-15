@@ -15,20 +15,26 @@ const Login = () => {
   const { isAuthenticated, loading, error } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
     if (error) {
       toast.error(error);
       dispatch(clearError());
     }
   }, [error, dispatch]);
 
-  const handleSubmit = async (values: { email: string }) => {
-    try {
-      await dispatch(login(values)).unwrap();
-      toast.success('Login successful');
-    } catch (error) {
-      // Error handling is done in the authSlice
-    }
-  };
+  // const handleSubmit = async (values: { email: string; password: string }) => {
+  //   try {
+  //     await dispatch(login(values)).unwrap();
+  //     toast.success('Login successful');
+  //   } catch (error) {
+  //     // Error handling is done in the authSlice
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F8F8' }}>
