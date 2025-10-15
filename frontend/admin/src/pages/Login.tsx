@@ -15,19 +15,13 @@ const Login = () => {
   const { isAuthenticated, loading, error } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
     if (error) {
       toast.error(error);
       dispatch(clearError());
     }
   }, [error, dispatch]);
 
-  const handleSubmit = async (values: { email: string; password: string }) => {
+  const handleSubmit = async (values: { email: string }) => {
     try {
       await dispatch(login(values)).unwrap();
       toast.success('Login successful');
@@ -81,7 +75,7 @@ const Login = () => {
           <Form
             form={form}
             name="login"
-            onFinish={handleSubmit}
+            // onFinish={handleSubmit}
             layout="vertical"
             size="large"
           >
