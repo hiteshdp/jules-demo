@@ -27,14 +27,14 @@ const Login = () => {
     }
   }, [error, dispatch]);
 
-  // const handleSubmit = async (values: { email: string; password: string }) => {
-  //   try {
-  //     await dispatch(login(values)).unwrap();
-  //     toast.success('Login successful');
-  //   } catch (error) {
-  //     // Error handling is done in the authSlice
-  //   }
-  // };
+  const handleSubmit = async (values: { email: string; password: string }) => {
+    try {
+      await dispatch(login(values)).unwrap();
+      toast.success('Login successful');
+    } catch (error) {
+      // Error handling is done in the authSlice
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8F8F8' }}>
@@ -81,7 +81,7 @@ const Login = () => {
           <Form
             form={form}
             name="login"
-            // onFinish={handleSubmit}
+            onFinish={handleSubmit}
             layout="vertical"
             size="large"
           >
