@@ -1,12 +1,12 @@
 // Generated via prompt: prompts/antd_admin_full_conversion_v1.md
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Card, 
-  Row, 
-  Col, 
-  Statistic, 
-  Typography, 
+import {
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Typography,
   Spin,
   Space,
   Alert
@@ -48,14 +48,10 @@ const Dashboard: React.FC = () => {
 
   const stats = data?.stats || {
     total_patients: 0,
-    total_dermatologists: 0,
-    total_appointments: 0,
     total_revenue: 0,
-    pending_appointments: 0,
     active_subscriptions: 0,
   };
-  
-  const monthlyAppointments = data?.monthly_appointments || [];
+
   const monthlyRevenue = data?.monthly_revenue || [];
 
   const statCards = [
@@ -66,28 +62,10 @@ const Dashboard: React.FC = () => {
       color: '#1890ff',
     },
     {
-      title: 'Total Dermatologists',
-      value: stats?.total_dermatologists || 0,
-      icon: <UserOutlined style={{ color: '#52c41a' }} />,
-      color: '#52c41a',
-    },
-    {
-      title: 'Total Appointments',
-      value: stats?.total_appointments || 0,
-      icon: <CalendarOutlined style={{ color: '#722ed1' }} />,
-      color: '#722ed1',
-    },
-    {
       title: 'Total Revenue',
       value: `₹${(stats?.total_revenue || 0).toLocaleString()}`,
       icon: <DollarOutlined style={{ color: '#faad14' }} />,
       color: '#faad14',
-    },
-    {
-      title: 'Pending Appointments',
-      value: stats?.pending_appointments || 0,
-      icon: <ClockCircleOutlined style={{ color: '#fa8c16' }} />,
-      color: '#fa8c16',
     },
     {
       title: 'Active Subscriptions',
@@ -99,11 +77,11 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '400px' 
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '400px'
       }}>
         <Spin size="large" />
       </div>
@@ -150,21 +128,6 @@ const Dashboard: React.FC = () => {
 
       {/* Charts */}
       <Row gutter={[16, 16]}>
-        <Col xs={24} lg={12}>
-          <Card title="Monthly Appointments">
-            <div style={{ height: 300 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyAppointments}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="count" stroke="#1890ff" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </Col>
 
         <Col xs={24} lg={12}>
           <Card title="Monthly Revenue">
@@ -187,7 +150,7 @@ const Dashboard: React.FC = () => {
       <Card title="Quick Actions">
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>
-            <Card 
+            <Card
               hoverable
               style={{ textAlign: 'center' }}
               onClick={() => navigate('/patients')}
@@ -200,36 +163,9 @@ const Dashboard: React.FC = () => {
             </Card>
           </Col>
 
-          <Col xs={24} sm={12} lg={6}>
-            <Card 
-              hoverable
-              style={{ textAlign: 'center' }}
-              onClick={() => navigate('/dermatologists')}
-            >
-              <UserOutlined style={{ fontSize: 32, color: '#52c41a', marginBottom: 16 }} />
-              <Title level={4}>Manage Dermatologists</Title>
-              <Text type="secondary">
-                Add and manage dermatologist accounts.
-              </Text>
-            </Card>
-          </Col>
 
           <Col xs={24} sm={12} lg={6}>
-            <Card 
-              hoverable
-              style={{ textAlign: 'center' }}
-              onClick={() => navigate('/appointments')}
-            >
-              <CalendarOutlined style={{ fontSize: 32, color: '#722ed1', marginBottom: 16 }} />
-              <Title level={4}>View Appointments</Title>
-              <Text type="secondary">
-                Monitor all appointments and consultations.
-              </Text>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={6}>
-            <Card 
+            <Card
               hoverable
               style={{ textAlign: 'center' }}
               onClick={() => navigate('/settings')}

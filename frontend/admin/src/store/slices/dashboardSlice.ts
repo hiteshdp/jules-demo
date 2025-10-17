@@ -3,10 +3,7 @@ import { dashboardAPI } from '../api/dashboardAPI';
 
 export interface DashboardStats {
     total_patients: number;
-    total_dermatologists: number;
-    total_appointments: number;
     total_revenue: number;
-    pending_appointments: number;
     active_subscriptions: number;
 }
 
@@ -18,7 +15,6 @@ export interface MonthlyTrend {
 
 export interface DashboardData {
     stats: DashboardStats;
-    monthly_appointments: MonthlyTrend[];
     monthly_revenue: MonthlyTrend[];
 }
 
