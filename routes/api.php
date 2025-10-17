@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\WebhookController;
 // use App\Http\Controllers\Api\PatientController;
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\Admin\AdminSubscriptionController;
+use App\Http\Controllers\Api\Admin\AdminDermatologistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -122,7 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('patients', PatientController::class);
 
         // Dermatologist management CRUD
-        Route::apiResource('dermatologists', DermatologistController::class);
+        Route::apiResource('dermatologists', AdminDermatologistController::class);
 
         // Product management CRUD
         Route::get('/products', [AdminController::class, 'getProducts']);

@@ -9,6 +9,7 @@ import Products from './pages/Products';
 import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import Subscriptions from './pages/subscriptions';
+import Dermatologists from './pages/Dermatologists';
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
             <Route index element={<Navigate to="/dashboard" />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="patients" element={<Patients />} />
+            <Route path="dermatologists" element={<Dermatologists />} />
             <Route path="products" element={<Products />} />
             <Route path="subscriptions" element={<Subscriptions />} />
             <Route path="settings" element={<Settings />} />

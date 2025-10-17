@@ -1,0 +1,11 @@
+
+> hair-skin-health-admin@1.0.0 start
+> vite
+
+Re-optimizing dependencies because lockfile has changed
+Port 3002 is in use, trying another one...
+
+  VITE v5.4.20  ready in 722 ms
+
+  ➜  Local:   http://localhost:3003/admin/
+  ➜  Network: use --host to expose

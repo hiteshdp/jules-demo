@@ -23,6 +23,8 @@ class Dermatologist extends Model
         'qualifications',
         'bio',
         'consultation_fee',
+        'clinic_name',
+        'status',
     ];
 
     /**
