@@ -271,7 +271,7 @@ class AdminController extends Controller
     {
         $query = Appointment::with([
             'patient',
-            'dermatologist.user',
+            'dermatologist',
             'chatMessages',
             'payments'
         ]);
@@ -312,7 +312,7 @@ class AdminController extends Controller
     {
         $appointment = Appointment::with([
             'patient.patientProfile',
-            'dermatologist.user',
+            'dermatologist',
             'chatMessages',
             'payments'
         ])->findOrFail($id);

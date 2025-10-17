@@ -16,13 +16,13 @@ const { Sider } = Layout;
 const { Title } = Typography;
 
 const navigation = [
-  { key: '/dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
-  { key: '/patients', label: 'Patients', icon: <TeamOutlined /> },
-  { key: '/dermatologists', label: 'Dermatologists', icon: <UserOutlined /> },
-  { key: '/appointments', label: 'Appointments', icon: <CalendarOutlined /> },
-  { key: '/products', label: 'Products', icon: <ShoppingOutlined /> },
-  { key: '/subscriptions', label: 'Subscriptions', icon: <DollarOutlined /> },
-  { key: '/settings', label: 'Settings', icon: <SettingOutlined /> },
+  { key: 'dashboard', label: 'Dashboard', icon: <DashboardOutlined /> },
+  { key: 'patients', label: 'Patients', icon: <TeamOutlined /> },
+  { key: 'dermatologists', label: 'Dermatologists', icon: <UserOutlined /> },
+  { key: 'appointments', label: 'Appointments', icon: <CalendarOutlined /> },
+  { key: 'products', label: 'Products', icon: <ShoppingOutlined /> },
+  { key: 'subscriptions', label: 'Subscriptions', icon: <DollarOutlined /> },
+  { key: 'settings', label: 'Settings', icon: <SettingOutlined /> },
 ];
 
 const Sidebar: React.FC = () => {
@@ -32,6 +32,9 @@ const Sidebar: React.FC = () => {
   const handleMenuClick = ({ key }: { key: string }) => {
     navigate(key);
   };
+
+  // Get the last part of the path to match the key
+  const selectedKey = location.pathname.split('/').pop() || 'dashboard';
 
   return (
     <Sider
@@ -52,7 +55,7 @@ const Sidebar: React.FC = () => {
       </div>
       <Menu
         mode="inline"
-        selectedKeys={[location.pathname]}
+        selectedKeys={[selectedKey]}
         items={navigation}
         onClick={handleMenuClick}
         style={{
