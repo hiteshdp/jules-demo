@@ -50,7 +50,7 @@ const Dermatologists: React.FC = () => {
             const { data } = await dermatologistAPI.getDermatologists({ page, search });
             if (data.success) {
                 setDermatologists(data.data);
-                setTotal(data.total);
+                setTotal(data.pagination.total);
             } else {
                 toast.error(data.message || 'Failed to fetch dermatologists');
             }

@@ -33,8 +33,15 @@ class AdminDermatologistController extends Controller
 
         $dermatologists = $query->paginate($perPage);
 
-        return DermatologistResource::collection($dermatologists)->additional([
+        return response()->json([
             'success' => true,
+            'data' => DermatologistResource::collection($dermatologists),
+            'pagination' => [
+                'total' => $dermatologists->total(),
+                'per_page' => $dermatologists->perPage(),
+                'current_page' => $dermatologists->currentPage(),
+                'last_page' => $dermatologists->lastPage(),
+            ],
         ]);
     }
 
@@ -88,10 +95,12 @@ class AdminDermatologistController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): DermatologistResource
+    public function show(string $id): JsonResponse
     {
         $dermatologist = User::where('role', 'dermatologist')->with('dermatologistProfile')->findOrFail($id);
-        return new DermatologistResource($dermatologist);
+        return (new DermatologistResource($dermatologist))
+            ->additional(['success' => true])
+            ->response();
     }
 
     /**
