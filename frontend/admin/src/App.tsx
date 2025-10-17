@@ -10,6 +10,7 @@ import Settings from './pages/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import Subscriptions from './pages/subscriptions';
 import Dermatologists from './pages/Dermatologists';
+import Appointments from './pages/Appointments';
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="patients" element={<Patients />} />
             <Route path="dermatologists" element={<Dermatologists />} />
+            <Route path="appointments" element={<Appointments />} />
             <Route path="products" element={<Products />} />
             <Route path="subscriptions" element={<Subscriptions />} />
             <Route path="settings" element={<Settings />} />

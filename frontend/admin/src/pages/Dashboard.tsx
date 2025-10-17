@@ -13,14 +13,11 @@ import {
 } from 'antd';
 import {
   TeamOutlined,
-  UserOutlined,
-  CalendarOutlined,
   DollarOutlined,
-  ClockCircleOutlined,
   CheckCircleOutlined,
   SettingOutlined
 } from '@ant-design/icons';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchDashboardData, clearError } from '../store/slices/dashboardSlice';

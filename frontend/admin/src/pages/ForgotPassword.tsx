@@ -76,6 +76,12 @@ const ForgotPassword: React.FC = () => {
       const email = searchParams.get('email');
       const token = searchParams.get('token');
       
+      if (!email || !token) {
+        message.error('Invalid password reset link. Please try again.');
+        setLoading(false);
+        return;
+      }
+
       // Add email and token to the request
       const requestData = {
         ...values,
