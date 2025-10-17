@@ -163,11 +163,16 @@ const Dermatologists: React.FC = () => {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            render: (status) => (
-                <Tag color={status === 'active' ? 'green' : 'red'}>
-                    {status.charAt(0).toUpperCase() + status.slice(1)}
-                </Tag>
-            ),
+            render: (status) => {
+                if (!status) {
+                    return <Tag>Unknown</Tag>;
+                }
+                return (
+                    <Tag color={status === 'active' ? 'green' : 'red'}>
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </Tag>
+                );
+            },
         },
         {
             title: 'Actions',

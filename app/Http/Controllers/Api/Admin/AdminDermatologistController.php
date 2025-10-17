@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\DermatologistResource;
 
 class AdminDermatologistController extends Controller
 {
@@ -32,13 +33,8 @@ class AdminDermatologistController extends Controller
 
         $dermatologists = $query->paginate($perPage);
 
-        return response()->json([
+        return DermatologistResource::collection($dermatologists)->additional([
             'success' => true,
-            'data' => $dermatologists->items(),
-            'current_page' => $dermatologists->currentPage(),
-            'last_page' => $dermatologists->lastPage(),
-            'per_page' => $dermatologists->perPage(),
-            'total' => $dermatologists->total(),
         ]);
     }
 
@@ -79,11 +75,10 @@ class AdminDermatologistController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Dermatologist created successfully.',
-                'data' => $user->load('dermatologistProfile'),
-            ], 201);
+            return (new DermatologistResource($user->load('dermatologistProfile')))
+                ->additional(['success' => true, 'message' => 'Dermatologist created successfully.'])
+                ->response()
+                ->setStatusCode(201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to create dermatologist.', 'error' => $e->getMessage()], 500);
@@ -93,10 +88,10 @@ class AdminDermatologistController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): JsonResponse
+    public function show(string $id): DermatologistResource
     {
         $dermatologist = User::where('role', 'dermatologist')->with('dermatologistProfile')->findOrFail($id);
-        return response()->json(['success' => true, 'data' => $dermatologist]);
+        return new DermatologistResource($dermatologist);
     }
 
     /**
@@ -142,11 +137,9 @@ class AdminDermatologistController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Dermatologist updated successfully.',
-                'data' => $user->load('dermatologistProfile'),
-            ]);
+            return (new DermatologistResource($user->load('dermatologistProfile')))
+                ->additional(['success' => true, 'message' => 'Dermatologist updated successfully.'])
+                ->response();
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to update dermatologist.', 'error' => $e->getMessage()], 500);

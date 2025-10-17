@@ -13,7 +13,6 @@ def run(playwright):
 
     # Wait for navigation to the dashboard
     page.wait_for_url("http://localhost:3002/admin/dashboard")
-    print(page.content())
 
     # Navigate to dermatologists page
     page.get_by_role("link", name="Dermatologists").click()
