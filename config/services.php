@@ -46,6 +46,30 @@ return [
 
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),
+        'chat_model' => env('OPENAI_CHAT_MODEL', 'gpt-4o-mini'),
+    ],
+
+    /*
+     * Groq (OpenAI-compatible API) – used by AI Orchestrator when OPENAI_BASE_URL points to Groq.
+     */
+    'groq' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'base_url' => env('OPENAI_BASE_URL', 'https://api.groq.com/openai/v1'),
+        'model' => env('OPENAI_MODEL', 'llama-3.1-70b-versatile'),
+        'max_tokens' => env('OPENAI_MAX_TOKENS', 8192),
+    ],
+
+    'github' => [
+        'token' => env('GITHUB_TOKEN'),
+        'owner' => env('GITHUB_REPO_OWNER'),
+        'repo' => env('GITHUB_REPO_NAME'),
+    ],
+
+    'claude' => [
+        'api_key' => env('CLAUDE_API_KEY'),
+        'api_url' => env('CLAUDE_API_URL', 'https://api.anthropic.com/v1/messages'),
+        'model' => env('CLAUDE_MODEL', 'claude-3-7-sonnet'),
+        'max_tokens' => env('CLAUDE_MAX_TOKENS', 8192),
     ],
 
     'mail' => [

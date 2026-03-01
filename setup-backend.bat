@@ -6,6 +6,9 @@ echo === Backend Setup Started ===
 echo ================================
 echo.
 
+REM Composer path (XAMPP 8.2)
+set COMPOSER_PHAR=C:\xampp82\composer.phar
+
 REM Check if we're in the project root directory
 if not exist "composer.json" (
     echo [ERROR] composer.json not found. Please run this script from the project root directory.
@@ -30,9 +33,9 @@ echo [DEBUG] PHP check completed, errorlevel=%errorlevel%
 
 REM --- COMPOSER CHECK ---
 echo [INFO] Checking Composer installation...
-call composer.bat --version >nul 2>&1
+php "%COMPOSER_PHAR%" --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Composer is not installed or not accessible. Please install from https://getcomposer.org/
+    echo [ERROR] Composer not found at %COMPOSER_PHAR%. Please install or update the path.
     pause
     exit /b 1
 ) else (
@@ -66,7 +69,7 @@ echo [SUCCESS] Laravel directories created
 
 REM --- INSTALL DEPENDENCIES ---
 echo [INFO] Installing PHP dependencies with Composer...
-call composer.bat install --no-interaction --prefer-dist --optimize-autoloader
+php "%COMPOSER_PHAR%" install --no-interaction --prefer-dist --optimize-autoloader
 if %errorlevel% neq 0 (
     echo [ERROR] Failed to install PHP dependencies
     pause
