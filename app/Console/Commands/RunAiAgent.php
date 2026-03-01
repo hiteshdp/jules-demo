@@ -65,9 +65,9 @@ class RunAiAgent extends Command
             $this->git->checkout($baseBranch);
             $this->git->checkoutNewBranch($branchName);
 
-            $filesContent = $this->buildCodeContext();
-            $issueText = "Title: {$issueTitle}\n\n{$issueBody}";
-            $prompt = $this->groq->buildPrompt($issueText, self::FILE_BLOCK_RULES, $filesContent);
+            $projectContext = $this->buildCodeContext();
+            $issueText = "### ISSUE DETAILS\n{$issueTitle}\n\n{$issueBody}";
+            $prompt = $this->groq->buildPrompt($issueText, self::FILE_BLOCK_RULES, $projectContext);
 
             $this->info('Calling Groq API to generate code...');
             $generatedCode = $this->groq->generateCode($prompt);
@@ -78,8 +78,21 @@ class RunAiAgent extends Command
                 return self::FAILURE;
             }
 
-            $this->groq->writeFileBlocks($blocks, base_path());
-            $this->info('Wrote ' . count($blocks) . ' file(s).');
+            $filtered = [];
+            foreach ($blocks as $path => $content) {
+                if (trim($content) === '') {
+                    $this->warn("Skipping blank file: {$path}");
+                    continue;
+                }
+                $filtered[$path] = $content;
+            }
+            if ($filtered === []) {
+                $this->warn('All FILE blocks were blank. Nothing to apply.');
+                return self::FAILURE;
+            }
+
+            $this->groq->writeFileBlocks($filtered, base_path());
+            $this->info('Wrote ' . count($filtered) . ' file(s).');
 
             if (! $this->git->hasChanges()) {
                 $this->warn('No git changes after writing files. Skipping commit/push.');
@@ -135,36 +148,25 @@ class RunAiAgent extends Command
 
     private function buildCodeContext(): string
     {
-        $base = base_path();
-        $lines = ['Laravel project structure (app/):'];
-        $appPath = $base . DIRECTORY_SEPARATOR . 'app';
-        if (is_dir($appPath)) {
-            $this->listDirRecursive($appPath, 'app', $lines, 2);
-        }
-        return implode("\n", $lines);
-    }
+        $files = [
+            'app/Http/Controllers/UserController.php',
+            'app/Models/User.php',
+            'app/Http/Requests/UserStoreRequest.php',
+            'app/Http/Requests/UserUpdateRequest.php',
+            'resources/views/users/index.blade.php',
+            'routes/web.php',
+        ];
 
-    private function listDirRecursive(string $dir, string $prefix, array &$lines, int $maxDepth, int $depth = 0): void
-    {
-        if ($depth >= $maxDepth) {
-            return;
-        }
-        $items = @scandir($dir);
-        if (! is_array($items)) {
-            return;
-        }
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-            $path = $dir . DIRECTORY_SEPARATOR . $item;
-            $rel = $prefix . '/' . $item;
-            if (is_dir($path)) {
-                $lines[] = $rel . '/';
-                $this->listDirRecursive($path, $rel, $lines, $maxDepth, $depth + 1);
-            } else {
-                $lines[] = $rel;
+        $output = "### PROJECT CONTEXT\n";
+
+        foreach ($files as $file) {
+            $path = base_path($file);
+            if (file_exists($path)) {
+                $content = file_get_contents($path);
+                $output .= "\nFILE: {$file}\n{$content}\n";
             }
         }
+
+        return $output;
     }
 }
