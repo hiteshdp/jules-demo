@@ -12,266 +12,6 @@
         }
     ],
     "paths": {
-        "/admin/subscriptions": {
-            "get": {
-                "tags": [
-                    "Admin Subscription Management"
-                ],
-                "summary": "Get all subscriptions with filters",
-                "description": "Get all subscriptions with filters",
-                "operationId": "4091644156e995ba104bd714f4c74884",
-                "parameters": [
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Filter by subscription status",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "active",
-                                "cancelled",
-                                "expired",
-                                "pending"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "payment_status",
-                        "in": "query",
-                        "description": "Filter by payment status",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "paid",
-                                "pending",
-                                "failed"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "patient_name",
-                        "in": "query",
-                        "description": "Filter by patient name"
-                    },
-                    {
-                        "name": "date_from",
-                        "in": "query",
-                        "description": "Filter from date (YYYY-MM-DD)"
-                    },
-                    {
-                        "name": "date_to",
-                        "in": "query",
-                        "description": "Filter to date (YYYY-MM-DD)"
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "description": "Items per page",
-                        "schema": {
-                            "type": "integer",
-                            "default": 15
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Subscriptions retrieved successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "subscriptions": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "object"
-                                                    }
-                                                },
-                                                "pagination": {
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/admin/subscriptions/{id}": {
-            "get": {
-                "tags": [
-                    "Admin Subscription Management"
-                ],
-                "summary": "Get subscription details",
-                "description": "Get subscription details",
-                "operationId": "db4af88eb3104ede0ee523f35b76a03d",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Subscription ID",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Subscription details retrieved successfully"
-                    },
-                    "404": {
-                        "description": "Subscription not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/admin/subscriptions/{id}/status": {
-            "put": {
-                "tags": [
-                    "Admin Subscription Management"
-                ],
-                "summary": "Update subscription status",
-                "description": "Update subscription status",
-                "operationId": "e598d32c5843a251c78dd24f9943f93e",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Subscription ID",
-                        "required": true
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "status"
-                                ],
-                                "properties": {
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "active",
-                                            "cancelled",
-                                            "expired",
-                                            "paused"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Subscription status updated successfully"
-                    },
-                    "404": {
-                        "description": "Subscription not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/admin/subscriptions/{id}/payment-status": {
-            "put": {
-                "tags": [
-                    "Admin Subscription Management"
-                ],
-                "summary": "Update payment status",
-                "description": "Update payment status",
-                "operationId": "5bc4c8247d44dfaba0b68ea9de34b904",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Subscription ID",
-                        "required": true
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "payment_status"
-                                ],
-                                "properties": {
-                                    "payment_status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "paid",
-                                            "pending",
-                                            "failed"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Payment status updated successfully"
-                    },
-                    "404": {
-                        "description": "Subscription not found"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/admin/subscriptions/statistics": {
-            "get": {
-                "tags": [
-                    "Admin Subscription Management"
-                ],
-                "summary": "Get subscription statistics",
-                "description": "Get subscription statistics",
-                "operationId": "2425406c21c68598da373e8bcfe874b5",
-                "responses": {
-                    "200": {
-                        "description": "Statistics retrieved successfully"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
         "/admin/dashboard": {
             "get": {
                 "tags": [
@@ -603,6 +343,144 @@
                 "security": [
                     {
                         "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/subscriptions": {
+            "get": {
+                "tags": [
+                    "Admin Subscription Management"
+                ],
+                "summary": "Get all subscriptions with filters",
+                "description": "Get all subscriptions with filters",
+                "operationId": "4091644156e995ba104bd714f4c74884",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by subscription status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "cancelled",
+                                "expired",
+                                "pending"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "patient_name",
+                        "in": "query",
+                        "description": "Filter by patient name"
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Filter from date (YYYY-MM-DD)"
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Filter to date (YYYY-MM-DD)"
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subscriptions retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "subscriptions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "pagination": {
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/subscriptions/{id}": {
+            "get": {
+                "tags": [
+                    "Admin Subscription Management"
+                ],
+                "summary": "Get subscription details",
+                "description": "Get subscription details",
+                "operationId": "db4af88eb3104ede0ee523f35b76a03d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Subscription ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subscription details retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Subscription not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/subscriptions/statistics": {
+            "get": {
+                "tags": [
+                    "Admin Subscription Management"
+                ],
+                "summary": "Get subscription statistics",
+                "description": "Get subscription statistics",
+                "operationId": "2425406c21c68598da373e8bcfe874b5",
+                "responses": {
+                    "200": {
+                        "description": "Statistics retrieved successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
                     }
                 ]
             }
@@ -2705,6 +2583,285 @@
                 ]
             }
         },
+        "/employees": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "List all employees",
+                "description": "Returns a paginated list of employees (10 per page).",
+                "operationId": "262e495aea36cc30f2910709f97d3b09",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Employee"
+                                            }
+                                        },
+                                        "first_page_url": {
+                                            "type": "string"
+                                        },
+                                        "from": {
+                                            "type": "integer",
+                                            "nullable": true
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page_url": {
+                                            "type": "string"
+                                        },
+                                        "links": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        },
+                                        "next_page_url": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "path": {
+                                            "type": "string"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "prev_page_url": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "to": {
+                                            "type": "integer",
+                                            "nullable": true
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Create employee",
+                "description": "Create a new employee. Validates: first_name/last_name (required, min 2), email (required, unique), phone (optional), department_id (optional, must exist in departments), status (optional boolean).",
+                "operationId": "bce48712ce5b354355a56b2176c33bf3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmployeeStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Employee created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/employees/{id}": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Get employee by ID",
+                "description": "Returns a single employee.",
+                "operationId": "58ffa5a0a610a6c7d232925185e9f026",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employee not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Update employee",
+                "description": "Update an existing employee. All fields are optional (partial update). Same validation rules as create for provided fields; email must be unique excluding current record.",
+                "operationId": "1f2530db195bd185ee665da72f5ac0ae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmployeeUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Employee updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Employee"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employee not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Delete employee",
+                "description": "Delete an employee by ID.",
+                "operationId": "fbb7aab5528665b328efd1d1542761c5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Employee deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employee deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employee not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employee not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/admin/patients": {
             "get": {
                 "tags": [
@@ -4497,6 +4654,123 @@
                 },
                 "type": "object"
             },
+            "Employee": {
+                "required": [
+                    "first_name",
+                    "last_name",
+                    "email"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "minLength": 2,
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "minLength": 2,
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john.doe@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+1234567890",
+                        "nullable": true
+                    },
+                    "department_id": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "EmployeeStoreRequest": {
+                "required": [
+                    "first_name",
+                    "last_name",
+                    "email"
+                ],
+                "properties": {
+                    "first_name": {
+                        "type": "string",
+                        "minLength": 2,
+                        "example": "John"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "minLength": 2,
+                        "example": "Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john.doe@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "department_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "EmployeeUpdateRequest": {
+                "properties": {
+                    "first_name": {
+                        "type": "string",
+                        "minLength": 2
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "minLength": 2
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "department_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
             "Patient": {
                 "properties": {
                     "id": {
@@ -4800,19 +5074,20 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "bearerFormat": "JWT",
-                "scheme": "bearer"
+                "description": "Enter token in format (Bearer <token>)",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     },
     "tags": [
         {
-            "name": "Admin Subscription Management",
-            "description": "Admin APIs for managing subscriptions"
-        },
-        {
             "name": "Admin",
             "description": "Admin panel endpoints"
+        },
+        {
+            "name": "Admin Subscription Management",
+            "description": "Admin APIs for managing subscriptions"
         },
         {
             "name": "Appointments",
@@ -4839,6 +5114,10 @@
             "description": "Dermatologist management endpoints (Admin)"
         },
         {
+            "name": "Employees",
+            "description": "Employee resource API"
+        },
+        {
             "name": "Patients",
             "description": "Patient management endpoints (Admin)"
         },
@@ -4857,11 +5136,6 @@
         {
             "name": "Admin Settings",
             "description": "Admin Settings"
-        }
-    ],
-    "security": [
-        {
-            "bearerAuth": []
         }
     ]
 }
