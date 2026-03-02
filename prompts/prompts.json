@@ -1,0 +1,16 @@
+[
+  {
+    "id": "ai_orchestrator_command",
+    "path": "prompts/ai_orchestrator_command_v1.md",
+    "used_in": [
+      "app/Console/Commands/RunAiAgent.php",
+      "app/Services/AiCodeGeneratorService.php",
+      "app/Services/GitService.php",
+      "app/Services/GitHubService.php"
+    ],
+    "author": "AI",
+    "date": "2025-03-01T00:00:00.000Z",
+    "user_prompt": "Create all required Laravel components for an AI Orchestrator Command (RunAiAgent, AiCodeGeneratorService, GitService, GitHubService) with GitHub issues, OpenAI, FILE blocks, commit/push, PR.",
+    "prompt_type": "user_request"
+  }
+]
