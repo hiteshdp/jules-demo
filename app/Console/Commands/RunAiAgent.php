@@ -26,10 +26,20 @@ class RunAiAgent extends Command
      */
     protected $description = 'Fetch an ai-task GitHub issue, generate code via Groq LLM, apply changes, push branch and open a PR';
 
-    private const FILE_BLOCK_RULES = 'Respond with one or more file blocks. For each file to create or update use this exact format:'
-        . "\n\nFILE: path/to/file.php\n<updated or new code here>\n\n"
-        . 'Use only FILE: and the path on the first line, then the full file contents (including <?php and all code). '
-        . 'No markdown code fences around the content. One FILE block per file.';
+    private const FILE_BLOCK_RULES = <<<'TXT'
+You MUST output one or more file blocks in the EXACT following format:
+
+FILE: path/to/file.php
+<full raw file content here with NO markdown formatting>
+
+STRICT RULES:
+- Never use ```php or any markdown code fences.
+- Never wrap code in backticks.
+- Never prepend language tags.
+- Only output raw code exactly as it will be written to disk.
+- Every file must start with "FILE:" on a new line.
+- Absolutely no extra text, comments, or formatting outside FILE blocks.
+TXT;
 
     public function __construct(
         private GitHubService $github,
@@ -68,10 +78,16 @@ class RunAiAgent extends Command
             $projectContext = $this->buildCodeContext();
             $issueText = "### ISSUE DETAILS\n{$issueTitle}\n\n{$issueBody}";
             $prompt = $this->groq->buildPrompt($issueText, self::FILE_BLOCK_RULES, $projectContext);
+            $prompt .= "\n\nIMPORTANT:\nDo NOT use markdown formatting.\nDo NOT use backticks.\nReturn raw code only.\nOutput must strictly follow the FILE: block format.";
 
             $this->info('Calling Groq API to generate code...');
             $generatedCode = $this->groq->generateCode($prompt);
 
+            $generatedCode = str_replace(
+                ['```php', '```html', '```json', '```txt', '```', '``'],
+                '',
+                $generatedCode
+            );
             $blocks = $this->groq->parseFileBlocks($generatedCode);
             if ($blocks === []) {
                 $this->warn('No FILE blocks in LLM response. Nothing to apply.');
