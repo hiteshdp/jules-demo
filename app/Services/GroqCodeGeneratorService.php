@@ -91,22 +91,42 @@ class GroqCodeGeneratorService
 
     /**
      * Parse LLM response into associative array path => content.
+     * Splits on "FILE:" so literal "FILE:" inside file content does not truncate.
      *
      * @return array<string, string>
      */
-    public function parseFileBlocks(string $llmResponse): array
+    public function parseFileBlocks(string $output): array
     {
         $blocks = [];
-        $pattern = '/FILE:\s*(.+?)\s*\n([\s\S]*?)(?=FILE:\s*|$)/m';
+        $output = str_replace(["\r\n", "\r"], "\n", $output);
 
-        if (preg_match_all($pattern, $llmResponse, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $m) {
-                $path = trim($m[1]);
-                $content = trim($m[2]);
-                if ($path !== '' && $content !== '') {
-                    $blocks[$path] = $content;
-                }
+        // Remove only null bytes and other problematic control chars; keep \n and \t
+        $output = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $output);
+
+        // Remove markdown code fences if any remain
+        $output = str_replace(['```php', '```html', '```json', '```txt', '```', '``'], '', $output);
+
+        // Split on "FILE:" (with optional leading newline) so "FILE:" inside file content does not truncate
+        $parts = preg_split('/(?<=\n|^)FILE:\s*/', $output);
+
+        foreach ($parts as $part) {
+            if (trim($part) === '') {
+                continue;
             }
+
+            $lines = explode("\n", $part);
+            $path = trim(array_shift($lines));
+            $content = trim(implode("\n", $lines));
+
+            if ($path === '' || $content === '') {
+                continue;
+            }
+
+            if (str_ends_with($path, '.php') && ! str_starts_with($content, '<?php')) {
+                $content = "<?php\n" . $content;
+            }
+
+            $blocks[$path] = $content;
         }
 
         return $blocks;

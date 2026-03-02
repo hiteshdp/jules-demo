@@ -27,18 +27,15 @@ class RunAiAgent extends Command
     protected $description = 'Fetch an ai-task GitHub issue, generate code via Groq LLM, apply changes, push branch and open a PR';
 
     private const FILE_BLOCK_RULES = <<<'TXT'
-You MUST output one or more file blocks in the EXACT following format:
+You MUST output one or more file blocks in the exact format:
 
 FILE: path/to/file.php
-<full raw file content here with NO markdown formatting>
+<raw code>
 
-STRICT RULES:
-- Never use ```php or any markdown code fences.
-- Never wrap code in backticks.
-- Never prepend language tags.
-- Only output raw code exactly as it will be written to disk.
-- Every file must start with "FILE:" on a new line.
-- Absolutely no extra text, comments, or formatting outside FILE blocks.
+NO backticks.
+NO markdown.
+NO ```php fences.
+NO extra formatting.
 TXT;
 
     public function __construct(
